@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Cleans up compiled stuff from our build
+
+set -eu
+cd $(dirname $0)/..
+echo "cleaning in $(pwd)"
+set -x
+
+# bin/ is eclipse default build dir
+rm -rf bin mybuild
