@@ -48,7 +48,7 @@ public class SemiSupervisedPOSTagger {
 	 */
 	private static final long serialVersionUID = 481162207516110632L;
 
-	private static Logger log = Logger.getLogger(SemiSupervisedPOSTagger.class.getCanonicalName());
+	public static Logger log = Logger.getLogger(SemiSupervisedPOSTagger.class.getCanonicalName());
 
 	public static Random baseRand = new Random(43569);
 	public static Random[] rands;
@@ -89,7 +89,7 @@ public class SemiSupervisedPOSTagger {
 	private String testSet;	
 	private String trainOrTest;	
 	private String modelFile;
-	private String runOutput;
+	private String runOutput = null;
 	private int numLabeledSentences;
 	private int numUnLabeledSentences;
 	private int maxSentenceLength;
@@ -177,8 +177,8 @@ public class SemiSupervisedPOSTagger {
 		parser = options.parser;
 		setVariousOptions();
 		createExecutionDirectory();
-	}
-
+	}	
+	
 	private void createExecutionDirectory() {
 		long timeStamp = new Date().getTime();
 		File dir = new File(execPoolDir + "/" + timeStamp);
@@ -415,6 +415,11 @@ public class SemiSupervisedPOSTagger {
 		}
 		modelFile = (String) parser.getOptionValue(options.modelFile);
 		runOutput = (String) parser.getOptionValue(options.runOutput);
+		if (runOutput != null && !runOutput.equals("null")) {
+			
+		} else {
+			runOutput = null;
+		}
 		if (!useOnlyUnlabeledData) {
 			numLabeledSentences = (Integer) parser.getOptionValue(options.numLabeledSentences);
 		}
@@ -602,7 +607,7 @@ public class SemiSupervisedPOSTagger {
 
 	private String[] getNames() {
 		System.out.println("Reading names file...");
-		String namesFile = "../lib/names";
+		String namesFile = "lib/names";
 		BufferedReader bReader = 
 			BasicFileIO.openFileToRead(namesFile);
 		String line = BasicFileIO.getLine(bReader);
@@ -621,7 +626,7 @@ public class SemiSupervisedPOSTagger {
 
 	private Map<String, double[]> readDistSim() {
 		System.out.println("Reading embeddings file...");
-		String distSimFile = "../lib/embeddings.txt";
+		String distSimFile = "lib/embeddings.txt";
 		BufferedReader bReader = 
 			BasicFileIO.openFileToRead(distSimFile);
 		String line = BasicFileIO.getLine(bReader);
@@ -731,7 +736,7 @@ public class SemiSupervisedPOSTagger {
 	}
 
 
-	private void initializeDataStructures() {
+	public void initializeDataStructures() {
 		featureIndexCounts = new ArrayList<Integer>();
 		indexToPOS = new ArrayList<String>();
 		indexToWord = new ArrayList<String>();
@@ -1791,9 +1796,9 @@ public class SemiSupervisedPOSTagger {
 			testFeatureHMM(sequences);
 		}			
 	}
-
-	public void testCRF(Collection<Pair<List<String>, List<String>>>  sequences) {
-		POSModel model = (POSModel) BasicFileIO.readSerializedObject(modelFile);
+	
+	public List<List<String>> testCRF(Collection<Pair<List<String>, List<String>>>  sequences,
+						POSModel model) {
 		featureIndexCounts = model.getFeatureIndexCounts();
 		featureToIndex = model.getFeatureToIndex();
 		indexToFeature = model.getIndexToFeature();
@@ -1809,8 +1814,8 @@ public class SemiSupervisedPOSTagger {
 				posToIndex);
 		lObservations = pairList.getFirst();
 		goldLabels = pairList.getSecond();
-		logObservationInfo();
-		logInputInfo();
+		// logObservationInfo();
+		// logInputInfo();
 		if (useStackedFeatures) {
 			Collection<Pair<List<String>, List<String>>> stackedSequences
 			= TabSeparatedFileReader.readPOSSeqences(stackedFile, 
@@ -1870,25 +1875,45 @@ public class SemiSupervisedPOSTagger {
 		Inference inf =  new Inference(numLabels, vertexExtractor, edgeExtractor);
 		double total = 0.0;
 		double correct = 0.0;
-
-		BufferedWriter bWriter = BasicFileIO.openFileToWrite(runOutput);
-		for (int i = 0; i < lObservations.length; i ++) {
-			List<Integer> tags = posteriorDecode(
-					lObservations[i], inf, largerSetOfWeights);
-			// List<Integer> tags = getViterbiLabelSequence(lObservations[i], inf, largerSetOfWeights);
-			for (int j = 0; j < goldLabels[i].length; j++) {
-				if(goldLabels[i][j] == tags.get(j)) {
-					correct++;
+		if (runOutput != null) {
+			BufferedWriter bWriter = BasicFileIO.openFileToWrite(runOutput);
+			for (int i = 0; i < lObservations.length; i ++) {
+				List<Integer> tags = posteriorDecode(
+						lObservations[i], inf, largerSetOfWeights);
+				// List<Integer> tags = getViterbiLabelSequence(lObservations[i], inf, largerSetOfWeights);
+				for (int j = 0; j < goldLabels[i].length; j++) {
+					if(goldLabels[i][j] == tags.get(j)) {
+						correct++;
+					}
+					total++;
+					BasicFileIO.writeLine(bWriter, 
+							indexToWord.get(lObservations[i][j]) + 
+							"\t" + indexToPOS.get(tags.get(j)));
 				}
-				total++;
-				BasicFileIO.writeLine(bWriter, 
-						indexToWord.get(lObservations[i][j]) + 
-						"\t" + indexToPOS.get(tags.get(j)));
+				BasicFileIO.writeLine(bWriter, "");
 			}
-			BasicFileIO.writeLine(bWriter, "");
+			log.info("Accuracy:" + (correct / total));
+			BasicFileIO.closeFileAlreadyWritten(bWriter);
+		} else {
+			ArrayList<List<String>> col = 
+				new ArrayList<List<String>>();
+			for (int i = 0; i < lObservations.length; i ++) {
+				List<Integer> tags = posteriorDecode(
+						lObservations[i], inf, largerSetOfWeights);
+				List<String> list = new ArrayList<String>();
+				for (int j = 0; j < goldLabels[i].length; j++) {
+					list.add(indexToPOS.get(tags.get(j)));
+				}
+				col.add(list);
+			}
+			return col;
 		}
-		log.info("Accuracy:" + (correct / total));
-		BasicFileIO.closeFileAlreadyWritten(bWriter);
+		return null;
+	}
+
+	public void testCRF(Collection<Pair<List<String>, List<String>>>  sequences) {
+		POSModel model = (POSModel) BasicFileIO.readSerializedObject(modelFile);
+		testCRF(sequences, model);
 	}
 
 	public List<Integer> posteriorDecode(int[] s, Inference inf, double[] w) {

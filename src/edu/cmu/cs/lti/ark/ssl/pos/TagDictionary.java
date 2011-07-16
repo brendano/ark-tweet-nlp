@@ -19,7 +19,7 @@ public class TagDictionary {
 	public static TagDictionary instance() {
 		if (_instance == null) {
 			_instance = new TagDictionary();
-			_instance.loadData("../lib/tagdict.txt");
+			_instance.loadData("lib/tagdict.txt");
 		}
 		return _instance;
 	}

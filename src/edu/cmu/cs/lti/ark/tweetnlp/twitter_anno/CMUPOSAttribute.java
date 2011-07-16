@@ -2,18 +2,22 @@ package edu.cmu.cs.lti.ark.tweetnlp.twitter_anno;
 
 import org.apache.lucene.util.Attribute;
 
-public class CMUPOSAttribute implements Attribute {
+public interface CMUPOSAttribute extends Attribute {
 
-    /** One-character tagname -- the official format as seen in the annotated training data.
-     * We could move to an enum but that would be more work to maintain.
+
+    /**
+     * One-character tagname -- the official format as seen in the annotated training data.
+     * We should move to an enum but that would be more work to maintain.
      */
-    public String tag;
+    String getTag();
 
-    /** The token (just a string) which this tag tags */
-    public String token;
+    /**
+     * The token (just a string) which this tag tags
+     */
+    String getToken();
 
-    public CMUPOSAttribute(String token, String tag) {
-        this.token = token;
-        this.tag = tag;
-    }
+    void setToken(String token);
+    void setTag(String tag);
+
+    Object clone();
 }

@@ -111,7 +111,10 @@ public class ProduceInterpolatedMultinomials {
 			}
 		}
 		
-		String[] sortedArray = Arrays.copyOf(validTagArray, validTagArray.length);
+		String[] sortedArray = new String[validTagArray.length];
+		for (int s = 0; s < validTagArray.length; s++) {
+			sortedArray[s] = new String(validTagArray[s]);
+		}
 		Arrays.sort(sortedArray);
 		System.out.println("Sorted array:");
 		for (String str: sortedArray) {

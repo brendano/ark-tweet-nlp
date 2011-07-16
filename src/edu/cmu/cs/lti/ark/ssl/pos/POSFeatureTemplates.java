@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.codec.language.Metaphone;
@@ -24,7 +25,7 @@ import fig.basic.Pair;
  */
 public class POSFeatureTemplates {
 
-	private static Logger log = Logger.getLogger(POSFeatureTemplates.class.getCanonicalName());
+	public static Logger log = Logger.getLogger(POSFeatureTemplates.class.getCanonicalName());
 
 	public interface EmitFeatureTemplate {
 

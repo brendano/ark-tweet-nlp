@@ -29,42 +29,30 @@ public class RunPOSTagger {
 		public static String output = null;
 		
 		@Option(gloss="conll = one token per line, blank lines separating tweets.")
-		public static String output_format = "conll";
+		public static String format = "conll";
 	}
 
+	private static TweetTaggerInstance ttInstance = null;
+	
 	/** Returns list of tags, one per token, parallel to the input tokens. */
-	public static List<String> doPOSTagging(List<String> toks, SemiSupervisedPOSTagger tagger) {
-		// TODO please replace this
-		return dummyTagging(toks);
+	public static List<String> doPOSTagging(List<String> toks) {
+		return tweetTagging(toks);
 	}
-	public static List<String> dummyTagging(List<String> toks) {
-		ArrayList<String> tags = new ArrayList();
-		for (String tok : toks) tags.add("N");
-		return tags;
+	
+	public static List<String> tweetTagging(List<String> toks) {
+		return TweetTaggerInstance.getInstance().getTagsForOneSentence(toks);
 	}
+		
 	public static void main(String[] args) throws Exception {
 		
 		OptionsParser op = new OptionsParser(Opts.class);
 		op.doParse(args);
-//		System.out.println("OPTIONS:\n" + op.doGetOptionPairs());
+        if (Opts.input == null) {
+            op.printHelp();
+            return;
+        }
 		if (Opts.input.equals("-")) throw new RuntimeException("stdin unimplemented");
-		
-		
-		System.out.println("Loading POS tagger.");
-		// TODO dipanjan please help :)
-		// If you keep it, be aware in its current state it doesn't seem to work, it needs more tweaking.
-		// Right now it doesn't work anyways.
-		// One big thing is, --testSet is not a good way to go.  
-		// This code needs to be in control of feeding in sentences. 
-		// This string-arg list is a horrible hack, feel free to get rid of.
-		String[] posOptionArgs = new String[]{
-				"--trainOrTest","test"
-				// ... more ...
-		};
-		POSOptions posOptions = new POSOptions(posOptionArgs);
-//		SemiSupervisedPOSTagger tagger = new SemiSupervisedPOSTagger(posOptions);
-		SemiSupervisedPOSTagger tagger = null;
-		
+
 		System.out.println("Tagging tweets from file: " + Opts.input);
 		
 		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(Opts.input), "UTF-8"));
@@ -72,15 +60,16 @@ public class RunPOSTagger {
 		String line;
 		while((line = reader.readLine()) != null) {
 			List<String> toks = Twokenize.tokenizeForTagger_J(line);
-			List<String> tags = doPOSTagging(toks, tagger);
-			
-			if (Opts.output_format.equals("conll")) {
+			List<String> tags = doPOSTagging(toks);
+			if (Opts.format.equals("conll")) {
 				for (int i=0; i < toks.size(); i++) {
 					writer.write(toks.get(i) + "\t" + tags.get(i) + "\n");
 				}
 				writer.write("\n");
 				writer.flush();
-			}
+			} else {
+                throw new RuntimeException("Unknown output format " + Opts.format);
+            }
 		}
 	}
 }

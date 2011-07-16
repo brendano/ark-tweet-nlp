@@ -1,6 +1,7 @@
 package edu.cmu.cs.lti.ark.tweetnlp.twitter_anno;
 
 import com.twitter.common.text.token.TokenStream;
+import edu.cmu.cs.lti.ark.tweetnlp.TweetTaggerInstance;
 import edu.cmu.cs.lti.ark.tweetnlp.Twokenize;
 import org.apache.lucene.util.Attribute;
 
@@ -23,7 +24,7 @@ public class CMUPOSTagger extends TokenStream {
     private int tokenIndex = -1;
 
     public CMUPOSTagger() {
-        addAttribute(CMUPOSAttribute.class);  // WTF does this do?
+        this.posAttr = addAttribute(CMUPOSAttribute.class);  // WTF does this do?
     }
 
     @Override
@@ -33,7 +34,10 @@ public class CMUPOSTagger extends TokenStream {
             return false;
         }
 
-        posAttr = new CMUPOSAttribute(tweetTokens.get(tokenIndex), tweetTags.get(tokenIndex));
+        posAttr.setTag(tweetTags.get(tokenIndex));
+        posAttr.setToken(tweetTokens.get(tokenIndex));
+
+        tokenIndex++;
 
         return true;
     }
@@ -41,10 +45,16 @@ public class CMUPOSTagger extends TokenStream {
     @Override
     public void reset(CharSequence input) {
         this.tweetTokens = Twokenize.tokenizeForTagger_J(input.toString());
-        this.tweetTags = dummyTagging(tweetTokens);
+        this.tweetTags = doTagging(tweetTokens);
+        this.tokenIndex = 0;
     }
 
-    public static List<String> dummyTagging(List<String> toks) {
+    private List<String> doTagging(List<String> toks) {
+        return TweetTaggerInstance.getInstance().getTagsForOneSentence(toks);
+//        return dummyTagging(toks);
+    }
+
+    private static List<String> dummyTagging(List<String> toks) {
         ArrayList<String> tags = new ArrayList<String>();
         for (String tok : toks) tags.add("N");
         return tags;
@@ -56,7 +66,7 @@ public class CMUPOSTagger extends TokenStream {
         stream.reset("This is what I want to tag.");
         while (stream.incrementToken()) {
             CMUPOSAttribute posAttribute = stream.getAttribute(CMUPOSAttribute.class);
-            System.out.printf("token= %s | POS= %s\n", posAttribute.token, posAttribute.tag);
+            System.out.printf("token= %s \t| POS= %s\n", posAttribute.getToken(), posAttribute.getTag());
         }
     }
 }

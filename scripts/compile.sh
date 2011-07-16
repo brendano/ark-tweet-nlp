@@ -16,7 +16,7 @@ mkdir -p mybuild
 
 scripts/compile_scala.sh
 
-javac -cp mybuild:$(echo lib/*.jar|tr ' ' :) -d mybuild src/**/*.java
+javac -cp mybuild:$(echo {lib,lib_twitter}/*.jar | tr ' ' :) -d mybuild  src/**/*.java
 
 set +x
 echo "All the .class files now in $(pwd)/mybuild"

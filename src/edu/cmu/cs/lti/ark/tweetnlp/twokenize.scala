@@ -53,6 +53,12 @@ import scala.collection.JavaConversions._
    June 2011
 */
 
+/**
+ * TODO
+ *  - byte offsets should be added here. can easily re-align
+ *  since the only munged characters are whitespace (hopefully)
+ */
+
 import scala.util.matching.Regex
 import collection.JavaConversions._
 

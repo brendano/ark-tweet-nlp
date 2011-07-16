@@ -4,13 +4,17 @@
 
 set -eu
 root=$(dirname $0)/..
-cp=$root/bin                 # Eclipse
-cp=$cp:$(print $root/out/production/*/ | tr ' ' :)   # IDEA
-cp=$cp:$root/mybuild         # Our own build dir
+
+cp=""
+# Eclipse and IDEA defaults
+cp=$cp:$root/bin
+cp=$cp:$(print $root/out/production/*/ | tr ' ' :)
+# our build dir
+cp=$cp:$root/mybuild
 
 cp=$cp:$(print $root/lib/*.jar | tr ' ' :)
+# Twitter Commons text library stuff
 cp=$cp:$(print $root/lib_twitter/*.jar | tr ' ' :)
 
-# set -x
 exec java -cp "$cp" "$@"
 

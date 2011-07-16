@@ -34,7 +34,7 @@ public class MyTokenizerUsageExample {
 //    TokenStream stream = tokenizer.getDefaultTokenStream();
 // BTO: above turns out to be a TokenizedCharSequenceStream
 
-      TokenStream stream = new CMUPOSTagger();
+    TokenStream stream = new CMUPOSTagger();
 
     // We're going to ask the token stream what type of attributes it makes available. "Attributes"
     // can be understood as "annotations" on the original text.
@@ -56,13 +56,18 @@ public class MyTokenizerUsageExample {
       // Now we're going to consume tokens from the stream.
       int tokenCnt = 0;
       while (stream.incrementToken()) {
+          // TODO these all don't work
+
+
         // CharSequenceTermAttribute holds the actual token text. This is preferred over
         // TermAttribute because it avoids creating new String objects.
+
         CharSequenceTermAttribute termAttribute = stream
             .getAttribute(CharSequenceTermAttribute.class);
 
         // OffsetAttribute holds indexes into the original String that the current token occupies.
         // The startOffset is character position is inclusive, the endOffset is exclusive.
+
         OffsetAttribute offsetAttribute = stream.getAttribute(OffsetAttribute.class);
 
         // TokenTypeAttribute holds, as you'd expect, the type of the token.

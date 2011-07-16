@@ -1,0 +1,26 @@
+CMU ARK Twitter Part-of-Speech Tagger
+http://www.ark.cs.cmu.edu/TweetNLP/
+
+Licensed under Apache 2.0 (see LICENSE file).
+
+Requires Java 6.  To run the tagger:
+
+    ./runTagger.sh -input example_tweets.txt -output tagged_tweets.txt
+
+To build from source:
+  scripts/compile.sh
+
+To train and evalute the tagger, see:
+  src/edu/cmu/cs/lti/ark/ssl/pos/SemiSupervisedPOSTagger.java
+
+Directories
+-----------
+ * runTagger.sh  is the script you probably want
+ * lib/          has runtime dependencies
+ * lib_build/    has buildtime dependency
+ * lib_twitter/  has the twitter-text and annotations API
+ * scripts/      helps you build and run
+ * src/          has the actual source code (mostly java, and one bit of scala)
+
+The lib_twitter stuff is optional; if you want to use it, you may wish to
+update to a newer version of the library.
