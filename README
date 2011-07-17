@@ -1,7 +1,6 @@
 CMU ARK Twitter Part-of-Speech Tagger
 http://www.ark.cs.cmu.edu/TweetNLP/
-
-Licensed under Apache 2.0 (see LICENSE file).
+===================================
 
 Requires Java 6.  To run the tagger:
 
@@ -24,3 +23,19 @@ Directories
 
 The lib_twitter stuff is optional; if you want to use it, you may wish to
 update to a newer version of the library.
+
+Information
+-----------
+This tagger is described in the following paper.  Please cite it if you write a
+research paper using this software.
+
+  Part-of-Speech Tagging for Twitter: Annotation, Features, and Experiments
+    Kevin Gimpel, Nathan Schneider, Brendan O'Connor, Dipanjan Das, Daniel
+    Mills, Jacob Eisenstein, Michael Heilman, Dani Yogatama, Jeffrey Flanigan,
+    and Noah A. Smith
+  In Proceedings of the Annual Meeting of the Association for Computational
+    Linguistics, companion volume, Portland, OR, June 2011.
+  http://www.ark.cs.cmu.edu/TweetNLP/gimpel+etal.acl11.pdf
+
+The software is licensed under Apache 2.0 (see LICENSE file).
+
