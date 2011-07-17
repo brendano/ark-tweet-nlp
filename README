@@ -14,14 +14,15 @@ To train and evalute the tagger, see:
 Directories
 -----------
  * runTagger.sh  is the script you probably want
- * lib/          has runtime dependencies
+ * lib/          has runtime dependencies and trained model
  * lib_build/    has buildtime dependency
- * lib_twitter/  has the twitter-text and annotations API
+ * lib_twitter/  has Twitter's text commons annotations API
  * scripts/      helps you build and run
  * src/          has the actual source code (mostly java, and one bit of scala)
 
 The lib_twitter stuff is optional; if you want to use it, you may wish to
-update to a newer version of the library.
+update to a newer version of the library.  A demo can be invoked as:
+  scripts/classwrap.sh -Xmx1g edu.cmu.cs.lti.ark.tweetnlp.twitter_anno.CMUPOSTagger
 
 Information
 -----------

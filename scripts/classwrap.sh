@@ -8,7 +8,7 @@ root=$(dirname $0)/..
 cp=""
 # Eclipse and IDEA defaults
 cp=$cp:$root/bin
-cp=$cp:$(print $root/out/production/*/ | tr ' ' :)
+cp=$cp:$root/out/production/ark-tweet-nlp
 # our build dir
 cp=$cp:$root/mybuild
 
