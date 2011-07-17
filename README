@@ -1,6 +1,5 @@
 CMU ARK Twitter Part-of-Speech Tagger
 http://www.ark.cs.cmu.edu/TweetNLP/
-===================================
 
 Requires Java 6.  To run the tagger:
 
