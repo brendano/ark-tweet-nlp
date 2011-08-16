@@ -1,18 +1,20 @@
-CMU ARK Twitter Part-of-Speech Tagger
+CMU ARK Twitter Part-of-Speech Tagger v0.2
 http://www.ark.cs.cmu.edu/TweetNLP/
 
 Requires Java 6.  To run the tagger:
 
     ./runTagger.sh -input example_tweets.txt -output tagged_tweets.txt
 
+The output should match tagged_tweets_expected.txt.
+ 
 To build from source:
   scripts/compile.sh
 
 To train and evalute the tagger, see:
   src/edu/cmu/cs/lti/ark/ssl/pos/SemiSupervisedPOSTagger.java
 
-Directories
------------
+Contents
+--------
  * runTagger.sh  is the script you probably want
  * lib/          has runtime dependencies and trained model
  * lib_build/    has buildtime dependency
@@ -37,4 +39,22 @@ research paper using this software.
   http://www.ark.cs.cmu.edu/TweetNLP/gimpel+etal.acl11.pdf
 
 The software is licensed under Apache 2.0 (see LICENSE file).
+
+Version 0.2 of the tagger differs from version 0.1 in the following ways:
+
+* The tokenizer has been improved and integrated with the tagger in a single Java program. 
+
+* The new tokenizer was run on the 1,827 tweets used for the annotation effort and the 
+annotations were adapted for tweets with differing tokenizations. The revised annotations 
+are contained in a companion v0.2 release of the data (twpos-data-v0.2).
+
+* The tagging model is trained on ALL of the available annotated data in twpos-data-v0.2. 
+The model in v0.1 was only trained on the training set.
+
+* The tokenizer/tagger is integrated with Twitter's text commons annotations API.
+
+Contact
+-------
+Please contact Brendan O'Connor (brenocon@cmu.edu) and Kevin Gimpel (kgimpel@cs.cmu.edu) 
+if you encounter any problems.
 
