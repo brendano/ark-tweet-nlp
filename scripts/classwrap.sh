@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 
 # Set up classpath and invoke 'java' with it
 
@@ -12,9 +12,9 @@ cp=$cp:$root/out/production/ark-tweet-nlp
 # our build dir
 cp=$cp:$root/mybuild
 
-cp=$cp:$(print $root/lib/*.jar | tr ' ' :)
+cp=$cp:$(echo $root/lib/*.jar | tr ' ' :)
 # Twitter Commons text library stuff
-cp=$cp:$(print $root/lib_twitter/*.jar | tr ' ' :)
+cp=$cp:$(echo $root/lib_twitter/*.jar | tr ' ' :)
 
 exec java -cp "$cp" "$@"
 
