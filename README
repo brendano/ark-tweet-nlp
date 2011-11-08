@@ -1,13 +1,20 @@
 CMU ARK Twitter Part-of-Speech Tagger v0.2
 http://www.ark.cs.cmu.edu/TweetNLP/
 
+Basic usage
+-----------
+
 Requires Java 6.  To run the tagger:
 
     ./runTagger.sh -input example_tweets.txt -output tagged_tweets.txt
 
 The output should match tagged_tweets_expected.txt.
  
-To build from source:
+Advanced usage
+--------------
+
+We include a pre-compiled .jar of the tagger so you hopefully don't need to
+compile it.  But if you need to recompile, do:
   scripts/compile.sh
 
 To train and evalute the tagger, see:
