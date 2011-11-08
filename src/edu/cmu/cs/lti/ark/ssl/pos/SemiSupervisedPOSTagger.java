@@ -1806,6 +1806,13 @@ public class SemiSupervisedPOSTagger {
 		posToIndex = model.getPosToIndex();
 
 		int numLabels = indexToPOS.size();
+		/*
+		 * clearing these two data structures during inference
+		 * because new words were creating memory explosion
+		 * dipanjan 11/08/2011
+		 */
+		indexToWord.clear();
+		wordToIndex.clear();
 		Pair<int[][], int[][]> pairList = POSUtil.getObservationsAndGoldLabels(
 				sequences, 
 				indexToWord, 
