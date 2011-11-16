@@ -72,20 +72,10 @@ object Twokenize {
   val entity     = """&(amp|lt|gt|quot);"""
 
   //  URLs
+  // The "web-only" version of Gruber's URL regex: http://daringfireball.net/2010/07/improved_regex_for_matching_urls
+  // For twitter, we probably can ignore non-web UR[IL]s.
+  val url        = """\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"""
 
-  // David: I give the Larry David eye to this whole URL regex
-  // (http://www.youtube.com/watch?v=2SmoBvg-etU) There are
-  // TODO potentially better options, see:
-  //   http://daringfireball.net/2010/07/improved_regex_for_matching_urls
-  //   http://mathiasbynens.be/demo/url-regex
-
-  val urlStart1  = """(https?://|www\.)"""
-  val commonTLDs = """(com|co\.uk|org|net|info|ca|ly|mp|edu|gov)"""
-  val urlStart2  = """[A-Za-z0-9\.-]+?\.""" + commonTLDs + """(?=[/ \W])"""
-  val urlBody    = """[^ \t\r\n<>]*?"""
-  val urlExtraCrapBeforeEnd = "("+punctChars+"|"+entity+")+?"
-  val urlEnd     = """(\.\.+|[<>]|\s|$)"""
-  val url        = """\b("""+urlStart1+"|"+urlStart2+")"+urlBody+"(?=("+urlExtraCrapBeforeEnd+")?"+urlEnd+")"
 
   // Numeric
   val timeLike   = """\d+:\d+"""
