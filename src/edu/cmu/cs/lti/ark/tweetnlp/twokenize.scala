@@ -288,6 +288,12 @@ object Twokenize {
     tokenizeForTagger(text).toSeq
   }
 
+  // Convenience method to produce a string representation of the 
+  // tokenized tweet in a standard-ish format.
+  def tokenizeToString (text: String): String = {
+  	tokenizeForTagger(text).mkString(" ");
+  }
+
   // Main method
   def main (args: Array[String]) = {
     // force stdin/stdout interpretation as UTF-8
