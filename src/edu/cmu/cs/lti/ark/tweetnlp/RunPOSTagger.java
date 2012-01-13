@@ -58,7 +58,17 @@ public class RunPOSTagger {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(Opts.input), "UTF-8"));
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(Opts.output), "UTF-8"));
 		String line;
+
+		int renewEvery=10000;
+		int lineNumber=0;
+		
 		while((line = reader.readLine()) != null) {
+
+			// Re-read tagger every n lines to keep memory in check.
+			if (++lineNumber % renewEvery == 0) {
+				TweetTaggerInstance.getInstance().renew();
+			}
+			
 			List<String> toks = Twokenize.tokenizeForTagger_J(line);
 			List<String> tags = doPOSTagging(toks);
 			if (Opts.format.equals("conll")) {
