@@ -25,7 +25,7 @@ public class TweetTaggerInstance {
         }
 		return ttInstance;
 	}
-	
+
 	private TweetTaggerInstance() {
 		List<String> argList = new ArrayList<String>();
 		argList.add("--trainOrTest");
@@ -66,6 +66,10 @@ public class TweetTaggerInstance {
         POSFeatureTemplates.log.setLevel(Level.WARNING);
         SemiSupervisedPOSTagger.log.setLevel(Level.WARNING);
 	}	
+	
+	public void renew() {
+	    model = (POSModel) BasicFileIO.readSerializedObject("lib/tweetpos.model");
+	}
 	
 	public List<String> getTagsForOneSentence(List<String> words) {
         // BTO: i don't get this, does tagger.testCRF need a dummy list or something? can we delete?
