@@ -18,6 +18,7 @@ compile it.  But if you need to recompile, do:
   scripts/compile.sh
 
 To train and evalute the tagger, see:
+  scripts/train.sh and scripts/test.sh
   src/edu/cmu/cs/lti/ark/ssl/pos/SemiSupervisedPOSTagger.java
 
 Contents
