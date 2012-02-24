@@ -15,23 +15,17 @@ Advanced usage
 
 We include a pre-compiled .jar of the tagger so you hopefully don't need to
 compile it.  But if you need to recompile, do:
-  scripts/compile.sh
+  mvn install
 
 To train and evalute the tagger, see:
-  src/edu/cmu/cs/lti/ark/ssl/pos/SemiSupervisedPOSTagger.java
+  ark-tweet-nlp/src/main/java/edu/cmu/cs/lti/ark/ssl/pos/SemiSupervisedPOSTagger.java
 
 Contents
 --------
  * runTagger.sh  is the script you probably want
- * lib/          has runtime dependencies and trained model
- * lib_build/    has buildtime dependency
- * lib_twitter/  has Twitter's text commons annotations API
- * scripts/      helps you build and run
+ * lib/          dependencies
+ * ark-tweet-nlp the project code itself
  * src/          has the actual source code (mostly java, and one bit of scala)
-
-The lib_twitter stuff is optional; if you want to use it, you may wish to
-update to a newer version of the library.  A demo can be invoked as:
-  scripts/classwrap.sh -Xmx1g edu.cmu.cs.lti.ark.tweetnlp.twitter_anno.CMUPOSTagger
 
 Information
 -----------

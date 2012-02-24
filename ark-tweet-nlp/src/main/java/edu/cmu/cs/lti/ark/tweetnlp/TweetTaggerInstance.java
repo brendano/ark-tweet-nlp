@@ -1,7 +1,6 @@
 package edu.cmu.cs.lti.ark.tweetnlp;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -19,13 +18,19 @@ public class TweetTaggerInstance {
 
     private static TweetTaggerInstance ttInstance;
 
+    static final POSModel NOAHS_MODEL;
 	public static TweetTaggerInstance getInstance() {
         if (ttInstance == null) {
             ttInstance = new TweetTaggerInstance();
         }
 		return ttInstance;
 	}
-	
+    static {
+        NOAHS_MODEL = (POSModel) BasicFileIO.readSerializedObject(
+                TweetTaggerInstance.class.getResourceAsStream("tweetpos.model"));
+
+    }
+
 	private TweetTaggerInstance() {
 		List<String> argList = new ArrayList<String>();
 		argList.add("--trainOrTest");
@@ -58,15 +63,15 @@ public class TweetTaggerInstance {
 	    String[] args = new String[argList.size()];
 	    argList.toArray(args);
 	    POSOptions options = new POSOptions(args);
-		options.parseArgs(args);		
+		options.parseArgs(args);
 	    tagger = new SemiSupervisedPOSTagger(options);
-	    model = (POSModel) BasicFileIO.readSerializedObject("lib/tweetpos.model");
+        model = NOAHS_MODEL; // FIXME(alexander) clone
 	    tagger.initializeDataStructures();
 
         POSFeatureTemplates.log.setLevel(Level.WARNING);
         SemiSupervisedPOSTagger.log.setLevel(Level.WARNING);
-	}	
-	
+	}
+
 	public List<String> getTagsForOneSentence(List<String> words) {
         // BTO: i don't get this, does tagger.testCRF need a dummy list or something? can we delete?
         ArrayList<String> dTags = new ArrayList<String>();
@@ -74,7 +79,7 @@ public class TweetTaggerInstance {
             dTags.add("N");
         }
 
-		List<Pair<List<String>, List<String>>> col = 
+		List<Pair<List<String>, List<String>>> col =
 			new ArrayList<Pair<List<String>, List<String>>>();
 		col.add(new Pair<List<String>, List<String>>(words, dTags));
 		List<List<String>> col1 = tagger.testCRF(col, model);

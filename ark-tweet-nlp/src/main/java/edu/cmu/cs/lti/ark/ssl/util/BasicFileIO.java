@@ -1,26 +1,9 @@
 package edu.cmu.cs.lti.ark.ssl.util;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.util.List;
+import java.io.*;
+import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-import java.util.logging.Logger;
 
 public class BasicFileIO {
 
@@ -73,7 +56,7 @@ public class BasicFileIO {
 			log.severe("Could not close file.");
 			System.exit(-1);
 		}
-	}	
+	}
 
 	public static void closeFileAlreadyWritten(BufferedWriter bWriter) {
 		try {
@@ -83,7 +66,7 @@ public class BasicFileIO {
 			log.severe("Could not close file.");
 			System.exit(-1);
 		}
-	}	
+	}
 
 	public static String getLine(BufferedReader bReader) {
 		try {
@@ -118,18 +101,25 @@ public class BasicFileIO {
 			finally{
 				output.close();
 			}
-		}  
+		}
 		catch(IOException ex){
 			log.severe("Cannot perform output.");
 			ex.printStackTrace();
 			System.exit(-1);
 		}
 	}
+    public static Object readSerializedObject(String file) {
+        try {
+            return readSerializedObject(new FileInputStream(file));
+        } catch (FileNotFoundException e) {
+            log.severe("Cannot perform input.");
+            throw new RuntimeException(e);
+        }
+    }
 
-	public static Object readSerializedObject(String file) {
+	public static Object readSerializedObject(InputStream iFile) {
 		Object object = null;
 		try{
-			InputStream iFile = new FileInputStream(file);
 			InputStream buffer = new BufferedInputStream(iFile);
 			ObjectInput input = new ObjectInputStream(buffer);
 			try{
@@ -141,11 +131,11 @@ public class BasicFileIO {
 		}
 		catch (ClassNotFoundException e) {
 			log.severe("Cannot perform input.");
-			System.exit(-1);
+            throw new RuntimeException(e);
 		}
 		catch(IOException ex){
 			log.severe("Cannot perform input.");
-			System.exit(-1);
+            throw new RuntimeException(ex);
 		}
 		return object;
 	}

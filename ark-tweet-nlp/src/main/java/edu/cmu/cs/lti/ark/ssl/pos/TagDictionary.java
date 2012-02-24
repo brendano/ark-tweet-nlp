@@ -5,54 +5,47 @@ import java.util.logging.Logger;
 
 import org.apache.commons.codec.language.Metaphone;
 
-import fig.basic.Pair;
-
 public class TagDictionary {
-	public HashMap<String, ArrayList> word2poses;
-//	public HashMap<String, ArrayList> metaphone2poses;
-	
-	public TagDictionary() {
-//		metaphone2poses = new HashMap();
-		word2poses = new HashMap();
-	}
-	private static TagDictionary _instance = null;
+	public final static Map<String, List<String>> WORD_TO_POS;
+    static {
+        WORD_TO_POS = loadData();
+    }
+    //FIXME(alexander) get rid of this
 	public static TagDictionary instance() {
-		if (_instance == null) {
-			_instance = new TagDictionary();
-			_instance.loadData("lib/tagdict.txt");
-		}
-		return _instance;
+        return new TagDictionary();
 	}
 	private static Logger log = Logger.getLogger(POSFeatureTemplates.class.getCanonicalName());
 
-	public void loadData(String tabFilePath) {
-		log.info("loading POS tag dictionary...");
+	static Map<String, List<String>> loadData() {
+//		log.info("loading POS tag dictionary...");
 		Metaphone _metaphone = new Metaphone();
 		_metaphone.setMaxCodeLen(100);
-
-		try {
-			BufferedReader in = new BufferedReader(new FileReader(tabFilePath));
+        HashMap<String, List<String>> wordToPos  =
+                new HashMap<String, List<String>>();
+			BufferedReader in = new BufferedReader(
+                   new InputStreamReader(
+                           TagDictionary.class.getResourceAsStream("tagdict.txt")));
 			String line;
-			while((line = in.readLine()) != null) {			    
-			    String[] parts = line.trim().split("\t");
-			    if (parts.length != 2) {
-			    	System.out.println(parts.length);
-			    	System.out.println("wtf " + line.trim() + " | " + parts.length);
-			    	continue;
-			    }
-			    String word = parts[0];
-			    String poses = parts[1].trim();
-			    ArrayList<String> arr = new ArrayList(); //new String[poses.length()];
-			    for (int i=0; i < poses.length(); i++) {
-			    	arr.add(poses.substring(i,i+1));
-			    }
-			    	
-			    word2poses.put(word, arr);			    	
-		    }
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        try {
+            while((line = in.readLine()) != null) {
+                String[] parts = line.trim().split("\t");
+                if (parts.length != 2) {
+                    System.out.println(parts.length);
+                    System.out.println("wtf " + line.trim() + " | " + parts.length);
+                    continue;
+                }
+                String word = parts[0];
+                String poses = parts[1].trim();
+                ArrayList<String> arr = new ArrayList(); //new String[poses.length()];
+                for (int i=0; i < poses.length(); i++) {
+                    arr.add(poses.substring(i,i+1));
+                }
+                wordToPos.put(word, Collections.unmodifiableList(arr));
+}
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return Collections.unmodifiableMap(wordToPos);
 	}
 	public static void main(String args[]) {
 		instance();

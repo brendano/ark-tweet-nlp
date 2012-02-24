@@ -1,24 +1,9 @@
 package edu.cmu.cs.lti.ark.ssl.pos;
 
-import jargs.gnu.CmdLineParser;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.*;
 import java.util.logging.Logger;
-import java.util.Date;
 
 import edu.berkeley.nlp.math.DifferentiableFunction;
 import edu.berkeley.nlp.util.CallbackFunction;
@@ -28,23 +13,20 @@ import edu.berkeley.nlp.util.PriorityQueue;
 import edu.cmu.cs.lti.ark.ssl.pos.POSFeatureTemplates.EmitFeatureTemplate;
 import edu.cmu.cs.lti.ark.ssl.pos.POSFeatureTemplates.InterpolationFeatureTemplate;
 import edu.cmu.cs.lti.ark.ssl.pos.POSFeatureTemplates.TransFeatureTemplate;
-import edu.cmu.cs.lti.ark.ssl.util.AverageMultinomials;
-import edu.cmu.cs.lti.ark.ssl.util.BasicFileIO;
-import edu.cmu.cs.lti.ark.ssl.util.ComputeTransitionMultinomials;
-import edu.cmu.cs.lti.ark.ssl.util.LBFGSOptimizer;
-import edu.cmu.cs.lti.ark.ssl.util.ProjectAlignedTags;
-import fig.basic.Pair;
 import edu.cmu.cs.lti.ark.ssl.pos.crf.CRFObjectiveFunction;
 import edu.cmu.cs.lti.ark.ssl.pos.crf.Inference;
+import edu.cmu.cs.lti.ark.ssl.util.*;
+import fig.basic.Pair;
+import jargs.gnu.CmdLineParser;
 
 /**
- * 
+ *
  * @author dipanjan
  * TODO: implement stacking for CRF
  */
 public class SemiSupervisedPOSTagger {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 481162207516110632L;
 
@@ -52,15 +34,20 @@ public class SemiSupervisedPOSTagger {
 
 	public static Random baseRand = new Random(43569);
 	public static Random[] rands;
+    private final static String[] NAMES;
+    private static final Map<String, double[]> DIST_SIM;
+
 
 	static {
 		rands = new Random[10];
 		for (int i=0; i<10; ++i) {
 			rands[i] = new Random(baseRand.nextInt());
 		}
+        NAMES = initNames();
+        DIST_SIM = initDistSim();
 	}
 
-	private POSOptions options;	
+	private POSOptions options;
 	private CmdLineParser parser;
 
 	/**
@@ -86,8 +73,8 @@ public class SemiSupervisedPOSTagger {
 	private String trainSet;
 	private String unlabeledSet;
 	private boolean useUnlabeledData;
-	private String testSet;	
-	private String trainOrTest;	
+	private String testSet;
+	private String trainOrTest;
 	private String modelFile;
 	private String runOutput = null;
 	private int numLabeledSentences;
@@ -116,20 +103,20 @@ public class SemiSupervisedPOSTagger {
 	private boolean useSameSetOfFeatures;
 	private boolean startWithTrainedSupervisedModel;
 	private String trainedSupervisedModelFile;
-	private POSModel trainedSupervisedModel;	
+	private POSModel trainedSupervisedModel;
 	private double gamma;
 	private boolean useOnlyUnlabeledData;
 	private String regParametersModelFile;
 	private POSModel regParametersModel;
-	private boolean useTagDictionary;	
-	private String tagDictionaryFile;	
-	private String clusterToTagMappingFile;	
+	private boolean useTagDictionary;
+	private String tagDictionaryFile;
+	private String clusterToTagMappingFile;
 	private int[][] tagsToClusters;
 	private int[][] tagDictionary;
 	private boolean trainHMMDiscriminatively;
 	private boolean useStackedFeatures;
 	private String stackedFile;
-	private int[][] stackedTags;	
+	private int[][] stackedTags;
 	private int numTags = 0;
 	private String noahsFeaturesFile = null;
 	private Map<String, String> noahsFeatures;
@@ -165,9 +152,9 @@ public class SemiSupervisedPOSTagger {
 	private int[][] uObservations;
 
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 		POSOptions options = new POSOptions(args);
-		options.parseArgs(args);		
+		options.parseArgs(args);
 		SemiSupervisedPOSTagger tagger = new SemiSupervisedPOSTagger(options);
 		tagger.run();
 	}
@@ -177,8 +164,8 @@ public class SemiSupervisedPOSTagger {
 		parser = options.parser;
 		setVariousOptions();
 		createExecutionDirectory();
-	}	
-	
+	}
+
 	private void createExecutionDirectory() {
 		long timeStamp = new Date().getTime();
 		File dir = new File(execPoolDir + "/" + timeStamp);
@@ -188,21 +175,21 @@ public class SemiSupervisedPOSTagger {
 		dir.mkdir();
 		execPoolDir = dir.getAbsolutePath();
 		log.info("Execution directory: " + execPoolDir);
-	}	
+	}
 
-	public boolean deleteDir(File dir) { 
-		if (dir.isDirectory()) { 
-			String[] children = dir.list(); 
-			for (int i=0; i<children.length; i++) { 
-				boolean success = deleteDir(new File(dir, children[i])); 
-				if (!success) { 
-					return false; 
-				} 
-			} 
-		} 
-		// The directory is now empty so delete it 
-		return dir.delete(); 
-	} 
+	public boolean deleteDir(File dir) {
+		if (dir.isDirectory()) {
+			String[] children = dir.list();
+			for (int i=0; i<children.length; i++) {
+				boolean success = deleteDir(new File(dir, children[i]));
+				if (!success) {
+					return false;
+				}
+			}
+		}
+		// The directory is now empty so delete it
+		return dir.delete();
+	}
 
 	private void getHelperTransitionsTagDict(String[] paths) {
 		System.out.println("Paths to transition matrices:");
@@ -212,7 +199,7 @@ public class SemiSupervisedPOSTagger {
 		Set<String> vTags = AverageMultinomials.getValidTags(fineToCoarseMapFile);
 		if (vTags.size() != indexToPOS.size()) {
 			System.out.println("Problem. Valid tag array size:" + vTags.size() + " indexToPOS size:" + indexToPOS.size());
-		}		
+		}
 		ArrayList<String> validTagList = new ArrayList<String>();
 		for (int i = 0; i < indexToPOS.size(); i++) {
 			validTagList.add(indexToPOS.get(i));
@@ -224,7 +211,7 @@ public class SemiSupervisedPOSTagger {
 		System.out.println("Valid tags from dictionary:");
 		for (String tag: validTagArray) {
 			System.out.println(tag);
-		}		
+		}
 		String[] coarseTagArray = ComputeTransitionMultinomials.COARSE_TAGS;
 		Arrays.sort(coarseTagArray);
 		if (validTagArray.length - 2 != this.numTags) {
@@ -233,7 +220,7 @@ public class SemiSupervisedPOSTagger {
 		System.out.println("Number of helper languages:" + numHelperLanguages);
 		transitionMatrices = new double[numHelperLanguages][validTagArray.length][validTagArray.length];
 		for (int i = 0; i < numHelperLanguages; i++) {
-			double[][] gold = 
+			double[][] gold =
 				AverageMultinomials.readGoldMultinomials(paths[i], coarseTagArray.length, "language" + i);
 				for (int j = 0; j < validTagArray.length; j++) {
 				double sum = 0.0;
@@ -251,7 +238,7 @@ public class SemiSupervisedPOSTagger {
 				}
 			}
 		}
-	}	
+	}
 
 	private void readTagDictionary() {
 		BufferedReader bReader = BasicFileIO.openFileToRead(tagDictionaryFile);
@@ -359,15 +346,15 @@ public class SemiSupervisedPOSTagger {
 		trainOrTest = (String) parser.getOptionValue(options.trainOrTest);
 		if (trainOrTest.equals("train")) {
 			trainSet = (String) parser.getOptionValue(options.trainSet);
-			useUnlabeledData = parser.getOptionValue(options.useUnlabeledData) 
+			useUnlabeledData = parser.getOptionValue(options.useUnlabeledData)
 			== null ? false : true;
 			if (useUnlabeledData) {
-				unlabeledSet = 
+				unlabeledSet =
 					(String) parser.getOptionValue(options.unlabeledSet);
 				numUnLabeledSentences =
 					(Integer) parser.getOptionValue(options.numUnLabeledSentences);
 				useSameSetOfFeatures = parser.getOptionValue(options.useSameSetOfFeatures)
-				== null ? false : true;				
+				== null ? false : true;
 				if (useSameSetOfFeatures) {
 					startWithTrainedSupervisedModel = parser.getOptionValue(options.startWithTrainedSupervisedModel)
 					== null ? false : true;
@@ -376,13 +363,13 @@ public class SemiSupervisedPOSTagger {
 					}
 				}
 				gamma = (Double) parser.getOptionValue(options.gamma);
-				useTagDictionary = parser.getOptionValue(options.useTagDictionary) 
+				useTagDictionary = parser.getOptionValue(options.useTagDictionary)
 				== null ? false : true;
 				if (useTagDictionary) {
 					tagDictionaryFile = (String) parser.getOptionValue(options.tagDictionaryFile);
 				}
 			} else {
-				useOnlyUnlabeledData = parser.getOptionValue(options.useOnlyUnlabeledData) 
+				useOnlyUnlabeledData = parser.getOptionValue(options.useOnlyUnlabeledData)
 				== null ? false : true;
 				if (useOnlyUnlabeledData) {
 					regParametersModelFile = (String) parser.getOptionValue(options.regParametersModel);
@@ -392,11 +379,11 @@ public class SemiSupervisedPOSTagger {
 						regParametersModel = null;
 						numTags = (Integer) parser.getOptionValue(options.numTags);
 					}
-					unlabeledSet = 
+					unlabeledSet =
 						(String) parser.getOptionValue(options.unlabeledSet);
 					numUnLabeledSentences =
 						(Integer) parser.getOptionValue(options.numUnLabeledSentences);
-					useTagDictionary = parser.getOptionValue(options.useTagDictionary) 
+					useTagDictionary = parser.getOptionValue(options.useTagDictionary)
 					== null ? false : true;
 					if (useTagDictionary) {
 						tagDictionaryFile = (String) parser.getOptionValue(options.tagDictionaryFile);
@@ -405,18 +392,18 @@ public class SemiSupervisedPOSTagger {
 			}
 		} else {
 			testSet = (String) parser.getOptionValue(options.testSet);
-			useTagDictionary = parser.getOptionValue(options.useTagDictionary) 
+			useTagDictionary = parser.getOptionValue(options.useTagDictionary)
 			== null ? false : true;
 			if (useTagDictionary) {
 				tagDictionaryFile = (String) parser.getOptionValue(options.tagDictionaryFile);
 			}
-			printPosteriors =  parser.getOptionValue(options.printPosteriors) 
+			printPosteriors =  parser.getOptionValue(options.printPosteriors)
 			== null ? false : true;
 		}
 		modelFile = (String) parser.getOptionValue(options.modelFile);
 		runOutput = (String) parser.getOptionValue(options.runOutput);
 		if (runOutput != null && !runOutput.equals("null")) {
-			
+
 		} else {
 			runOutput = null;
 		}
@@ -429,7 +416,7 @@ public class SemiSupervisedPOSTagger {
 		parser.getOptionValue(options.iters);
 		printRate = (Integer)
 		parser.getOptionValue(options.printRate);
-		useStandardMultinomialMStep = 
+		useStandardMultinomialMStep =
 			parser.getOptionValue(options.useStandardMultinomialMStep)
 			== null ? false : true;
 		Double standardMStepCountSmoothing0 = (Double)
@@ -438,7 +425,7 @@ public class SemiSupervisedPOSTagger {
 			standardMStepCountSmoothing = 0.0;
 		} else {
 			standardMStepCountSmoothing = standardMStepCountSmoothing0;
-		}			
+		}
 		useGlobalForLabeledData = (Boolean)
 		parser.getOptionValue(options.useGlobalForLabeledData)
 		== null ? false : true;
@@ -451,7 +438,7 @@ public class SemiSupervisedPOSTagger {
 			initialWeightsUpper = 0.01;
 		} else {
 			initialWeightsUpper = initialWeightsUpper0;
-		}			
+		}
 		Double initialWeightsLower0 = (Double)
 		parser.getOptionValue(options.initialWeightsLower);
 		if (initialWeightsLower0 == null) {
@@ -504,7 +491,7 @@ public class SemiSupervisedPOSTagger {
 		== null ? false : true;
 		if (restartTraining) {
 			restartModelFile = (String) parser.getOptionValue(options.restartModelFile);
-		}		
+		}
 		useStackedFeatures = (Boolean)
 		parser.getOptionValue(options.useStackedFeatures) == null ? false : true;
 		if (useStackedFeatures) {
@@ -528,7 +515,7 @@ public class SemiSupervisedPOSTagger {
 		parser.getOptionValue(options.useDistSim)
 		== null ? false : true;
 		if (useDistSim) {
-			distSimTable = readDistSim();
+			distSimTable = DIST_SIM;
 		} else {
 			distSimTable = null;
 		}
@@ -536,7 +523,7 @@ public class SemiSupervisedPOSTagger {
 		parser.getOptionValue(options.useNames)
 		== null ? false : true;
 		if (useNames) {
-			namesArray = getNames();
+			namesArray = NAMES;
 		} else {
 			namesArray = null;
 		}
@@ -554,7 +541,7 @@ public class SemiSupervisedPOSTagger {
 				System.out.println("Using tag dictionary, hence not reading helper matrices now.");
 			}
 		}
-	}	
+	}
 
 	private void getHelperTransitions(String[] paths) {
 		System.out.println("Paths to transition matrices:");
@@ -564,7 +551,7 @@ public class SemiSupervisedPOSTagger {
 		Set<String> validTags = AverageMultinomials.getValidTags(fineToCoarseMapFile);
 		String[] temp = new String[validTags.size()];
 		validTags.toArray(temp);
-		Arrays.sort(temp);		
+		Arrays.sort(temp);
 		ArrayList<String> validTagList = new ArrayList<String>();
 		for (String str: temp) {
 			validTagList.add(str);
@@ -576,7 +563,7 @@ public class SemiSupervisedPOSTagger {
 		System.out.println("Valid tags:");
 		for (String tag: validTagArray) {
 			System.out.println(tag);
-		}		
+		}
 		String[] coarseTagArray = ComputeTransitionMultinomials.COARSE_TAGS;
 		Arrays.sort(coarseTagArray);
 		if (validTagArray.length - 2 != this.numTags) {
@@ -585,7 +572,7 @@ public class SemiSupervisedPOSTagger {
 		System.out.println("Number of helper languages:" + numHelperLanguages);
 		transitionMatrices = new double[numHelperLanguages][validTagArray.length][validTagArray.length];
 		for (int i = 0; i < numHelperLanguages; i++) {
-			double[][] gold = 
+			double[][] gold =
 				AverageMultinomials.readGoldMultinomials(paths[i], coarseTagArray.length, "language" + i);
 			for (int j = 0; j < validTagArray.length; j++) {
 				double sum = 0.0;
@@ -603,13 +590,13 @@ public class SemiSupervisedPOSTagger {
 				}
 			}
 		}
-	}	
-
-	private String[] getNames() {
-		System.out.println("Reading names file...");
-		String namesFile = "lib/names";
-		BufferedReader bReader = 
-			BasicFileIO.openFileToRead(namesFile);
+	}
+	private static String[] initNames() {
+		// System.out.println("Reading NAMES file...");
+		BufferedReader bReader =
+			new BufferedReader(new InputStreamReader(
+                    SemiSupervisedPOSTagger.class.getResourceAsStream("names"),
+                    Charset.forName("UTF-8")));
 		String line = BasicFileIO.getLine(bReader);
 		ArrayList<String> namesList = new ArrayList<String>();
 		while (line != null) {
@@ -621,20 +608,20 @@ public class SemiSupervisedPOSTagger {
 		String[] arr = new String[namesList.size()];
 		namesList.toArray(arr);
 		Arrays.sort(arr);
-		return arr;
+		return NAMES;
 	}
 
-	private Map<String, double[]> readDistSim() {
-		System.out.println("Reading embeddings file...");
-		String distSimFile = "lib/embeddings.txt";
-		BufferedReader bReader = 
-			BasicFileIO.openFileToRead(distSimFile);
+	private static Map<String, double[]> initDistSim() {
+		BufferedReader bReader =
+			new BufferedReader(new InputStreamReader(
+                    SemiSupervisedPOSTagger.class.getResourceAsStream("embeddings.txt"),
+                    Charset.forName("UTF-8")));
 		String line = BasicFileIO.getLine(bReader);
 		Map<String, double[]> map = new HashMap<String, double[]>();
 		while (line != null) {
 			String[] toks = line.trim().split("\t");
 			String word = toks[0];
-			ArrayList<String> dists = 
+			ArrayList<String> dists =
 				ProjectAlignedTags.getTokens(toks[1].trim());
 			double[] arr = new double[dists.size()];
 			for (int i = 0; i < dists.size(); i++) {
@@ -644,7 +631,7 @@ public class SemiSupervisedPOSTagger {
 			line = BasicFileIO.getLine(bReader);
 		}
 		BasicFileIO.closeFileAlreadyRead(bReader);
-		return map;
+		return Collections.unmodifiableMap(map);
 	}
 
 
@@ -710,7 +697,7 @@ public class SemiSupervisedPOSTagger {
 					biasFeatureRegularizationWeight);
 		}
 		log.info("Gold POS labels: " + indexToPOS.toString());
-		log.info("Initial random weights lower: " + 
+		log.info("Initial random weights lower: " +
 				initialWeightsLower);
 		log.info("Initial random weights upper: " +
 				initialWeightsUpper);
@@ -757,12 +744,12 @@ public class SemiSupervisedPOSTagger {
 	}
 
 	private void logObservationInfo() {
-		int[][] observations = null;		
+		int[][] observations = null;
 		if (!useOnlyUnlabeledData) {
 			observations = lObservations;
 		} else {
 			observations = uObservations;
-		}		
+		}
 		int numTokens = 0;
 		int maxSeqLength = 0;
 		for (int s=0; s < observations.length; ++s) {
@@ -786,8 +773,8 @@ public class SemiSupervisedPOSTagger {
 	}
 
 	public List<Pair<Integer,Double>>[][] getActiveCRFTransFeatures(
-			List<TransFeatureTemplate> templates, 
-			int numObservations, 
+			List<TransFeatureTemplate> templates,
+			int numObservations,
 			int numLabels) {
 		List<Pair<Integer,Double>>[][] activeFeatures = new List[numLabels][numLabels];
 		for (int s0=0; s0<numLabels; ++s0) {
@@ -796,8 +783,8 @@ public class SemiSupervisedPOSTagger {
 				for (TransFeatureTemplate template : templates) {
 					List<Pair<String, Double>> features = template.getFeatures(s0, s1);
 					for (Pair<String, Double> feature : features) {
-						int index = POSUtil.indexString(feature.getFirst(), 
-								indexToFeature, 
+						int index = POSUtil.indexString(feature.getFirst(),
+								indexToFeature,
 								featureToIndex);
 						activeFeatures[s0][s1].add(Pair.makePair(index, feature.getSecond()));
 					}
@@ -810,15 +797,15 @@ public class SemiSupervisedPOSTagger {
 	public Pair<Integer,Double>[][] getActiveInterpolationFeatures(
 			InterpolationFeatureTemplate template,
 			int numHelperLanguages,
-			int numLabels, 
-			int startLabel, 
+			int numLabels,
+			int startLabel,
 			int stopLabel) {
 		Pair<Integer,Double>[][] activeFeatures = new Pair[numHelperLanguages][numLabels];
 		for (int l = 0; l < numHelperLanguages; l++) {
 			for (int s0=0; s0<numLabels; ++s0) {
 				Pair<String, Double> feature = template.getFeature(l, s0);
-				int index = POSUtil.indexString(feature.getFirst(), 
-						indexToFeature, 
+				int index = POSUtil.indexString(feature.getFirst(),
+						indexToFeature,
 						featureToIndex);
 				if (index >= featureIndexCounts.size()) {
 					featureIndexCounts.add(1);
@@ -832,10 +819,10 @@ public class SemiSupervisedPOSTagger {
 	}
 
 	public List<Pair<Integer,Double>>[][] getActiveTransFeatures(
-			List<TransFeatureTemplate> templates, 
-			int numObservations, 
-			int numLabels, 
-			int startLabel, 
+			List<TransFeatureTemplate> templates,
+			int numObservations,
+			int numLabels,
+			int startLabel,
 			int stopLabel) {
 		List<Pair<Integer,Double>>[][] activeFeatures = new List[numLabels][numLabels];
 		for (int s0=0; s0<numLabels; ++s0) {
@@ -846,8 +833,8 @@ public class SemiSupervisedPOSTagger {
 						for (TransFeatureTemplate template : templates) {
 							List<Pair<String, Double>> features = template.getFeatures(s0, s1);
 							for (Pair<String, Double> feature : features) {
-								int index = POSUtil.indexString(feature.getFirst(), 
-										indexToFeature, 
+								int index = POSUtil.indexString(feature.getFirst(),
+										indexToFeature,
 										featureToIndex);
 								if (index >= featureIndexCounts.size()) {
 									featureIndexCounts.add(1);
@@ -865,8 +852,8 @@ public class SemiSupervisedPOSTagger {
 	}
 
 	public List<Pair<Integer,Double>>[][] getActiveCRFEmitFeatures(
-			List<EmitFeatureTemplate> templates, 
-			int numObservations, 
+			List<EmitFeatureTemplate> templates,
+			int numObservations,
 			int numLabels) {
 
 		List<Pair<Integer,Double>>[][] activeFeatures = new List[numLabels][numObservations];
@@ -877,7 +864,7 @@ public class SemiSupervisedPOSTagger {
 				for (EmitFeatureTemplate template : templates) {
 					List<Pair<String, Double>> features = template.getFeatures(s, indexToWord.get(i));
 					for (Pair<String, Double> feature : features) {
-						int index = POSUtil.indexString(feature.getFirst(), 
+						int index = POSUtil.indexString(feature.getFirst(),
 								indexToFeature, featureToIndex);
 						if (index >= featureIndexCounts.size()) {
 							featureIndexCounts.add(1);
@@ -902,7 +889,7 @@ public class SemiSupervisedPOSTagger {
 					for (EmitFeatureTemplate template : templates) {
 						List<Pair<String, Double>> features = template.getFeatures(s, indexToWord.get(i));
 						for (Pair<String, Double> feature : features) {
-							int index = POSUtil.indexString(feature.getFirst(), 
+							int index = POSUtil.indexString(feature.getFirst(),
 									indexToFeature, featureToIndex);
 							if (index >= featureIndexCounts.size()) {
 								featureIndexCounts.add(1);
@@ -921,10 +908,10 @@ public class SemiSupervisedPOSTagger {
 	public List<Pair<Integer, Double>>[][] getActiveStackedFeatures(int numObservations, int numLabels, int startLabel, int stopLabel) {
 		List<Pair<Integer,Double>>[][] activeFeatures = new List[numLabels][indexToPOS.size()];
 		POSFeatureTemplates templates1 = new POSFeatureTemplates();
-		EmitFeatureTemplate template = 
+		EmitFeatureTemplate template =
 			templates1.new StackedIndicatorFeature(useTagDictionary,
-					wordToIndex, 
-					tagDictionary, 
+					wordToIndex,
+					tagDictionary,
 					tagsToClusters);
 		for (int s=0; s<numLabels; ++s) {
 			if (s != startLabel && s != stopLabel) {
@@ -932,7 +919,7 @@ public class SemiSupervisedPOSTagger {
 					activeFeatures[s][i] = new ArrayList<Pair<Integer,Double>>();
 					List<Pair<String, Double>> features = template.getFeatures(s, indexToPOS.get(i));
 					for (Pair<String, Double> feature : features) {
-						int index = POSUtil.indexString(feature.getFirst(), 
+						int index = POSUtil.indexString(feature.getFirst(),
 								indexToFeature, featureToIndex);
 						if (index >= featureIndexCounts.size()) {
 							featureIndexCounts.add(1);
@@ -991,10 +978,10 @@ public class SemiSupervisedPOSTagger {
 	}
 
 	public double[] getSpecialRegularizationBiases(
-			List<TransFeatureTemplate> transFeatures, 
-			List<EmitFeatureTemplate> emitFeatures, 
-			int numLabels, 
-			int startLabel, 
+			List<TransFeatureTemplate> transFeatures,
+			List<EmitFeatureTemplate> emitFeatures,
+			int numLabels,
+			int startLabel,
 			int stopLabel) {
 		double[] regularizationBiases = new double[indexToFeature.size()];
 		for (int f = 0; f<indexToFeature.size(); ++f) {
@@ -1040,8 +1027,8 @@ public class SemiSupervisedPOSTagger {
 		if(!useOnlyUnlabeledData) {
 			log.info("Labeled training set:" + trainSet);
 			sequences =
-				TabSeparatedFileReader.readPOSSeqences(trainSet, 
-						numLabeledSentences, 
+				TabSeparatedFileReader.readPOSSeqences(trainSet,
+						numLabeledSentences,
 						maxSentenceLength);
 			if (useUnlabeledData) {
 				if (startWithTrainedSupervisedModel) {
@@ -1055,10 +1042,10 @@ public class SemiSupervisedPOSTagger {
 				}
 			}
 			Pair<int[][], int[][]> pairList = POSUtil.getObservationsAndGoldLabels(
-					sequences, 
-					indexToWord, 
-					wordToIndex, 
-					indexToPOS, 
+					sequences,
+					indexToWord,
+					wordToIndex,
+					indexToPOS,
 					posToIndex);
 			lObservations = pairList.getFirst();
 			goldLabels = pairList.getSecond();
@@ -1066,26 +1053,26 @@ public class SemiSupervisedPOSTagger {
 			 * account for unlabeled data
 			 */
 			if (useUnlabeledData) {
-				uSequences = 
-					UnlabeledSentencesReader.readSequences(unlabeledSet, 
-							this.numUnLabeledSentences, 
+				uSequences =
+					UnlabeledSentencesReader.readSequences(unlabeledSet,
+							this.numUnLabeledSentences,
 							this.maxSentenceLength);
-				uObservations = 
-					POSUtil.getObservationsFromUnlabeledSet(uSequences, 
-							indexToWord, 
+				uObservations =
+					POSUtil.getObservationsFromUnlabeledSet(uSequences,
+							indexToWord,
 							wordToIndex);
 			}
 			logObservationInfo();
 			logInputInfo();
 		} else { //fully unlabeled data
 			log.info("Totally unlabeled training set:" + unlabeledSet);
-			uSequences = 
-				UnlabeledSentencesReader.readSequences(unlabeledSet, 
-						this.numUnLabeledSentences, 
+			uSequences =
+				UnlabeledSentencesReader.readSequences(unlabeledSet,
+						this.numUnLabeledSentences,
 						this.maxSentenceLength);
-			uObservations = 
-				POSUtil.getObservationsFromUnlabeledSet(uSequences, 
-						indexToWord, 
+			uObservations =
+				POSUtil.getObservationsFromUnlabeledSet(uSequences,
+						indexToWord,
 						wordToIndex);
 			if (regParametersModel == null) {
 				if (numTags == 0) {
@@ -1095,7 +1082,7 @@ public class SemiSupervisedPOSTagger {
 					if (useTagDictionary) {
 						System.out.println("Reading tag dictionary...");
 						readTagDictionary();
-					} else {	
+					} else {
 						for (int i = 0; i < numTags; i++) {
 							indexToPOS.add("T"+i);
 							posToIndex.put("T"+i, i);
@@ -1104,11 +1091,11 @@ public class SemiSupervisedPOSTagger {
 				}
 			} else {
 				indexToPOS = regParametersModel.getIndexToPOS();
-				posToIndex = regParametersModel.getPosToIndex(); 
+				posToIndex = regParametersModel.getPosToIndex();
 			}
 			logObservationInfo();
 			logInputInfo();
-		}	
+		}
 
 		int numStackedSentences = 0;
 		if (useOnlyUnlabeledData) {
@@ -1119,14 +1106,14 @@ public class SemiSupervisedPOSTagger {
 
 		if (useStackedFeatures) {
 			Collection<Pair<List<String>, List<String>>> stackedSequences
-			= TabSeparatedFileReader.readPOSSeqences(stackedFile, 
-					numStackedSentences, 
-					maxSentenceLength);			
+			= TabSeparatedFileReader.readPOSSeqences(stackedFile,
+					numStackedSentences,
+					maxSentenceLength);
 			Pair<int[][], int[][]> pairList = POSUtil.getObservationsAndGoldLabels(
-					stackedSequences, 
-					indexToWord, 
-					wordToIndex, 
-					indexToPOS, 
+					stackedSequences,
+					indexToWord,
+					wordToIndex,
+					indexToPOS,
 					posToIndex);
 			stackedTags = pairList.getSecond();
 			for (int i = 0; i < stackedTags.length; i ++) {
@@ -1146,24 +1133,24 @@ public class SemiSupervisedPOSTagger {
 
 		// Get feature templates
 		List<TransFeatureTemplate> transFeatures = null;
-		InterpolationFeatureTemplate interpolationFeature = 
+		InterpolationFeatureTemplate interpolationFeature =
 			null;
 		if (!useInterpolation) {
-			transFeatures = 
+			transFeatures =
 				POSFeatureTemplates.getTransFeatures(useBiasFeature);
 		} else { // interpolation of existing multinomials
 			interpolationFeature =
 				POSFeatureTemplates.getInterpolationFeatures(numHelperLanguages);
 		}
-		List<EmitFeatureTemplate> emitFeatures = 
-			POSFeatureTemplates.getEmitFeatures(useStandardFeatures, 
+		List<EmitFeatureTemplate> emitFeatures =
+			POSFeatureTemplates.getEmitFeatures(useStandardFeatures,
 					lengthNGramSuffixFeature,
-					useTagDictionary, wordToIndex, 
+					useTagDictionary, wordToIndex,
 					tagDictionary,
 					tagsToClusters,
 					noahsFeatures,
 					distSimTable,
-					namesArray);	
+					namesArray);
 		FileWriter curveOut = null;
 		try {
 			curveOut = new FileWriter(execPoolDir + "/" + "curve");
@@ -1191,12 +1178,12 @@ public class SemiSupervisedPOSTagger {
 		} else if (!useUnlabeledData) { // a supervised model
 			if (!useGlobalForLabeledData) {
 				if (!trainHMMDiscriminatively)  {
-					trainSupervisedFeatureHMM(numLabels, 
+					trainSupervisedFeatureHMM(numLabels,
 							transFeatures,
 							emitFeatures,
 							curveOut);
 				} else {
-					trainSupervisedFeatureHMMDiscriminatively(numLabels, 
+					trainSupervisedFeatureHMMDiscriminatively(numLabels,
 							transFeatures,
 							emitFeatures,
 							curveOut);
@@ -1206,16 +1193,16 @@ public class SemiSupervisedPOSTagger {
 						transFeatures,
 						emitFeatures,
 						curveOut);
-			}		
+			}
 		} else { // a model with a discriminative as well as generative objective
-			trainSemiSupervisedModel(numLabels, 
-					transFeatures, 
-					emitFeatures, 
+			trainSemiSupervisedModel(numLabels,
+					transFeatures,
+					emitFeatures,
 					curveOut);
 		}
 	}
 
-	public void trainSemiSupervisedModel(int numLabels, 
+	public void trainSemiSupervisedModel(int numLabels,
 			List<TransFeatureTemplate> transFeatures,
 			List<EmitFeatureTemplate> emitFeatures,
 			FileWriter curveOut) {
@@ -1228,31 +1215,31 @@ public class SemiSupervisedPOSTagger {
 		 */
 		log.info("Caching features...");
 		log.info("Caching transition features...");
-		// these should ideally be the same as 
+		// these should ideally be the same as
 		// the CRF model, hence
-		// we need to cache these features only once 
-		activeTransFeatures = 
-			getActiveTransFeatures(transFeatures, 
-					indexToWord.size(), 
-					numLabels + 2, 
-					startLabel, 
+		// we need to cache these features only once
+		activeTransFeatures =
+			getActiveTransFeatures(transFeatures,
+					indexToWord.size(),
+					numLabels + 2,
+					startLabel,
 					stopLabel);
 		log.info("Caching emission features...");
-		activeEmitFeatures = 
-			getActiveEmitFeatures(emitFeatures, 
-					indexToWord.size(), 
-					numLabels + 2, 
-					startLabel, 
-					stopLabel);		
+		activeEmitFeatures =
+			getActiveEmitFeatures(emitFeatures,
+					indexToWord.size(),
+					numLabels + 2,
+					startLabel,
+					stopLabel);
 		if (useStackedFeatures) {
-			activeStackedFeatures = 
-				getActiveStackedFeatures(indexToWord.size(), 
-						numLabels + 2, 
-						startLabel, 
+			activeStackedFeatures =
+				getActiveStackedFeatures(indexToWord.size(),
+						numLabels + 2,
+						startLabel,
 						stopLabel);
 		}
 
-		VertexFeatureExtractor vertexExtractor = 
+		VertexFeatureExtractor vertexExtractor =
 			new VertexFeatureExtractor(activeEmitFeatures);
 		EdgeFeatureExtractor edgeExtractor =
 			new EdgeFeatureExtractor(activeTransFeatures);
@@ -1260,7 +1247,7 @@ public class SemiSupervisedPOSTagger {
 		double sigma = regularizationWeight;
 		regularizationWeight = 0.0;
 
-		SemiSupervisedCRFHMMModel grad = 
+		SemiSupervisedCRFHMMModel grad =
 			new SemiSupervisedCRFHMMModel(
 					lObservations,
 					goldLabels,
@@ -1268,27 +1255,27 @@ public class SemiSupervisedPOSTagger {
 					numLabels,
 					indexToWord.size(),
 					sigma,
-					vertexExtractor, 
+					vertexExtractor,
 					edgeExtractor,
 					indexToFeature.size(),
 					gamma,
 					printPosteriors);
-		GradientSequenceModel hmmModel = 
+		GradientSequenceModel hmmModel =
 			grad.getHMMModel();
 
-		double[] regularizationWeights = 
+		double[] regularizationWeights =
 			getRegularizationWeights(transFeatures, emitFeatures);
-		double[] regularizationBiases = 
-			getRegularizationBiases(transFeatures, 
-					emitFeatures, 
-					hmmModel.getNumLabels(), 
-					hmmModel.getStartLabel(), 
+		double[] regularizationBiases =
+			getRegularizationBiases(transFeatures,
+					emitFeatures,
+					hmmModel.getNumLabels(),
+					hmmModel.getStartLabel(),
 					hmmModel.getStopLabel());
-		hmmModel.setActiveFeatures(activeTransFeatures, 
-				activeEmitFeatures, 
+		hmmModel.setActiveFeatures(activeTransFeatures,
+				activeEmitFeatures,
 				activeStackedFeatures,
-				indexToFeature.size(), 
-				regularizationWeights, 
+				indexToFeature.size(),
+				regularizationWeights,
 				regularizationBiases);
 
 		double[] initialWeights = new double[indexToFeature.size()];
@@ -1298,14 +1285,14 @@ public class SemiSupervisedPOSTagger {
 			for (int i = 0; i < trainedWeights.length; i ++) {
 				initialWeights[i] = trainedWeights[i];
 			}
-		} else {			
+		} else {
 			for (int i = 0; i < initialWeights.length; i ++) {
 				initialWeights[i] = 0.0;
-			}		
+			}
 			if (useBiasFeature) {
 				initialWeights[featureToIndex.get("bias")] = biasFeatureBias;
 			}
-		}		
+		}
 
 		POSModel model = new POSModel();
 		model.setFeatureIndexCounts(featureIndexCounts);
@@ -1313,11 +1300,11 @@ public class SemiSupervisedPOSTagger {
 		model.setIndexToFeature(indexToFeature);
 		model.setIndexToPOS(indexToPOS);
 		model.setPosToIndex(posToIndex);
-		PrintLikelihoodCallbackCRF crfCallBack = 
+		PrintLikelihoodCallbackCRF crfCallBack =
 			new PrintLikelihoodCallbackCRF(model, curveOut);
 		log.info("Training with LBFGS");
 		double[] w = LBFGSOptimizer.optimize(grad,
-				initialWeights, 
+				initialWeights,
 				crfCallBack,
 				iters);
 		log.info("Finished training with LBFGS");
@@ -1326,48 +1313,48 @@ public class SemiSupervisedPOSTagger {
 	}
 
 	public void trainUnsupervisedFeatureHMMInterpolation(
-			int numLabels, 
+			int numLabels,
 			InterpolationFeatureTemplate interpolationFeature,
 			List<EmitFeatureTemplate> emitFeatures,
 			FileWriter curveOut) {
-		GradientSequenceModel grad = 
+		GradientSequenceModel grad =
 			new GradientSequenceInterpolatedModel(uObservations,
-					numLabels, 
+					numLabels,
 					indexToWord.size(),
 					transitionMatrices,
-					printPosteriors); 
+					printPosteriors);
 		// Cache active features
-		activeConvexCombiners = 
-			this.getActiveInterpolationFeatures(interpolationFeature, 
-					numHelperLanguages, grad.getNumLabels(), 
-					grad.getStartLabel(), 
+		activeConvexCombiners =
+			this.getActiveInterpolationFeatures(interpolationFeature,
+					numHelperLanguages, grad.getNumLabels(),
+					grad.getStartLabel(),
 					grad.getStopLabel());
 
-		activeEmitFeatures = 
-			getActiveEmitFeatures(emitFeatures, 
-					grad.getNumObservations(), 
-					grad.getNumLabels(), 
-					grad.getStartLabel(), 
+		activeEmitFeatures =
+			getActiveEmitFeatures(emitFeatures,
+					grad.getNumObservations(),
+					grad.getNumLabels(),
+					grad.getStartLabel(),
 					grad.getStopLabel());
 
 		if (useStackedFeatures) {
-			activeStackedFeatures = 
-				getActiveStackedFeatures(grad.getNumObservations(), 
-						grad.getNumLabels(), 
-						grad.getStartLabel(), 
+			activeStackedFeatures =
+				getActiveStackedFeatures(grad.getNumObservations(),
+						grad.getNumLabels(),
+						grad.getStartLabel(),
 						grad.getStopLabel());
 		}
 
 		log.info("Num features: " + indexToFeature.size());
-		double[] regularizationWeights = 
+		double[] regularizationWeights =
 			getRegularizationWeights();
-		double[] regularizationBiases = 
+		double[] regularizationBiases =
 			getSpecialRegularizationBiases();
 		grad.setActiveFeatures(activeConvexCombiners,
 				activeEmitFeatures,
 				activeStackedFeatures,
-				indexToFeature.size(), 
-				regularizationWeights, 
+				indexToFeature.size(),
+				regularizationWeights,
 				regularizationBiases);
 		// Initialize weights to 0.0;
 		double[] initialWeights;
@@ -1377,7 +1364,7 @@ public class SemiSupervisedPOSTagger {
 		} else {
 			initialWeights = uniformRandomWeights(indexToFeature.size(), initialWeightsLower, initialWeightsUpper, rands[0]);
 			if (initTransProbs != null) {
-				initialWeights = 
+				initialWeights =
 					initializeFeatureWeightsWithInitialTransitionProbs(initialWeights, grad);
 			}
 		}
@@ -1391,64 +1378,64 @@ public class SemiSupervisedPOSTagger {
 		model.setIndexToFeature(indexToFeature);
 		model.setIndexToPOS(indexToPOS);
 		model.setPosToIndex(posToIndex);
-		PrintLikelihoodCallbackCRF crfCallBack = 
+		PrintLikelihoodCallbackCRF crfCallBack =
 			new PrintLikelihoodCallbackCRF(model, curveOut);
 		log.info("Training with LBFGS");
 		double[] w = LBFGSOptimizer.optimize(grad,
-				initialWeights, 
+				initialWeights,
 				crfCallBack,
 				iters);
 		log.info("Finished training with LBFGS");
 		model.setWeights(w);
 		BasicFileIO.writeSerializedObject(modelFile, model);
-	}	
+	}
 
 	public void trainUnsupervisedFeatureHMM(
-			int numLabels, 
+			int numLabels,
 			List<TransFeatureTemplate> transFeatures,
 			List<EmitFeatureTemplate> emitFeatures,
 			FileWriter curveOut) {
-		GradientSequenceModel grad = 
+		GradientSequenceModel grad =
 			new GradientGenSequenceModel(uObservations,
 					stackedTags,
 					numLabels, indexToWord.size(),
-					printPosteriors); 
+					printPosteriors);
 		// Cache active features
-		activeTransFeatures = 
-			getActiveTransFeatures(transFeatures, 
-					grad.getNumObservations(), 
-					grad.getNumLabels(), 
-					grad.getStartLabel(), 
+		activeTransFeatures =
+			getActiveTransFeatures(transFeatures,
+					grad.getNumObservations(),
+					grad.getNumLabels(),
+					grad.getStartLabel(),
 					grad.getStopLabel());
 
-		activeEmitFeatures = 
-			getActiveEmitFeatures(emitFeatures, 
-					grad.getNumObservations(), 
-					grad.getNumLabels(), 
-					grad.getStartLabel(), 
+		activeEmitFeatures =
+			getActiveEmitFeatures(emitFeatures,
+					grad.getNumObservations(),
+					grad.getNumLabels(),
+					grad.getStartLabel(),
 					grad.getStopLabel());
 		if (useStackedFeatures) {
-			activeStackedFeatures = 
-				getActiveStackedFeatures(grad.getNumObservations(), 
-						grad.getNumLabels(), 
-						grad.getStartLabel(), 
+			activeStackedFeatures =
+				getActiveStackedFeatures(grad.getNumObservations(),
+						grad.getNumLabels(),
+						grad.getStartLabel(),
 						grad.getStopLabel());
 		}
 
 		log.info("Num features: " + indexToFeature.size());
-		double[] regularizationWeights = 
+		double[] regularizationWeights =
 			getRegularizationWeights(transFeatures, emitFeatures);
-		double[] regularizationBiases = 
-			getSpecialRegularizationBiases(transFeatures, 
-					emitFeatures, 
-					grad.getNumLabels(), 
-					grad.getStartLabel(), 
+		double[] regularizationBiases =
+			getSpecialRegularizationBiases(transFeatures,
+					emitFeatures,
+					grad.getNumLabels(),
+					grad.getStartLabel(),
 					grad.getStopLabel());
-		grad.setActiveFeatures(activeTransFeatures, 
-				activeEmitFeatures, 
+		grad.setActiveFeatures(activeTransFeatures,
+				activeEmitFeatures,
 				activeStackedFeatures,
-				indexToFeature.size(), 
-				regularizationWeights, 
+				indexToFeature.size(),
+				regularizationWeights,
 				regularizationBiases);
 		// Initialize weights to 0.0;
 		double[] initialWeights;
@@ -1458,7 +1445,7 @@ public class SemiSupervisedPOSTagger {
 		} else {
 			initialWeights = uniformRandomWeights(indexToFeature.size(), initialWeightsLower, initialWeightsUpper, rands[0]);
 			if (initTransProbs != null) {
-				initialWeights = 
+				initialWeights =
 					initializeFeatureWeightsWithInitialTransitionProbs(initialWeights, grad);
 			}
 		}
@@ -1472,17 +1459,17 @@ public class SemiSupervisedPOSTagger {
 		model.setIndexToFeature(indexToFeature);
 		model.setIndexToPOS(indexToPOS);
 		model.setPosToIndex(posToIndex);
-		PrintLikelihoodCallbackCRF crfCallBack = 
+		PrintLikelihoodCallbackCRF crfCallBack =
 			new PrintLikelihoodCallbackCRF(model, curveOut);
 		log.info("Training with LBFGS");
 		double[] w = LBFGSOptimizer.optimize(grad,
-				initialWeights, 
+				initialWeights,
 				crfCallBack,
 				iters);
 		log.info("Finished training with LBFGS");
 		model.setWeights(w);
 		BasicFileIO.writeSerializedObject(modelFile, model);
-	}	
+	}
 
 	private double[] initializeFeatureWeightsWithInitialTransitionProbs(
 			double[] initialWeights,
@@ -1495,7 +1482,7 @@ public class SemiSupervisedPOSTagger {
 			System.out.println("Problem. " +
 			"Number of input labels and the number of labels in the transition matrix unequal.");
 			System.exit(-1);
-		}		
+		}
 		int featLen = indexToFeature.size();
 		for (int i = 0; i < featLen; i++) {
 			String feat = indexToFeature.get(i);
@@ -1536,7 +1523,7 @@ public class SemiSupervisedPOSTagger {
 
 //	trains a HMM model with a discriminative objective
 	public void trainSupervisedFeatureHMMDiscriminatively(
-			int numLabels, 
+			int numLabels,
 			List<TransFeatureTemplate> transFeatures,
 			List<EmitFeatureTemplate> emitFeatures,
 			FileWriter curveOut) {
@@ -1544,7 +1531,7 @@ public class SemiSupervisedPOSTagger {
 		int startLabel = numLabels + 1;
 		POSModel oldModel = null;
 		if (restartTraining) {
-			oldModel = 
+			oldModel =
 				(POSModel) BasicFileIO.readSerializedObject(restartModelFile);
 			featureIndexCounts = oldModel.getFeatureIndexCounts();
 			featureToIndex = oldModel.getFeatureToIndex();
@@ -1554,30 +1541,30 @@ public class SemiSupervisedPOSTagger {
 		}
 		log.info("Caching features...");
 		log.info("Caching transition features...");
-		activeTransFeatures = 
-			getActiveTransFeatures(transFeatures, 
-					indexToWord.size(), 
-					numLabels + 2, 
-					startLabel, 
+		activeTransFeatures =
+			getActiveTransFeatures(transFeatures,
+					indexToWord.size(),
+					numLabels + 2,
+					startLabel,
 					stopLabel);
 		log.info("Caching emission features...");
-		activeEmitFeatures = 
-			getActiveEmitFeatures(emitFeatures, 
-					indexToWord.size(), 
-					numLabels + 2, 
-					startLabel, 
-					stopLabel);	
+		activeEmitFeatures =
+			getActiveEmitFeatures(emitFeatures,
+					indexToWord.size(),
+					numLabels + 2,
+					startLabel,
+					stopLabel);
 		if (useStackedFeatures) {
-			activeStackedFeatures = 
-				getActiveStackedFeatures(indexToWord.size(), 
-						numLabels + 2, 
-						startLabel, 
+			activeStackedFeatures =
+				getActiveStackedFeatures(indexToWord.size(),
+						numLabels + 2,
+						startLabel,
 						stopLabel);
 		}
 		log.info("Num features: " + indexToFeature.size());
-		SupervisedGenSequenceModelDiscObjective grad = 
+		SupervisedGenSequenceModelDiscObjective grad =
 			new SupervisedGenSequenceModelDiscObjective(
-					lObservations, goldLabels, 
+					lObservations, goldLabels,
 					numLabels, indexToWord.size(),
 					indexToFeature.size(),
 					regularizationWeight,
@@ -1589,23 +1576,23 @@ public class SemiSupervisedPOSTagger {
 
 		SupervisedGenSequenceModel num = grad.getNumeratorModel();
 		GradientGenSequenceModel denom = grad.getDenominatorModel();
-		num.setActiveFeatures(activeTransFeatures, 
-				activeEmitFeatures, 
+		num.setActiveFeatures(activeTransFeatures,
+				activeEmitFeatures,
 				activeStackedFeatures,
-				indexToFeature.size(), 
-				zeroRegWeights, 
+				indexToFeature.size(),
+				zeroRegWeights,
 				zeroBiasWeights);
-		denom.setActiveFeatures(activeTransFeatures, 
-				activeEmitFeatures, 
+		denom.setActiveFeatures(activeTransFeatures,
+				activeEmitFeatures,
 				activeStackedFeatures,
-				indexToFeature.size(), 
-				zeroRegWeights, 
-				zeroBiasWeights);		
+				indexToFeature.size(),
+				zeroRegWeights,
+				zeroBiasWeights);
 		// Initialize weights to 0.0;
 		double[] initialWeights = new double[grad.dimension()];
 		if (restartTraining) {
 			initialWeights = oldModel.getWeights();
-		} else {			
+		} else {
 			Arrays.fill(initialWeights, 0.0);
 			if (useBiasFeature) {
 				initialWeights[featureToIndex.get("bias")] = biasFeatureBias;
@@ -1617,28 +1604,28 @@ public class SemiSupervisedPOSTagger {
 		model.setIndexToFeature(indexToFeature);
 		model.setIndexToPOS(indexToPOS);
 		model.setPosToIndex(posToIndex);
-		PrintLikelihoodCallbackCRF crfCallBack = 
+		PrintLikelihoodCallbackCRF crfCallBack =
 			new PrintLikelihoodCallbackCRF(model, curveOut);
 		log.info("Training with LBFGS");
 		double[] w = LBFGSOptimizer.optimize(grad,
-				initialWeights, 
+				initialWeights,
 				crfCallBack,
 				iters);
 		log.info("Finished training with LBFGS");
-		model.setWeights(w);		
+		model.setWeights(w);
 		BasicFileIO.writeSerializedObject(modelFile, model);
 	}
 
 	public void trainSupervisedFeatureHMM(
-			int numLabels, 
+			int numLabels,
 			List<TransFeatureTemplate> transFeatures,
 			List<EmitFeatureTemplate> emitFeatures,
 			FileWriter curveOut) {
-		GradientSequenceModel grad = new SupervisedGenSequenceModel(lObservations, goldLabels, 
-				numLabels, indexToWord.size()); 
+		GradientSequenceModel grad = new SupervisedGenSequenceModel(lObservations, goldLabels,
+				numLabels, indexToWord.size());
 		POSModel oldModel = null;
 		if (restartTraining) {
-			oldModel = 
+			oldModel =
 				(POSModel) BasicFileIO.readSerializedObject(restartModelFile);
 			featureIndexCounts = oldModel.getFeatureIndexCounts();
 			featureToIndex = oldModel.getFeatureToIndex();
@@ -1647,47 +1634,47 @@ public class SemiSupervisedPOSTagger {
 			posToIndex = oldModel.getPosToIndex();
 		}
 		// Cache active features
-		activeTransFeatures = 
-			getActiveTransFeatures(transFeatures, 
-					grad.getNumObservations(), 
-					grad.getNumLabels(), 
-					grad.getStartLabel(), 
+		activeTransFeatures =
+			getActiveTransFeatures(transFeatures,
+					grad.getNumObservations(),
+					grad.getNumLabels(),
+					grad.getStartLabel(),
 					grad.getStopLabel());
 
-		activeEmitFeatures = 
-			getActiveEmitFeatures(emitFeatures, 
-					grad.getNumObservations(), 
-					grad.getNumLabels(), 
-					grad.getStartLabel(), 
+		activeEmitFeatures =
+			getActiveEmitFeatures(emitFeatures,
+					grad.getNumObservations(),
+					grad.getNumLabels(),
+					grad.getStartLabel(),
 					grad.getStopLabel());
 		if (useStackedFeatures) {
-			activeStackedFeatures = 
-				getActiveStackedFeatures(grad.getNumObservations(), 
-						grad.getNumLabels(), 
-						grad.getStartLabel(), 
+			activeStackedFeatures =
+				getActiveStackedFeatures(grad.getNumObservations(),
+						grad.getNumLabels(),
+						grad.getStartLabel(),
 						grad.getStopLabel());
 		}
 
 		log.info("Num features: " + indexToFeature.size());
-		double[] regularizationWeights = 
+		double[] regularizationWeights =
 			getRegularizationWeights(transFeatures, emitFeatures);
-		double[] regularizationBiases = 
-			getRegularizationBiases(transFeatures, 
-					emitFeatures, 
-					grad.getNumLabels(), 
-					grad.getStartLabel(), 
+		double[] regularizationBiases =
+			getRegularizationBiases(transFeatures,
+					emitFeatures,
+					grad.getNumLabels(),
+					grad.getStartLabel(),
 					grad.getStopLabel());
-		grad.setActiveFeatures(activeTransFeatures, 
-				activeEmitFeatures, 
+		grad.setActiveFeatures(activeTransFeatures,
+				activeEmitFeatures,
 				activeStackedFeatures,
-				indexToFeature.size(), 
-				regularizationWeights, 
+				indexToFeature.size(),
+				regularizationWeights,
 				regularizationBiases);
 		// Initialize weights to 0.0;
 		double[] initialWeights = new double[grad.getNumFeatures()];
 		if (restartTraining) {
 			initialWeights = oldModel.getWeights();
-		} else {			
+		} else {
 			Arrays.fill(initialWeights, 0.0);
 			if (useBiasFeature) {
 				initialWeights[featureToIndex.get("bias")] = biasFeatureBias;
@@ -1700,22 +1687,22 @@ public class SemiSupervisedPOSTagger {
 		model.setIndexToFeature(indexToFeature);
 		model.setIndexToPOS(indexToPOS);
 		model.setPosToIndex(posToIndex);
-		PrintLikelihoodCallbackCRF crfCallBack = 
+		PrintLikelihoodCallbackCRF crfCallBack =
 			new PrintLikelihoodCallbackCRF(model, curveOut);
 		log.info("Training with LBFGS");
 		double[] w = LBFGSOptimizer.optimize(grad,
-				initialWeights, 
+				initialWeights,
 				crfCallBack,
 				iters);
 		log.info("Finished training with LBFGS");
-		model.setWeights(w);		
+		model.setWeights(w);
 		BasicFileIO.writeSerializedObject(modelFile, model);
 	}
 
-	public void trainCRF(int numLabels, 
+	public void trainCRF(int numLabels,
 			List<TransFeatureTemplate> transFeatures,
 			List<EmitFeatureTemplate> emitFeatures,
-			FileWriter curveOut) {		
+			FileWriter curveOut) {
 		/*
 		 * getting active CRF features
 		 */
@@ -1724,7 +1711,7 @@ public class SemiSupervisedPOSTagger {
 		log.info("Caching transition features...");
 		POSModel oldModel = null;
 		if (restartTraining) {
-			oldModel = 
+			oldModel =
 				(POSModel) BasicFileIO.readSerializedObject(restartModelFile);
 			featureIndexCounts = oldModel.getFeatureIndexCounts();
 			featureToIndex = oldModel.getFeatureToIndex();
@@ -1732,18 +1719,18 @@ public class SemiSupervisedPOSTagger {
 			indexToPOS = oldModel.getIndexToPOS();
 			posToIndex = oldModel.getPosToIndex();
 		}
-		activeCRFTransFeatures = 
-			getActiveCRFTransFeatures(transFeatures, 
-					indexToWord.size(), 
+		activeCRFTransFeatures =
+			getActiveCRFTransFeatures(transFeatures,
+					indexToWord.size(),
 					numLabels);
 		log.info("Caching emission features...");
-		activeCRFEmitFeatures = 
-			getActiveCRFEmitFeatures(emitFeatures, 
-					indexToWord.size(), 
+		activeCRFEmitFeatures =
+			getActiveCRFEmitFeatures(emitFeatures,
+					indexToWord.size(),
 					numLabels);
 		log.info("Total number of features:" + indexToFeature.size());
 
-		VertexFeatureExtractor vertexExtractor = 
+		VertexFeatureExtractor vertexExtractor =
 			new VertexFeatureExtractor(activeCRFEmitFeatures);
 		EdgeFeatureExtractor edgeExtractor =
 			new EdgeFeatureExtractor(activeCRFTransFeatures);
@@ -1752,7 +1739,7 @@ public class SemiSupervisedPOSTagger {
 				goldLabels,
 				numLabels,
 				regularizationWeight,
-				vertexExtractor, 
+				vertexExtractor,
 				edgeExtractor,
 				indexToFeature.size());
 		POSModel model = new POSModel();
@@ -1761,42 +1748,42 @@ public class SemiSupervisedPOSTagger {
 		model.setIndexToFeature(indexToFeature);
 		model.setIndexToPOS(indexToPOS);
 		model.setPosToIndex(posToIndex);
-		PrintLikelihoodCallbackCRF crfCallBack = 
+		PrintLikelihoodCallbackCRF crfCallBack =
 			new PrintLikelihoodCallbackCRF(model, curveOut);
 		log.info("Training with LBFGS");
 		double[] initialWeights = new double[indexToFeature.size()];
 		if (restartTraining) {
 			initialWeights = oldModel.getWeights();
-		} else {			
+		} else {
 			for (int i = 0; i < initialWeights.length; i ++) {
 				initialWeights[i] = 0.0;
-			}		
+			}
 			if (useBiasFeature) {
 				initialWeights[featureToIndex.get("bias")] = biasFeatureBias;
 			}
 		}
 		double[] w = LBFGSOptimizer.optimize(objective,
-				initialWeights, 
+				initialWeights,
 				crfCallBack,
 				iters);
 		log.info("Finished training with LBFGS");
 		model.setWeights(w);
 		BasicFileIO.writeSerializedObject(modelFile, model);
-	}	
+	}
 
 	public void test() {
 		log.info("test set:" + testSet);
 		Collection<Pair<List<String>, List<String>>>  sequences =
-			TabSeparatedFileReader.readPOSSeqences(testSet, 
-					numLabeledSentences, 
+			TabSeparatedFileReader.readPOSSeqences(testSet,
+					numLabeledSentences,
 					maxSentenceLength);
 		if (useGlobalForLabeledData) {
 			testCRF(sequences);
 		} else {
 			testFeatureHMM(sequences);
-		}			
+		}
 	}
-	
+
 	public List<List<String>> testCRF(Collection<Pair<List<String>, List<String>>>  sequences,
 						POSModel model) {
 		featureIndexCounts = model.getFeatureIndexCounts();
@@ -1814,10 +1801,10 @@ public class SemiSupervisedPOSTagger {
 		indexToWord.clear();
 		wordToIndex.clear();
 		Pair<int[][], int[][]> pairList = POSUtil.getObservationsAndGoldLabels(
-				sequences, 
-				indexToWord, 
-				wordToIndex, 
-				indexToPOS, 
+				sequences,
+				indexToWord,
+				wordToIndex,
+				indexToPOS,
 				posToIndex);
 		lObservations = pairList.getFirst();
 		goldLabels = pairList.getSecond();
@@ -1825,14 +1812,14 @@ public class SemiSupervisedPOSTagger {
 		// logInputInfo();
 		if (useStackedFeatures) {
 			Collection<Pair<List<String>, List<String>>> stackedSequences
-			= TabSeparatedFileReader.readPOSSeqences(stackedFile, 
-					numLabeledSentences, 
-					maxSentenceLength);			
+			= TabSeparatedFileReader.readPOSSeqences(stackedFile,
+					numLabeledSentences,
+					maxSentenceLength);
 			pairList = POSUtil.getObservationsAndGoldLabels(
-					stackedSequences, 
-					indexToWord, 
-					wordToIndex, 
-					indexToPOS, 
+					stackedSequences,
+					indexToWord,
+					wordToIndex,
+					indexToPOS,
 					posToIndex);
 			stackedTags = pairList.getSecond();
 			for (int i = 0; i < stackedTags.length; i ++) {
@@ -1846,29 +1833,29 @@ public class SemiSupervisedPOSTagger {
 		 * getting active CRF features
 		 */
 		// Cache active features
-		List<TransFeatureTemplate> transFeatures = 
+		List<TransFeatureTemplate> transFeatures =
 			POSFeatureTemplates.getTransFeatures(useBiasFeature);
-		List<EmitFeatureTemplate> emitFeatures = 
-			POSFeatureTemplates.getEmitFeatures(useStandardFeatures, 
+		List<EmitFeatureTemplate> emitFeatures =
+			POSFeatureTemplates.getEmitFeatures(useStandardFeatures,
 					lengthNGramSuffixFeature,
-					useTagDictionary, wordToIndex, 
+					useTagDictionary, wordToIndex,
 					tagDictionary,
 					tagsToClusters,
 					noahsFeatures,
 					distSimTable,
-					namesArray);	
+					namesArray);
 		log.info("Caching features...");
 		log.info("Caching transition features...");
-		activeCRFTransFeatures = 
-			getActiveCRFTransFeatures(transFeatures, 
-					indexToWord.size(), 
+		activeCRFTransFeatures =
+			getActiveCRFTransFeatures(transFeatures,
+					indexToWord.size(),
 					numLabels);
 		log.info("Caching emission features...");
-		activeCRFEmitFeatures = 
-			getActiveCRFEmitFeatures(emitFeatures, 
-					indexToWord.size(), 
+		activeCRFEmitFeatures =
+			getActiveCRFEmitFeatures(emitFeatures,
+					indexToWord.size(),
 					numLabels);
-		VertexFeatureExtractor vertexExtractor = 
+		VertexFeatureExtractor vertexExtractor =
 			new VertexFeatureExtractor(activeCRFEmitFeatures);
 		EdgeFeatureExtractor edgeExtractor =
 			new EdgeFeatureExtractor(activeCRFTransFeatures);
@@ -1878,7 +1865,7 @@ public class SemiSupervisedPOSTagger {
 		Arrays.fill(largerSetOfWeights, 0.0);
 		for (int i = 0; i < trainedWeights.length; i ++) {
 			largerSetOfWeights[i] = trainedWeights[i];
-		}				
+		}
 		Inference inf =  new Inference(numLabels, vertexExtractor, edgeExtractor);
 		double total = 0.0;
 		double correct = 0.0;
@@ -1893,8 +1880,8 @@ public class SemiSupervisedPOSTagger {
 						correct++;
 					}
 					total++;
-					BasicFileIO.writeLine(bWriter, 
-							indexToWord.get(lObservations[i][j]) + 
+					BasicFileIO.writeLine(bWriter,
+							indexToWord.get(lObservations[i][j]) +
 							"\t" + indexToPOS.get(tags.get(j)));
 				}
 				BasicFileIO.writeLine(bWriter, "");
@@ -1902,7 +1889,7 @@ public class SemiSupervisedPOSTagger {
 			log.info("Accuracy:" + (correct / total));
 			BasicFileIO.closeFileAlreadyWritten(bWriter);
 		} else {
-			ArrayList<List<String>> col = 
+			ArrayList<List<String>> col =
 				new ArrayList<List<String>>();
 			for (int i = 0; i < lObservations.length; i ++) {
 				List<Integer> tags = posteriorDecode(
@@ -1924,11 +1911,11 @@ public class SemiSupervisedPOSTagger {
 	}
 
 	public List<Integer> posteriorDecode(int[] s, Inference inf, double[] w) {
-		Pair<double[][], double[]> alphaAndFactors = 
+		Pair<double[][], double[]> alphaAndFactors =
 			inf.getAlphas(s, w);
-		Pair<double[][], double[]> betaAndFactors = 
+		Pair<double[][], double[]> betaAndFactors =
 			inf.getBetas(s, w);
-		double[][] vposts = 
+		double[][] vposts =
 			inf.getVertexPosteriors(alphaAndFactors, betaAndFactors);
 		List<Integer> result = new ArrayList<Integer>();
 		for (double[] vPost: vposts) {
@@ -1958,7 +1945,7 @@ public class SemiSupervisedPOSTagger {
 			double score = rankedScores.getPriority();
 			Pair<Integer, Integer> chain = rankedScores.next();
 			sentences.add(Pair.makePair(rebuildChain(chart.getFirst(), chain.getFirst(), chain.getSecond()), score));
-		}		
+		}
 		return sentences;
 	}
 
@@ -1998,17 +1985,17 @@ public class SemiSupervisedPOSTagger {
 		posToIndex = model.getPosToIndex();
 
 		Pair<int[][], int[][]> pairList = POSUtil.getObservationsAndGoldLabels(
-				sequences, 
-				indexToWord, 
-				wordToIndex, 
-				indexToPOS, 
+				sequences,
+				indexToWord,
+				wordToIndex,
+				indexToPOS,
 				posToIndex);
 		System.out.println("Use tag dictionary..." + useTagDictionary);
 		numTags = indexToPOS.size();
 		if (useTagDictionary) {
 			System.out.println("Reading tag dictionary...");
 			readTagDictionary();
-		}	
+		}
 
 		lObservations = pairList.getFirst();
 		goldLabels = pairList.getSecond();
@@ -2016,14 +2003,14 @@ public class SemiSupervisedPOSTagger {
 		logInputInfo();
 		if (useStackedFeatures) {
 			Collection<Pair<List<String>, List<String>>> stackedSequences
-			= TabSeparatedFileReader.readPOSSeqences(stackedFile, 
-					numLabeledSentences, 
-					maxSentenceLength);			
+			= TabSeparatedFileReader.readPOSSeqences(stackedFile,
+					numLabeledSentences,
+					maxSentenceLength);
 			pairList = POSUtil.getObservationsAndGoldLabels(
-					stackedSequences, 
-					indexToWord, 
-					wordToIndex, 
-					indexToPOS, 
+					stackedSequences,
+					indexToWord,
+					wordToIndex,
+					indexToPOS,
 					posToIndex);
 			stackedTags = pairList.getSecond();
 			for (int i = 0; i < stackedTags.length; i ++) {
@@ -2033,17 +2020,17 @@ public class SemiSupervisedPOSTagger {
 				}
 			}
 		}
-		List<TransFeatureTemplate> transFeatures = 
+		List<TransFeatureTemplate> transFeatures =
 			POSFeatureTemplates.getTransFeatures(useBiasFeature);
-		List<EmitFeatureTemplate> emitFeatures = 
-			POSFeatureTemplates.getEmitFeatures(useStandardFeatures, 
+		List<EmitFeatureTemplate> emitFeatures =
+			POSFeatureTemplates.getEmitFeatures(useStandardFeatures,
 					lengthNGramSuffixFeature,
-					useTagDictionary, wordToIndex, 
+					useTagDictionary, wordToIndex,
 					tagDictionary,
 					tagsToClusters,
 					noahsFeatures,
 					distSimTable,
-					namesArray);	
+					namesArray);
 		FileWriter curveOut = null;
 		try {
 			curveOut = new FileWriter(execPoolDir + "/" + "curve");
@@ -2053,46 +2040,46 @@ public class SemiSupervisedPOSTagger {
 		// Do gradient ascent
 		GradientSequenceModel grad = null;
 		int numLabels = indexToPOS.size();
-		grad = new GradientGenSequenceModel(lObservations, 
+		grad = new GradientGenSequenceModel(lObservations,
 				stackedTags,
-				numLabels, 
+				numLabels,
 				indexToWord.size(),
 				printPosteriors);
-		activeTransFeatures = 
-			getActiveTransFeatures(transFeatures, 
-					grad.getNumObservations(), 
-					grad.getNumLabels(), 
-					grad.getStartLabel(), 
+		activeTransFeatures =
+			getActiveTransFeatures(transFeatures,
+					grad.getNumObservations(),
+					grad.getNumLabels(),
+					grad.getStartLabel(),
 					grad.getStopLabel());
 
-		activeEmitFeatures = 
-			getActiveEmitFeatures(emitFeatures, 
-					grad.getNumObservations(), 
-					grad.getNumLabels(), 
-					grad.getStartLabel(), 
+		activeEmitFeatures =
+			getActiveEmitFeatures(emitFeatures,
+					grad.getNumObservations(),
+					grad.getNumLabels(),
+					grad.getStartLabel(),
 					grad.getStopLabel());
 
 		if (useStackedFeatures) {
-			activeStackedFeatures = 
-				getActiveStackedFeatures(grad.getNumObservations(), 
-						grad.getNumLabels(), 
-						grad.getStartLabel(), 
+			activeStackedFeatures =
+				getActiveStackedFeatures(grad.getNumObservations(),
+						grad.getNumLabels(),
+						grad.getStartLabel(),
 						grad.getStopLabel());
 		}
 		log.info("Num features: " + indexToFeature.size());
-		double[] regularizationWeights = 
+		double[] regularizationWeights =
 			getRegularizationWeights(transFeatures, emitFeatures);
-		double[] regularizationBiases = 
-			getRegularizationBiases(transFeatures, 
-					emitFeatures, 
-					grad.getNumLabels(), 
-					grad.getStartLabel(), 
+		double[] regularizationBiases =
+			getRegularizationBiases(transFeatures,
+					emitFeatures,
+					grad.getNumLabels(),
+					grad.getStartLabel(),
 					grad.getStopLabel());
-		grad.setActiveFeatures(activeTransFeatures, 
-				activeEmitFeatures, 
+		grad.setActiveFeatures(activeTransFeatures,
+				activeEmitFeatures,
 				activeStackedFeatures,
-				indexToFeature.size(), 
-				regularizationWeights, 
+				indexToFeature.size(),
+				regularizationWeights,
 				regularizationBiases);
 		double[] initialWeights = new double[grad.getNumFeatures()];
 		double[] trainedWeights = model.getWeights();
@@ -2118,8 +2105,8 @@ public class SemiSupervisedPOSTagger {
 		Comparator comp = new Comparator<Pair<String, Double>>() {
 			public int compare(Pair<String, Double> o1,
 					Pair<String, Double> o2) {
-				if (o1.getSecond() > o2.getSecond()) { 
-					return -1; 
+				if (o1.getSecond() > o2.getSecond()) {
+					return -1;
 				} else if (o1.getSecond() == o2.getSecond()) {
 					return 0;
 				} else
@@ -2152,18 +2139,18 @@ public class SemiSupervisedPOSTagger {
 		double total = 0.0;
 		if (goldLabels.length != guessLabels.length) {
 			log.severe("Problem. Length of gold labels should be equal " +
-					"to guess labels:" + goldLabels.length + 
+					"to guess labels:" + goldLabels.length +
 					" " + guessLabels.length);
 			System.exit(-1);
 		}
 		for (int i = 0; i < goldLabels.length; i++) {
 			if (goldLabels[i].length != guessLabels[i].length) {
-				log.severe("Problem. Length of gold labels in sentence " + 
+				log.severe("Problem. Length of gold labels in sentence " +
 						i +" should be equal " +
-						"to guess labels:" + goldLabels[i].length + 
+						"to guess labels:" + goldLabels[i].length +
 						" " + guessLabels[i].length);
 				System.exit(-1);
-			}			
+			}
 			for (int j = 0; j < goldLabels[i].length; j++) {
 				if (goldLabels[i][j] == guessLabels[i][j]) {
 					correct++;
@@ -2174,12 +2161,12 @@ public class SemiSupervisedPOSTagger {
 		return (correct / total);
 	}
 
-	private void evaluateCurrentScore(FileWriter curveOut, 
-			double[] weights, 
-			int[][] guessLabels, 
-			double margProb, 
+	private void evaluateCurrentScore(FileWriter curveOut,
+			double[] weights,
+			int[][] guessLabels,
+			double margProb,
 			int iter) {
-		double score = scoreLabels(goldLabels, 
+		double score = scoreLabels(goldLabels,
 				guessLabels);
 		log.info("Score: " + score);
 		if (curveOut != null) {
@@ -2193,15 +2180,15 @@ public class SemiSupervisedPOSTagger {
 		BufferedWriter bWriter = BasicFileIO.openFileToWrite(runOutput);
 		for (int i = 0; i < lObservations.length; i ++) {
 			for (int j = 0; j < goldLabels[i].length; j++) {
-				BasicFileIO.writeLine(bWriter, 
-						indexToWord.get(lObservations[i][j]) + 
+				BasicFileIO.writeLine(bWriter,
+						indexToWord.get(lObservations[i][j]) +
 						"\t" + indexToPOS.get(guessLabels[i][j]));
 			}
 			BasicFileIO.writeLine(bWriter, "");
 		}
 		BasicFileIO.closeFileAlreadyWritten(bWriter);
 		printWeightsToFile(iter, weights);
-	}	
+	}
 
 	private void printWeightsToFile(int iter, double[] weights) {
 		if (iter % printRate == 0) {
@@ -2227,9 +2214,9 @@ public class SemiSupervisedPOSTagger {
 		private FileWriter writer;
 		private POSModel model;
 
-		public PrintLikelihoodCallbackCRF(POSModel model0, 
+		public PrintLikelihoodCallbackCRF(POSModel model0,
 				FileWriter writer0) {
-			this.writer = writer0;   
+			this.writer = writer0;
 			this.model = model0;
 		}
 
@@ -2249,7 +2236,7 @@ public class SemiSupervisedPOSTagger {
 				model.setWeights(weights);
 				BasicFileIO.writeSerializedObject(modelFile+"_"+iteration, model);
 			}
-		}	
+		}
 	}
 
 	private class PrintLikelihoodCallback implements CallbackFunction {
@@ -2257,7 +2244,7 @@ public class SemiSupervisedPOSTagger {
 		private GradientSequenceModel func;
 
 		public PrintLikelihoodCallback(FileWriter writer0, GradientSequenceModel func0) {
-			this.writer = writer0;   
+			this.writer = writer0;
 			this.func = func0;
 		}
 
@@ -2271,6 +2258,6 @@ public class SemiSupervisedPOSTagger {
 				derivative += grad[f] * grad[f];
 			}
 			log.info("Derivative: " + derivative);
-		}	
-	}	
+		}
+	}
 }

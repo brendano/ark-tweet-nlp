@@ -11,3 +11,5 @@ out
 
 mybuild
 tokenizer_development
+
+target/
