@@ -22,10 +22,9 @@ To train and evalute the tagger, see:
 
 Contents
 --------
- * runTagger.sh  is the script you probably want
- * lib/          dependencies
- * ark-tweet-nlp the project code itself
- * src/          has the actual source code (mostly java, and one bit of scala)
+ * runTagger.sh       is the script you probably want
+ * lib/               dependencies
+ * ark-tweet-nlp/src  the project code itself (mostly java, and one bit of scala)
 
 Information
 -----------
