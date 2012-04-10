@@ -9,30 +9,23 @@ Requires Java 6.  To run the tagger:
     ./runTagger.sh -input example_tweets.txt -output tagged_tweets.txt
 
 The output should match tagged_tweets_expected.txt.
- 
+
 Advanced usage
 --------------
 
 We include a pre-compiled .jar of the tagger so you hopefully don't need to
 compile it.  But if you need to recompile, do:
-  scripts/compile.sh
+  mvn install
 
 To train and evalute the tagger, see:
+  ark-tweet-nlp/src/main/java/edu/cmu/cs/lti/ark/ssl/pos/SemiSupervisedPOSTagger.java
   scripts/train.sh and scripts/test.sh
-  src/edu/cmu/cs/lti/ark/ssl/pos/SemiSupervisedPOSTagger.java
 
 Contents
 --------
- * runTagger.sh  is the script you probably want
- * lib/          has runtime dependencies and trained model
- * lib_build/    has buildtime dependency
- * lib_twitter/  has Twitter's text commons annotations API
- * scripts/      helps you build and run
- * src/          has the actual source code (mostly java, and one bit of scala)
-
-The lib_twitter stuff is optional; if you want to use it, you may wish to
-update to a newer version of the library.  A demo can be invoked as:
-  scripts/classwrap.sh -Xmx1g edu.cmu.cs.lti.ark.tweetnlp.twitter_anno.CMUPOSTagger
+ * runTagger.sh       is the script you probably want
+ * lib/               dependencies
+ * ark-tweet-nlp/src  the project code itself (mostly java, and one bit of scala)
 
 Information
 -----------
@@ -50,19 +43,19 @@ The software is licensed under Apache 2.0 (see LICENSE file).
 
 Version 0.2 of the tagger differs from version 0.1 in the following ways:
 
-* The tokenizer has been improved and integrated with the tagger in a single Java program. 
+* The tokenizer has been improved and integrated with the tagger in a single Java program.
 
-* The new tokenizer was run on the 1,827 tweets used for the annotation effort and the 
-annotations were adapted for tweets with differing tokenizations. The revised annotations 
+* The new tokenizer was run on the 1,827 tweets used for the annotation effort and the
+annotations were adapted for tweets with differing tokenizations. The revised annotations
 are contained in a companion v0.2 release of the data (twpos-data-v0.2).
 
-* The tagging model is trained on ALL of the available annotated data in twpos-data-v0.2. 
+* The tagging model is trained on ALL of the available annotated data in twpos-data-v0.2.
 The model in v0.1 was only trained on the training set.
 
 * The tokenizer/tagger is integrated with Twitter's text commons annotations API.
 
 Contact
 -------
-Please contact Brendan O'Connor (brenocon@cmu.edu) and Kevin Gimpel (kgimpel@cs.cmu.edu) 
+Please contact Brendan O'Connor (brenocon@cmu.edu) and Kevin Gimpel (kgimpel@cs.cmu.edu)
 if you encounter any problems.
 
