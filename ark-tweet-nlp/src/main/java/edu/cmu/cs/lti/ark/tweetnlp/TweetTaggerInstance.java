@@ -26,11 +26,12 @@ public class TweetTaggerInstance {
 		return ttInstance;
 	}
     static {
-        NOAHS_MODEL = (POSModel) BasicFileIO.readSerializedObject(
-                TweetTaggerInstance.class.getResourceAsStream("tweetpos.model"));
-
+        NOAHS_MODEL = deserializeNoahsModel();
     }
-
+    private static POSModel deserializeNoahsModel(){
+        return (POSModel) BasicFileIO.readSerializedObject(
+                        TweetTaggerInstance.class.getResourceAsStream("tweetpos.model"));
+    }
 	private TweetTaggerInstance() {
 		List<String> argList = new ArrayList<String>();
 		argList.add("--trainOrTest");
@@ -70,6 +71,10 @@ public class TweetTaggerInstance {
 
         POSFeatureTemplates.log.setLevel(Level.WARNING);
         SemiSupervisedPOSTagger.log.setLevel(Level.WARNING);
+	}
+
+	public void renew() {
+	    model = deserializeNoahsModel();
 	}
 
 	public List<String> getTagsForOneSentence(List<String> words) {
