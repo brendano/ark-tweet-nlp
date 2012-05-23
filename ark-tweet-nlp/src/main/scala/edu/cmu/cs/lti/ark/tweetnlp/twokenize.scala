@@ -80,7 +80,7 @@ object Twokenize {
   //   http://mathiasbynens.be/demo/url-regex
 
   val urlStart1  = """(https?://|www\.)"""
-  val commonTLDs = """(com|co\.uk|org|net|info|ca|ly|mp|edu|gov)"""
+  val commonTLDs = """(com|co\.uk|org|net|info|ca|ly|mp|edu|gov|co|ms)"""
   val urlStart2  = """[A-Za-z0-9\.-]+?\.""" + commonTLDs + """(?=[/ \W])"""
   val urlBody    = """[^ \t\r\n<>]*?"""
   val urlExtraCrapBeforeEnd = "("+punctChars+"|"+entity+")+?"
@@ -98,8 +98,7 @@ object Twokenize {
   val aa2  = """[^A-Za-z]([A-Za-z]\.){1,}[A-Za-z](?=""" + boundaryNotDot + ")"
   val standardAbbreviations = """\b([Mm]r|[Mm]rs|[Mm]s|[Dd]r|[Ss]r|[Jj]r|[Rr]ep|[Ss]en|[Ss]t)\."""
   val arbitraryAbbrev = "(" + aa1 +"|"+ aa2 + "|" + standardAbbreviations + ")"
-
-  val separators  = "(--+|―)"
+  val separators  = "(--+|―|—|~|–)"
   val decorations = """[♫]+"""
   val thingsThatSplitWords = """[^\s\.,]"""
   val embeddedApostrophe = thingsThatSplitWords+"""+'""" + thingsThatSplitWords + """+"""
@@ -138,9 +137,9 @@ object Twokenize {
     pat.replace("<", "(<|&lt;)").replace(">", "(>|&gt;)")
   }
   
-  val Hearts = allowEntities("""(<+/?3+)""")
+  val Hearts = OR("""♥""",allowEntities("""(<+/?3+)"""))
 
-  val Arrows = allowEntities("""(<*[-=]*>+|<+[-=]*>*)""")
+  val Arrows = allowEntities("""(<*[-―—=]*>+|<+[-―—=]*>*)""")
 
   // BTO 2011-06: restored Hashtag, AtMention protection (dropped in original scala port) because it fixes
   // "hello (#hashtag)" ==> "hello (#hashtag )"  WRONG
