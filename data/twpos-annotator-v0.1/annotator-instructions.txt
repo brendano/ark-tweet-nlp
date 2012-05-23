@@ -1,0 +1,34 @@
+TWEETNLP POS ANNOTATOR INSTRUCTIONS
+
+(This assumes the annotation platform and input data have been set up 
+as described in the setup instructions.)
+
+0. Obtain or create a URL for a batch of items to annotate.
+   Navigate to that URL in Firefox 3.6+.
+   
+The interface should display numbered text snippets ("items"). Initial 
+POS tags may be present in gray above the tokens.
+
+1. For each item,
+
+ a) Determine whether the text is valid. 
+
+   If there is a problem with the item, indicate this via the drop-down 
+   on the left. You may consult the metadata for the item by clicking the 
+   "Metadata" button.
+   
+ b) If the text is valid, look for tagging errors. 
+   
+   To correct a token's label, click to select it and type a new label. 
+   If you enter something other than the original tag, it will appear in red.
+   If you are unsure of the correct tag, enter "?".
+   
+   You may also use Tab/Shift+Tab or the left and right arrow keys to change 
+   the currently selected token.
+   
+2. When you are done with a page of items, click the "Submit Query" button 
+   at the bottom. This will add your annotations to an output file on the 
+   server and display the next page of items.
+   
+3. When you have completed the last page of the batch of annotations 
+   specified by the URL, a completion message will be displayed.

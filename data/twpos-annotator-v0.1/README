@@ -1,0 +1,28 @@
+TweetNLP POS Annotation Interface
+
+A simple web browser interface for labeling words of text, especially tweets from 
+Twitter, with part-of-speech tags. Built for Firefox 3.6+ using PHP and Javascript.
+
+The code is released under the MIT license (see the file MIT-LICENSE included with 
+this distribution).
+
+This interface was originally developed to support annotation described in the paper:
+  Part-of-Speech Tagging for Twitter: Annotation, Features, and Experiments
+  Kevin Gimpel, Nathan Schneider, Brendan O'Connor, Dipanjan Das, Daniel Mills, 
+   Jacob Eisenstein, Michael Heilman, Dani Yogatama, Jeffrey Flanigan, and Noah A. Smith
+  In Proceedings of the Annual Meeting of the Association for Computational Linguistics, 
+   companion volume, Portland, OR, June 2011.
+  http://www.ark.cs.cmu.edu/TweetNLP/gimpel+etal.acl11.pdf
+
+SETUP INSTRUCTIONS
+See beginning of pos.php source.
+
+ANNOTATOR INSTRUCTIONS
+See annotator-instructions.txt.
+
+SEE ALSO
+http://www.ark.cs.cmu.edu/TweetNLP/ to download this software as well as related 
+data, tools, and documentation, including the Tweet NLP tokenizer and POS tagger.
+
+The interface was developed and this release was prepared by Nathan Schneider (nathan@cmu.edu).
+
