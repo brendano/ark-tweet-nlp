@@ -1,4 +1,4 @@
-.svn
+﻿.svn
 
 .idea
 *.iml
@@ -11,5 +11,6 @@ out
 
 mybuild
 tokenizer_development
-
+mod/
 target/
+/*.txt
