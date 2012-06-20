@@ -12,5 +12,6 @@
     <modules>
       <module>jargs</module>
       <module>posBerkeley</module>
+	  <module>jackson-core</module>
     </modules>
 </project>
