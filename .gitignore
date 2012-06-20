@@ -1,4 +1,4 @@
-﻿.svn
+.svn
 
 .idea
 *.iml
@@ -14,3 +14,4 @@ tokenizer_development
 mod/
 target/
 /*.txt
+*.bak
