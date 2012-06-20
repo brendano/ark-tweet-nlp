@@ -51,6 +51,12 @@ import scala.collection.JavaConversions._
 
  - Jason Baldridge (jasonbaldridge@gmail.com)
    June 2011
+   
+ Emoticon/Symbol/URL detection improvements. Be careful when adding
+ new () groupings due to my basicface and decorations back-references
+   
+ - Tobi Owoputi (tobiowo@gmail.com)  
+   June 2012
 */
 
 /**
@@ -64,12 +70,12 @@ import collection.JavaConversions._
 
 object Twokenize {
 
-  val Contractions = """(?i)(\w+)(n't|'ve|'ll|'d|'re|'s|'m)$""".r
-  val Whitespace = """\s+""".r
+  val Contractions = """(?i)(?:\w+)(?:n't|'ve|'ll|'d|'re|'s|'m)$""".r
+  val Whitespace = """[\s\u3000]+""".r
 
   val punctChars = """['“\".?!,:;]"""
   val punctSeq   = punctChars+"""+"""
-  val entity     = """&(amp|lt|gt|quot);"""
+  val entity     = """&(?:amp|lt|gt|quot);"""
 
   //  URLs
 
@@ -79,67 +85,82 @@ object Twokenize {
   //   http://daringfireball.net/2010/07/improved_regex_for_matching_urls
   //   http://mathiasbynens.be/demo/url-regex
 
-  val urlStart1  = """(https?://|www\.)"""
-  val commonTLDs = """(com|co\.uk|org|net|info|ca|ly|mp|edu|gov|co|ms)"""
-  val urlStart2  = """[A-Za-z0-9\.-]+?\.""" + commonTLDs + """(?=[/ \W])"""
-  val urlBody    = """[^ \t\r\n<>]*?"""
-  val urlExtraCrapBeforeEnd = "("+punctChars+"|"+entity+")+?"
-  val urlEnd     = """(\.\.+|[<>]|\s|$)"""
-  val url        = """\b("""+urlStart1+"|"+urlStart2+")"+urlBody+"(?=("+urlExtraCrapBeforeEnd+")?"+urlEnd+")"
+  val urlStart1  = "(?:https?://|\\bwww\\.)"
+  val commonTLDs = "(?:com|org|edu|gov|net|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|pro|tel|travel|xxx)"
+  val ccTLDs	 = "(?:ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|" +
+      "bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|" +
+      "er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|" +
+      "hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|" +
+      "lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|" +
+      "nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|sk|" +
+      "sl|sm|sn|so|sr|ss|st|su|sv|sy|sz|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|" +
+      "va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|za|zm|zw)"	//todo: remove obscure country domains?
+  val urlStart2  = "\\b(?:[A-Za-z\\d-])+(?:\\.[A-Za-z0-9]+){0,3}\\." + "(?:"+commonTLDs+"|"+ccTLDs+")"+"(?:\\."+ccTLDs+")?(?U)(?=[\\W])"
+  val urlBody    = """(?:[^\.\s<>][^\s<>]*?)?"""
+  val urlExtraCrapBeforeEnd = "(?:"+punctChars+"|"+entity+")+?"
+  val urlEnd     = """(?:\.\.+|[<>]|\s|$)"""
+  val url        = """(?:"""+urlStart1+"|"+urlStart2+")"+urlBody+"(?=(?:"+urlExtraCrapBeforeEnd+")?"+urlEnd+")"
+  
 
   // Numeric
-  val timeLike   = """\d+:\d+"""
-  val numNum     = """\d+\.\d+"""
-  val numberWithCommas = """(\d+,)+?\d{3}""" + """(?=([^,]|$))"""
+  val timeLike   = "\\d+(?::\\d+){1,2}"
+  //val numNum     = "\\d+\\.\\d+"
+  val numberWithCommas = "(?:(?<!\\d)\\d{1,3},)+?\\d{3}" + "(?=(?:[^,\\d]|$))"
+  val numComb	 = "\\$?\\d+(?:\\.\\d+)+%?"
 
   // Abbreviations
-  val boundaryNotDot = """($|\s|[“\"?!,:;]|""" + entity + ")" 
-  val aa1  = """([A-Za-z]\.){2,}(?=""" + boundaryNotDot + ")"
-  val aa2  = """[^A-Za-z]([A-Za-z]\.){1,}[A-Za-z](?=""" + boundaryNotDot + ")"
-  val standardAbbreviations = """\b([Mm]r|[Mm]rs|[Mm]s|[Dd]r|[Ss]r|[Jj]r|[Rr]ep|[Ss]en|[Ss]t)\."""
-  val arbitraryAbbrev = "(" + aa1 +"|"+ aa2 + "|" + standardAbbreviations + ")"
-  val separators  = "(--+|―|—|~|–)"
-  val decorations = """[♫]+"""
+  val boundaryNotDot = """(?:$|\s|[“\"?!,:;]|""" + entity + ")" 
+  val aa1  = "(?:[A-Za-z]\\.){2,}(?=" + boundaryNotDot + ")"
+  val aa2  = "[^A-Za-z](?:[A-Za-z]\\.){1,}[A-Za-z](?=" + boundaryNotDot + ")"
+  val standardAbbreviations = "\\b(?:[Mm]r|[Mm]rs|[Mm]s|[Dd]r|[Ss]r|[Jj]r|[Rr]ep|[Ss]en|[Ss]t)\\."
+  val arbitraryAbbrev = "(?:" + aa1 +"|"+ aa2 + "|" + standardAbbreviations + ")"
+  val separators  = "(?:--+|―|—|~|–)"
+  val decorations = "([♫♪]|[★☆]|[♥❤]|[\\u2639-\\u263b]|[\\ue001-\\uebbb])\\3*" //backreference for ♥♥♥ etc.
   val thingsThatSplitWords = """[^\s\.,]"""
-  val embeddedApostrophe = thingsThatSplitWords+"""+'""" + thingsThatSplitWords + """+"""
+  val embeddedApostrophe = thingsThatSplitWords+"+'" + thingsThatSplitWords + "+"
 
   //  Emoticons
   val normalEyes = "(?iu)[:=]"
   val wink = "[;]"
-  val noseArea = "(|o|O|-|[^a-zA-Z0-9 ])"
-  val happyMouths = """[D\)\]]+"""
-  val sadMouths = """[\(\[]+"""
+  val noseArea = "(?:|o|O|-|[^a-zA-Z0-9 ])"
+  val happyMouths = "[D\\)\\]]+"
+  val sadMouths = "[\\(\\[]+"
   val tongue = "[pP]"
-  val otherMouths = """[doO/\\]+""" // remove forward slash if http://'s aren't cleaned
+  val otherMouths = "[doO/\\\\vV]+" // remove forward slash if http://'s aren't cleaned
 
   // mouth repetition examples:
   // @aliciakeys Put it in a love song :-))
   // @hellocalyclops =))=))=)) Oh well
 
   def OR(parts: String*) = {
-    "(" + parts.toList.mkString("|") + ")"
+    "(?:" + parts.toList.mkString("|") + ")"
   }
 
+  val basicface= "(?i)(♥|0|o|t|x|>|\\u0CA0|<|@|ʘ|•|・|◕|\\^|¬|\\*)[\\._+\\-+]\\2"
+  val eastEmote= """[＼\\ƪ\(（<>;ヽ\-=~\*]+(?:"""+basicface+"""|[^A-Za-z0-9\s\(\):])+[\-=\);'\"<>ʃ）/／ノﾉ丿╯σっµ~\*]+"""
   val emoticon = OR(
       // Standard version  :) :( :] :D :P
       OR(normalEyes, wink) + noseArea + OR(tongue, otherMouths, sadMouths, happyMouths),
       
       // reversed version (: D:  use positive lookbehind to remove "(word):"
       // because eyes on the right side is more ambiguous with the standard usage of : ;
-      """(?<=( |^))""" + OR(sadMouths,happyMouths,otherMouths) + noseArea + OR(normalEyes, wink) 
+      "(?<=(?: |^))" + OR(sadMouths,happyMouths,otherMouths) + noseArea + OR(normalEyes, wink),
       
-      // TODO japanese-style emoticons
+	  
+	  //inspired by http://en.wikipedia.org/wiki/User:Scapler/emoticons#East_Asian_style
+	  eastEmote, basicface
+      // iOS 'emoji' characters (some smileys, some symbols) [\ue001-\uebbb]  
       // TODO should try a big precompiled lexicon from Wikipedia, Dan Ramage told me (BTO) he does this
   	)
 
   def allowEntities(pat: String)= {
     // so we can write patterns with < and > and let them match escaped html too
-    pat.replace("<", "(<|&lt;)").replace(">", "(>|&gt;)")
+    pat.replace("<", "(?:<|&lt;)").replace(">", "(?:>|&gt;)")
   }
   
-  val Hearts = OR("""♥""",allowEntities("""(<+/?3+)"""))
+  val Hearts = allowEntities("(?:<+/?3+)+") //the other hearts are in decorations
 
-  val Arrows = allowEntities("""(<*[-―—=]*>+|<+[-―—=]*>*)""")
+  val Arrows = allowEntities("(?:<*[-―—=]*>+|<+[-―—=]*>*)")
 
   // BTO 2011-06: restored Hashtag, AtMention protection (dropped in original scala port) because it fixes
   // "hello (#hashtag)" ==> "hello (#hashtag )"  WRONG
@@ -149,15 +170,15 @@ object Twokenize {
   // ... Some sort of weird interaction with edgepunct I guess, because edgepunct 
   // has poor content-symbol detection.
   
-  val Hashtag = """#[a-zA-Z0-9_]+""";  // also gets #1 #40 which probably aren't hashtags .. but good as tokens
+  val Hashtag = "#[a-zA-Z0-9_]+";  // also gets #1 #40 which probably aren't hashtags .. but good as tokens
 
-  val AtMention = """@[a-zA-Z0-9_]+""";
+  val AtMention = "@[a-zA-Z0-9_]+";
   
   // I was worried this would conflict with at-mentions
   // but seems ok in sample of 5800: 7 changes all email fixes
   // http://www.regular-expressions.info/email.html
-  val Bound = """(\W|^|$)"""
-  val Email = "(?<=" +Bound+ """)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}(?=""" +Bound+")"
+  val Bound = "(?:\\W|^|$)"
+  val Email = "(?<=" +Bound+ ")[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}(?=" +Bound+")"
 
   // We will be tokenizing using these regexps as delimiters
   // Additionally, these things are "protected", meaning they shouldn't be further split themselves.
@@ -165,19 +186,20 @@ object Twokenize {
     OR(
       Hearts,
       Arrows,
-      emoticon,
       url,
       Email,
       entity,
       timeLike,
-      numNum,
+      //numNum,
       numberWithCommas,
+	  numComb,
+	  emoticon,
       punctSeq,
       arbitraryAbbrev,
       separators,
       decorations,
       embeddedApostrophe,
-      Hashtag, 
+	  Hashtag,  
       AtMention
      ))
   
