@@ -16,5 +16,5 @@ cp=$cp:$(echo $root/lib/*.jar | tr ' ' :)
 # Twitter Commons text library stuff
 cp=$cp:$(echo $root/lib_twitter/*.jar | tr ' ' :)
 
-exec java -cp "$cp" "$@"
+exec java -ea -cp "$cp" "$@"
 

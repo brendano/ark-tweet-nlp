@@ -1,0 +1,59 @@
+package newalgo.io;
+
+import com.google.common.io.Files;
+
+import edu.cmu.cs.lti.ark.ssl.util.BasicFileIO;
+import newalgo.Sentence;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Read a simplified version of the CoNLL format.  Two columns
+ *   Word \t POSTag
+ *
+ * With a blank line separating sentences.
+ */
+public class CoNLLReader {
+    public static ArrayList<Sentence> readFile(String filename) throws IOException {
+        BufferedReader reader = BasicFileIO.openFileToRead(filename);
+        ArrayList sentences = new ArrayList<String>();
+
+        ArrayList<String> curLines = new ArrayList<String>();
+        String line;
+        while ( (line = reader.readLine()) != null ) {
+            if (line.matches("^\\s*$")) {
+                if (curLines.size() > 0) {
+                    // Flush
+                    sentences.add(sentenceFromLines(curLines));
+                    curLines.clear();
+                }
+            } else {
+                curLines.add(line);
+            }
+        }
+        if (curLines.size() > 0) {
+            sentences.add(sentenceFromLines(curLines));
+        }
+        return sentences;
+    }
+
+    private static Sentence sentenceFromLines(List<String> lines) {
+        Sentence s = new Sentence();
+        s.tokens = new ArrayList<String>();
+        s.labels = new ArrayList<String>();
+        
+        for (String line : lines) {
+            String[] parts = line.split("\t");
+            assert parts.length == 2;
+            s.tokens.add( parts[0].trim() );
+            s.labels.add( parts[1].trim() );
+        }
+//        System.out.println(s);
+        return s;
+    }
+}
