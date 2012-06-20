@@ -1,11 +1,11 @@
 #!/bin/sh
 set -eux
 # Test the tagger on annotated data
-testfile=${3:-"$HOME/ark/blitz2011/blitz2011/data/newsplit/dev.goldtags.tab"}
+testfile="$(dirname $0)/../data/twpos-data-v0.2/dev"
 java -Xmx2g -Xms2g -cp "$(dirname $0)/../ark-tweet-nlp/target/bin/ark-1.0-SNAPSHOT.jar" \
-      edu.cmu.cs.lti.ark.ssl.pos.SemiSupervisedPOSTagger
+      edu.cmu.cs.lti.ark.ssl.pos.SemiSupervisedPOSTagger	\
       --trainOrTest test \
-      --testSet "$testfile" \
+      --testSet $testfile \
       --numLabeledSentences 100000 \
       --maxSentenceLength 200 \
       --useGlobalForLabeledData \
@@ -17,7 +17,7 @@ java -Xmx2g -Xms2g -cp "$(dirname $0)/../ark-tweet-nlp/target/bin/ark-1.0-SNAPSH
       --initialWeightsUpper 0.01 \
       --iters 1000 \
       --printRate 100 \
-      --runOutput "$2"     \
-      --execPoolDir tmp2  \
-      --modelFile "$1"     \
-      --noahsFeaturesFile noah.feats
+      --runOutput $1    \
+      --execPoolDir /tmp2  \
+      --modelFile "C:\Users\Tobi\Documents\GitHub\ark-tweet-nlp\mod\model_220"     \
+      #--noahsFeaturesFile noah.feats
