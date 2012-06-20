@@ -15,6 +15,7 @@
             <plugin>
                 <groupId>org.scala-tools</groupId>
                 <artifactId>maven-scala-plugin</artifactId>
+                <version>2.15.2</version>
                 <executions>
                     <execution>
                         <id>compile</id>
@@ -48,6 +49,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
@@ -146,16 +148,6 @@
             <version>10.0.1</version>
         </dependency>
         <!-- START locally distributed libs -->
-        <dependency>
-            <groupId>net.sf.jargs</groupId>
-            <artifactId>jargs</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>edu.berkeley.nlp</groupId>
-            <artifactId>posTagger</artifactId>
-            <version>0.0.0</version>
-        </dependency>
         <!-- END locally distributed libs -->
         <!-- START testing dependecies -->
         <dependency>
@@ -171,5 +163,23 @@
             <scope>test</scope>
         </dependency>
         <!-- END testing dependecies -->
+        <dependency>
+        	<groupId>net.sf.jargs</groupId>
+        	<artifactId>jargs</artifactId>
+        	<version>1.0.0</version>
+        	<type>pom</type>
+        </dependency>
+        <dependency>
+        	<groupId>edu.berkeley.nlp</groupId>
+        	<artifactId>posTagger</artifactId>
+        	<version>0.0.0</version>
+        	<type>pom</type>
+        </dependency>
+        <dependency>
+        	<groupId>com.fasterxml.jackson.core</groupId>
+        	<artifactId>jackson-core</artifactId>
+        	<version>2.1.0-SNAPSHOT</version>
+        	<type>pom</type>
+        </dependency>
     </dependencies>
 </project>
