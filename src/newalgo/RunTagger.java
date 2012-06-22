@@ -29,7 +29,7 @@ public class RunTagger {
 			assert false;
 		}
 		
-		model = Model.readCoefs(modelFilename);
+		model = Model.loadModelFromText(modelFilename);
         FeatureExtractor fe = new FeatureExtractor(model, false);
         
         boolean evalMode = inputFormat.equals("conll");

@@ -239,14 +239,13 @@ public class Model {
 //        return id - K - (K+1)*K;
 //    }
 
-	public void dumpCoefs(String outputFilename) throws IOException {
+	public void saveModelAsText(String outputFilename) throws IOException {
 		BufferedWriter writer = BasicFileIO.openFileToWrite(outputFilename);
 		PrintWriter out = new PrintWriter(writer);
 		
 		for (int k=0; k<numLabels(); k++) {
 			out.printf("***BIAS***\t%s\t%g\n", labelVocab.name(k), biasCoefs[k]);
 		}
-		Util.p(labelVocab);
 		for (int prevLabel=0; prevLabel < numLabels()+1; prevLabel++) {
 			for (int curLabel=0; curLabel < numLabels(); curLabel++) {
 				out.printf("***EDGE***\t%s %s\t%s\n", prevLabel, curLabel, edgeCoefs[prevLabel][curLabel]);
@@ -264,7 +263,7 @@ public class Model {
 		writer.close();
 	}
 	
-	public static Model readCoefs(String filename) throws IOException {
+	public static Model loadModelFromText(String filename) throws IOException {
 		Model model = new Model();
         BufferedReader reader = BasicFileIO.openFileToRead(filename);
         String line;

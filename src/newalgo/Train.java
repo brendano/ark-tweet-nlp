@@ -46,7 +46,7 @@ public class Train {
         model.lockdownAfterFeatureExtraction();
         optimizationLoop();
 //      sgdLoop();
-        model.dumpCoefs(modelSaveFilename);
+        model.saveModelAsText(modelSaveFilename);
     }
 
     public void readTrainingSentences(String filename) throws IOException {

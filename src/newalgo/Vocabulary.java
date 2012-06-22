@@ -45,8 +45,8 @@ public class Vocabulary {
         }
     }
 
-    String name (int num) {
-        if ( num2name.size() <= num ) {
+    String name(int num) {
+        if (num2name.size() <= num) {
             throw new RuntimeException("Unknown number for vocab: " + num);
         } else {
             return num2name.get(num);
@@ -59,37 +59,9 @@ public class Vocabulary {
 
     /** Throw an error if OOV **/
 	public int numStrict(String string) {
+		assert isLocked;
 		int n = num(string);
 		if (n == -1) throw new RuntimeException("OOV happened");
 		return n;
 	}
-
 }
-
-
-//      auto iter = name2num.find(featname);
-//      if (iter == name2num.end()) {
-//        int n = name2num.size();
-//        name2num[featname] = n;
-//        string *newname = new string(featname);
-//        num2name[n] = *newname;
-//        return n;
-//      } else {
-//        return name2num[featname];
-//      }
-//    }
-
-//    int total() const {
-//      return name2num.size();
-//    }
-//    string
-//    name(int num) const {
-//      if (num2name.find(num) == num2name.end()) {
-//        return WTF;
-//      } else {
-//        auto it = num2name.find(num);
-//        if (it==num2name.end()) return WTF;
-//        return it->second;
-//      }
-//    }
-
