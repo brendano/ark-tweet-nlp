@@ -53,6 +53,11 @@ public class Vocabulary {
         }
     }
     
+    public boolean contains(String name) {
+    	return name2num.containsKey(name);
+    }
+    
+    
     public String toString() {
     	return "[" + StringUtils.join(num2name) + "]";
     }

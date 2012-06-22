@@ -115,6 +115,12 @@ public class RunTagger {
 	}
 	
 	public static void usage() {
+    	System.out.println(
+		"RunTagger [options] <ExamplesFilename> <ModelFilename>\n" +
+		"Options:" +
+		"\n  --input-format <Format>" + 
+		"\n  --output-format <Format>" +
+		"\n");
 		System.exit(1);
 	}
 }

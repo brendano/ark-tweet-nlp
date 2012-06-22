@@ -72,14 +72,15 @@ public class Model {
     }
 
     /**
-     * "given labels" i.e. at trainingtime labels are observed.  this isn't really decoding, but rather, compute 
-     * the funny incremental posteriors you get from an MEMM (that don't have a proper full-model marginalization
-     * interpretation like a CRF does. no?)
+     * "given labels" i.e. at trainingtime labels are observed.  These are
+     * the funny incremental posterior marginals you get from an MEMM
+     * (that don't have a proper full-model marginalization
+     * interpretation like a CRF forward-backward-computed posterior does. no?)
      * 
      * @param sentence: Input.
      * @returns posterior: Output. dim (T x N_label)
      */
-    public double[][] decodeGivenLabels(ModelSentence sentence) {
+    public double[][] inferPosteriorGivenLabels(ModelSentence sentence) {
     	double[][] posterior = new double[sentence.T][labelVocab.size()];
     	double[] labelScores = new double[numLabels()];
     	for (int t=0; t<sentence.T; t++) {
@@ -154,7 +155,7 @@ public class Model {
     public void computeGradient(ModelSentence sentence, double[] grad) {
     	assert grad.length == flatIDsize();
         int T = sentence.T;
-        double[][] posterior = decodeGivenLabels(sentence);
+        double[][] posterior = inferPosteriorGivenLabels(sentence);
 
         for (int t=0; t<T; t++) {        	
         	int prevLabel = sentence.edgeFeatures[t];
@@ -174,7 +175,7 @@ public class Model {
     }
     
 	public double computeLogLik(ModelSentence s) {
-		double[][] posterior = decodeGivenLabels(s);
+		double[][] posterior = inferPosteriorGivenLabels(s);
 		double loglik = 0;
 		for (int t=0; t < s.T; t++) {
 			int y = s.labels[t];
@@ -182,6 +183,8 @@ public class Model {
 		}
 		return loglik;
 	}
+	
+	/////////////////////////////////////////////////////////
     
     public void setCoefsFromFlat(double[] flatCoefs) {
     	for (int k=0; k<numLabels(); k++) {
@@ -197,6 +200,24 @@ public class Model {
     			observationFeatureCoefs[feat][k] = flatCoefs[observationFeature_to_flatID(feat, k)];
     		}
     	}
+    }
+    
+    public double[] convertCoefsToFlat() {
+    	double[] flatCoefs = new double[flatIDsize()];
+    	for (int k=0; k<numLabels(); k++) {
+    		flatCoefs[biasFeature_to_flatID(k)] = biasCoefs[k];
+    	}
+    	for (int prevLabel=0; prevLabel<numLabels()+1; prevLabel++) {
+    		for (int k=0; k<numLabels(); k++) {
+    			flatCoefs[edgeFeature_to_flatID(prevLabel, k)] = edgeCoefs[prevLabel][k];
+    		}
+    	}
+    	for (int feat=0; feat < featureVocab.size(); feat++) {
+    		for (int k=0; k < numLabels(); k++) {
+    			flatCoefs[observationFeature_to_flatID(feat, k)] = observationFeatureCoefs[feat][k];
+    		}
+    	}
+    	return flatCoefs;
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -219,10 +240,12 @@ public class Model {
         return K + (K+1)*K + featID*K + label;
     }
     
-    public boolean isUnregularized(int flatFeatID) {
-        int K = labelVocab.size();
-    	return flatFeatID < K + (K+1)*K;
-    }
+//    public boolean isUnregularized(int flatFeatID) {
+//        int K = labelVocab.size();
+//    	return flatFeatID < K + (K+1)*K;
+//    }
+    
+    // These appear to be unnecessary, and trickier to get correct anyway
 //    private int flatID_to_biasFeature(int id) {
 //        return id;
 //    }
@@ -238,7 +261,21 @@ public class Model {
 //        int K = labelVocab.size();
 //        return id - K - (K+1)*K;
 //    }
-
+    
+//////////////////////////////////////////////////
+    
+    /*
+     todo, think about binary format.  idea
+    
+     
+     NumLabels\n[[binary blob for biases]][[binary blob for edge coefs]]
+     NumObsFeats\n[[binary blob for obs feats]]
+     
+     where NumLabels and NumObsFeats are plaintext.
+     there is no separator after the binary blobs, you infer that from NumLabels and NumObsFeats
+     
+     */
+    
 	public void saveModelAsText(String outputFilename) throws IOException {
 		BufferedWriter writer = BasicFileIO.openFileToWrite(outputFilename);
 		PrintWriter out = new PrintWriter(writer);
@@ -312,6 +349,36 @@ public class Model {
         	model.observationFeatureCoefs[x.getFirst()][x.getSecond()] = x.getThird();
         }        
         return model;
+	}
+	
+	/**
+	 * Copies coefs from sourceModel into destModel.
+	 * For observation features, only copies features that exist in both.
+	 * (Therefore if a feature exists in destModel but not sourceModel, it's not touched.)
+	 */
+	public static void copyCoefsForIntersectingFeatures(Model sourceModel, Model destModel) {		
+		int K = sourceModel.numLabels();
+		
+		// We could do the name-checking intersection trick for label vocabs, but punt for now
+		if (K != destModel.numLabels()) throw new RuntimeException("label vocabs must be same size for warm-start");
+		for (int k=0; k < K; k++) {
+			if ( ! destModel.labelVocab.name(k).equals(sourceModel.labelVocab.name(k))) {
+				throw new RuntimeException("label vocabs must agree for warm-start");
+			}
+		}
+
+		destModel.biasCoefs = ArrayUtil.copy(sourceModel.biasCoefs);
+		destModel.edgeCoefs = ArrayUtil.copy(sourceModel.edgeCoefs);
+		
+		// observation features need the intersection
+		for (int sourceFeatID=0; sourceFeatID < sourceModel.featureVocab.size(); sourceFeatID++) {
+			String featName = sourceModel.featureVocab.name(sourceFeatID);
+			if (destModel.featureVocab.contains(featName)) {
+				int destFeatID = destModel.featureVocab.num(featName);
+				destModel.observationFeatureCoefs[destFeatID] = ArrayUtil.copy(
+						sourceModel.observationFeatureCoefs[sourceFeatID] );
+			}
+		}
 	}
 
 }

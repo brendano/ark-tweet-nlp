@@ -15,7 +15,7 @@ public class Train {
     public double l1penalty = 0.01;
 	public double tol = 1e-5;
     public int maxIter = 500;
-//    public String modelLoadFilename = null;		
+    public String modelLoadFilename = null;		
     public String examplesFilename = null;
     public String modelSaveFilename = null;
     public boolean dumpFeatures = false;
@@ -34,16 +34,21 @@ public class Train {
         model = new Model();
     }
     
+    public void doFeatureDumping() throws IOException {
+        readTrainingSentences(examplesFilename);
+        constructLabelVocab();
+        extractFeatures();
+    	dumpFeatures();
+    }
 
     public void doTraining() throws IOException {
         readTrainingSentences(examplesFilename);
         constructLabelVocab();
-        if (dumpFeatures) {
-        	dumpFeatures();
-        	System.exit(0);
-        }
         extractFeatures();
         model.lockdownAfterFeatureExtraction();
+        if (modelLoadFilename != null) {
+        	readWarmStartModel();
+        }
         optimizationLoop();
 //      sgdLoop();
         model.saveModelAsText(modelSaveFilename);
@@ -81,14 +86,20 @@ public class Train {
             mSentences.add(mSent);
         }
     }
+    
+    public void readWarmStartModel() throws IOException {
+    	assert model.featureVocab.isLocked();
+    	Model warmModel = Model.loadModelFromText(modelLoadFilename);
+    	Model.copyCoefsForIntersectingFeatures(warmModel, model);
+    }
 
     public void optimizationLoop() {
     	OWLQN minimizer = new OWLQN();
     	minimizer.setMaxIters(maxIter);
     	minimizer.setQuiet(false);
-    	double[] initialWeights = new double[model.flatIDsize()];
-    	
     	minimizer.setWeightsPrinting(new MyWeightsPrinter());
+    	
+    	double[] initialWeights = model.convertCoefsToFlat();
     	
         double[] finalWeights = minimizer.minimize(
         		new GradientCalculator(),
@@ -179,12 +190,15 @@ public class Train {
 
         int i=0;
         while (i < args.length) {
-        	if (!args[i].startsWith("-")) break;
-//        	else if (args[i].equals("--load-model")) {
-//        		trainer.modelLoadFilename = args[i+1];
-//        		i += 2;
-//        	} 
-        	if (args[i].equals("--maxiter")) {
+//        	Util.p(args[i]);
+        	if (!args[i].startsWith("-")) {
+        		break;
+        	}
+        	else if (args[i].equals("--warm-start")) {
+        		trainer.modelLoadFilename = args[i+1];
+        		i += 2;
+        	} 
+        	else if (args[i].equals("--max-iter")) {
         		trainer.maxIter = Integer.parseInt(args[i+1]);
         		i += 2;
         	}
@@ -197,6 +211,12 @@ public class Train {
         	}
         }
         
+        if (trainer.dumpFeatures) {
+            trainer.examplesFilename = args[i];
+        	trainer.doFeatureDumping();
+        	System.exit(0);
+        }
+                
         if (args.length - i < 2) usage();
 
         trainer.examplesFilename = args[i];
@@ -207,9 +227,12 @@ public class Train {
     }
     public static void usage() {
     	System.out.println(
-    			"Train [options]  examples_filename model_output_filename\n" +
-    			"Options:\n" +
-    			"  --load-model model_name_to_load\n"
+		"Train [options] <ExamplesFilename> <ModelOutputFilename>\n" +
+		"Options:" +
+		"\n  --max-iter <n>" +
+		"\n  --warm-start <modelfile>    Initializes at weights of this model.  discards base features that aren't in training set." +
+		"\n  --dump-feat                 Show extracted features, instead of training. Useful for debugging/analyzing feature extractors." +
+		"\n"
     	);
     	System.exit(1);
     }
