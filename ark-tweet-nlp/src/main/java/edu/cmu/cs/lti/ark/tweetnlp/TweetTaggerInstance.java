@@ -54,7 +54,7 @@ public class TweetTaggerInstance {
 	    argList.add("--execPoolDir");
 	    argList.add("/tmp");
 	    argList.add("--modelFile");
-	    argList.add("lib/tweetpos.model");
+	    argList.add("tweetpos.model");
 	    argList.add("--useDistSim");
 	    argList.add("--useNames");
 	    argList.add("--numLabeledSentences");

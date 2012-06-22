@@ -44,7 +44,7 @@ public class CMUPOSTagger extends TokenStream {
 
     @Override
     public void reset(CharSequence input) {
-        this.tweetTokens = Twokenize.tokenizeForTagger_J(input.toString());
+        this.tweetTokens = Twokenize.tokenizeForTagger(input.toString());
         this.tweetTags = doTagging(tweetTokens);
         this.tokenIndex = 0;
     }

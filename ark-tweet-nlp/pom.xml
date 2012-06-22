@@ -13,40 +13,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.scala-tools</groupId>
-                <artifactId>maven-scala-plugin</artifactId>
-                <version>2.15.2</version>
-                <executions>
-                    <execution>
-                        <id>compile</id>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <phase>compile</phase>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                        <phase>test-compile</phase>
-                    </execution>
-                    <execution>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <scalaVersion>2.9.0</scalaVersion>
-                    <jvmArgs>
-                        <jvmArg>-Xms64m</jvmArg>
-                        <jvmArg>-Xmx1024m</jvmArg>
-                    </jvmArgs>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
@@ -67,7 +33,7 @@
                             <addClasspath>true</addClasspath>
                         </manifest>
                     </archive>
-                    <outputDirectory>target/bin</outputDirectory>
+                    <outputDirectory>../bin</outputDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -80,12 +46,31 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>target/bin</outputDirectory>
+                            <outputDirectory>../bin</outputDirectory>
                             <includeScope>runtime</includeScope>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+			<plugin>
+				<groupId>com.googlecode.addjars-maven-plugin</groupId>
+				<artifactId>addjars-maven-plugin</artifactId>
+				<version>1.0.3</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>add-jars</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<JarResource>
+									<directory>../lib</directory>
+								</JarResource>
+							</resources>						
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>			
         </plugins>
     </build>
     <repositories>
@@ -95,22 +80,10 @@
             <url>https://oss.sonatype.org/content/repositories/JBoss</url>
         </repository>
         <repository>
-            <id>scala-tools.org</id>
-            <name>Scala-tools Maven2 Repository</name>
-            <url>http://scala-tools.org/repo-releases</url>
-        </repository>
-        <repository>
             <id>twitter</id>
             <url>http://maven.twttr.com/</url>
         </repository>
     </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>scala-tools.org</id>
-            <name>Scala-tools Maven2 Repository</name>
-            <url>http://scala-tools.org/repo-releases</url>
-        </pluginRepository>
-    </pluginRepositories>
     <dependencies>
         <dependency>
             <groupId>commons-codec</groupId>
@@ -128,11 +101,6 @@
             <version>1.4.1</version>
         </dependency>
         <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>2.9.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
             <version>3.0.3</version>
@@ -148,21 +116,6 @@
             <version>10.0.1</version>
         </dependency>
         <!-- START locally distributed libs -->
-        <!-- END locally distributed libs -->
-        <!-- START testing dependecies -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-all</artifactId>
-            <version>1.1</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- END testing dependecies -->
         <dependency>
         	<groupId>net.sf.jargs</groupId>
         	<artifactId>jargs</artifactId>
@@ -180,6 +133,21 @@
         	<artifactId>jackson-core</artifactId>
         	<version>2.1.0-SNAPSHOT</version>
         	<type>pom</type>
+        </dependency>        
+        <!-- END locally distributed libs -->
+        <!-- START testing dependecies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <version>1.1</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- END testing dependecies -->
     </dependencies>
 </project>

@@ -19,5 +19,5 @@ java -Xmx2g -Xms2g -cp "$(dirname $0)/../ark-tweet-nlp/target/bin/ark-1.0-SNAPSH
       --printRate 100 \
       --runOutput $1    \
       --execPoolDir /tmp2  \
-      --modelFile "C:\Users\Tobi\Documents\GitHub\ark-tweet-nlp\mod\model_220"     \
+      --modelFile $2     \
       #--noahsFeaturesFile noah.feats

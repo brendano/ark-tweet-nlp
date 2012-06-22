@@ -5,6 +5,9 @@ import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+
 public class BasicFileIO {
 
 	/*
@@ -78,6 +81,32 @@ public class BasicFileIO {
 			System.exit(-1);
 		}
 		return null;
+	}
+	
+	public static String getLine(JsonParser jParse) {
+		//returns the next "text" field or null if none left
+		try {
+			while(jParse.getText()!=null){
+			    if ("text".equals(jParse.getCurrentName())) {
+			    	jParse.nextToken(); // move to value
+			    	String tweet = jParse.getText();
+			    	jParse.nextToken();
+			    	return tweet;
+			    }
+			    jParse.nextToken();
+			}
+		} catch(JsonParseException e){
+			e.printStackTrace();
+			log.severe("Error parsing JSON.");
+			System.exit(-1);			  
+		  }
+		catch(IOException e) {
+			e.printStackTrace();
+			log.severe("Could not read line from file.");
+			System.exit(-1);
+		}
+		  
+		return null;	//jParse is null (EOF)	
 	}
 
 	public static void writeLine(BufferedWriter bWriter, String line) {
