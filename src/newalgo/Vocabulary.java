@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import edu.berkeley.nlp.util.StringUtils;
 
+/** Could scrap this and use ark-regression's version -- that one has CheapStrings **/
 public class Vocabulary {
 	
     private HashMap<String,Integer> name2num;

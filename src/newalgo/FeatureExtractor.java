@@ -125,6 +125,10 @@ public class FeatureExtractor {
     //
     // Actual feature extractors
     
+    // for performance, figuring out a numberization approach faster than string concatenation might help
+    // internet suggests that String.format() is slower than string concat
+    // maybe can reuse a StringBuilder object? Ideally, would do direct manipulation of a char[] with reuse.
+    
     private void initializeFeatureExtractors() {
         allFeatureExtractors = new ArrayList<FeatureExtractorInterface>();
         allFeatureExtractors.add(new WordformFeatures());

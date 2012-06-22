@@ -17,6 +17,7 @@ import edu.berkeley.nlp.util.StringUtils;
 import edu.berkeley.nlp.util.Triple;
 import edu.cmu.cs.lti.ark.ssl.util.BasicFileIO;
 import edu.stanford.nlp.math.ArrayMath;
+import edu.stanford.nlp.util.ArrayUtils;
 import fig.basic.Pair;
 
 /**
@@ -72,13 +73,14 @@ public class Model {
     }
 
     /**
-     * "given labels" i.e. at trainingtime labels are observed.  These are
-     * the funny incremental posterior marginals you get from an MEMM
-     * (that don't have a proper full-model marginalization
+     * "given labels" i.e. at trainingtime labels are observed.
+     * You hide the current one and predict it given you know the previous.
+     * So you get funny incremental posteriors per position that an MEMM uses at trainingtime.
+     * (They don't have a proper full-model posterior marginal
      * interpretation like a CRF forward-backward-computed posterior does. no?)
      * 
-     * @param sentence: Input.
-     * @returns posterior: Output. dim (T x N_label)
+     * @param sentence - must its have .labels set
+     * @returns posterior marginals, dim (T x N_label)
      */
     public double[][] inferPosteriorGivenLabels(ModelSentence sentence) {
     	double[][] posterior = new double[sentence.T][labelVocab.size()];
@@ -103,8 +105,6 @@ public class Model {
     /** 
      * THIS CLOBBERS THE LABELS, stores its decoding into them.
      * Does progressive rolling edge feature extraction
-     * 
-     * question: how to infer posterior marginals?
      **/
 	public void greedyDecode(ModelSentence sentence) {
 		int T = sentence.T;
@@ -118,7 +118,29 @@ public class Model {
     			sentence.edgeFeatures[t+1] = sentence.labels[t];
     	}
 	}
+	
 
+	/**
+	 * This needs forward-backward I think
+	 * @return dim: (T x K) posterior marginals at each position
+	 */
+	public double[][] inferPosteriorForUnknownLabels(ModelSentence sentence) {
+		assert false : "Unimplemented";
+		return null;
+	}
+	
+	public void viterbiDecode(ModelSentence sentence) {
+		assert false : "Unimplemented";
+	}
+	
+	public void mbrDecode(ModelSentence sentence) {
+		double[][] posterior = inferPosteriorForUnknownLabels(sentence);
+		for (int t=0; t < sentence.T; t++) {
+			sentence.labels[t] = ArrayMath.argmax(posterior[t]);
+		}
+	}
+
+	/** CLOBBERS labelScores **/
     public void computeLabelScores(int t, ModelSentence sentence, double[] labelScores) {
     	Arrays.fill(labelScores, 0);
     	computeBiasScores(labelScores);
@@ -126,12 +148,14 @@ public class Model {
     	computeObservedFeatureScores(t, sentence, labelScores);
     }
     
+    /** Adds into labelScores **/
     public void computeBiasScores(double[] labelScores) {
     	for (int k=0; k < numLabels(); k++) {
     		labelScores[k] += biasCoefs[k]; 
     	}
     }
     
+    /** Adds into labelScores **/
     public void computeEdgeScores(int t, ModelSentence sentence, double[] labelScores) {
 //    	Util.p(sentence.edgeFeatures);
     	int prev = sentence.edgeFeatures[t];
@@ -140,6 +164,7 @@ public class Model {
     	}
     }
     
+    /** Adds into labelScores **/
     public void computeObservedFeatureScores(int t, ModelSentence sentence, double[] labelScores) {
     	for (int k=0; k < numLabels(); k++) {
     		for (int obsFeat : sentence.observationFeatures.get(t)) {
@@ -185,6 +210,10 @@ public class Model {
 	}
 	
 	/////////////////////////////////////////////////////////
+	
+	// Flat-version conversion routines
+	// (If this was C++ we could do something clever with memory layout instead to avoid this.)
+	// (Or we could do said clever things in Java atop a flat representation, but that would be painful.)
     
     public void setCoefsFromFlat(double[] flatCoefs) {
     	for (int k=0; k<numLabels(); k++) {
@@ -275,6 +304,7 @@ public class Model {
      there is no separator after the binary blobs, you infer that from NumLabels and NumObsFeats
      
      */
+    
     
 	public void saveModelAsText(String outputFilename) throws IOException {
 		BufferedWriter writer = BasicFileIO.openFileToWrite(outputFilename);
