@@ -351,20 +351,20 @@ public class Model {
         }
         model.labelVocab.lock();
         
-        while ( (line = reader.readLine()) != null ) {
+        do {
         	String[] parts = line.split("\t");
         	if ( ! parts[0].equals("***EDGE***")) break;
     		String[] edgePair = parts[1].split(" ");
     		int prev = Integer.parseInt(edgePair[0]);
     		int cur  = Integer.parseInt(edgePair[1]);
     		edgeCoefs.add(new Triple(prev, cur, Double.parseDouble(parts[2])));
-        }
-        while ( (line = reader.readLine()) != null ) {
+        } while ( (line = reader.readLine()) != null );
+        do {
         	String[] parts = line.split("\t");
     		int f = model.featureVocab.num(parts[0]);
     		int k = model.labelVocab.num(parts[1]);
 			obsCoefs.add(new Triple(f, k, Double.parseDouble(parts[2])));
-    	}
+    	} while ( (line = reader.readLine()) != null );
         model.featureVocab.lock();
         
         model.allocateCoefs(model.labelVocab.size(), model.featureVocab.size());
