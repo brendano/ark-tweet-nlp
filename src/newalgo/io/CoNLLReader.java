@@ -1,16 +1,12 @@
 package newalgo.io;
 
-import com.google.common.io.Files;
-
-import edu.cmu.cs.lti.ark.ssl.util.BasicFileIO;
-import newalgo.Sentence;
-
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import newalgo.Sentence;
+import edu.cmu.cs.lti.ark.ssl.util.BasicFileIO;
 
 /**
  * Read a simplified version of the CoNLL format.  Two columns
