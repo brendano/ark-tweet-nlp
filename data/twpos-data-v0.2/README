@@ -1,0 +1,49 @@
+============================================================================
+    Twitter Part-of-Speech Annotated Data 
+    Copyright (C) 2011
+    Kevin Gimpel, Nathan Schneider, Brendan O'Connor, Dipanjan Das, Daniel Mills, 
+    Jacob Eisenstein, Michael Heilman, Dani Yogatama, Jeffrey Flanigan, and Noah A. Smith 
+    Language Technologies Institute, Carnegie Mellon University
+    http://www.ark.cs.cmu.edu/TweetNLP
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+=============================================================================
+
+  Description:
+
+    This is release v0.2 of a data set of tweets manually annotated with part-of-speech 
+    tags. The annotated data is divided into three files: 
+      "train" (1000 tweets),
+      "dev" (327 tweets), and
+      "test" (500 tweets). 
+    Each file contains one token (with its tag separated by a tab) per line, and a blank 
+    line to indicate a tweet boundary. See Gimpel et al. (2011) for information on the tagset.
+
+    We attempted to anonymize all Twitter usernames within tweets. For this, we used a 
+    hash from Twitter usernames to unique identifiers.
+
+    The difference between this version and version 0.1 is the use of an improved Twitter tokenizer. 
+    After the new tokenizer was run, tweets with differing tokenizations were reannotated following 
+    the same guidelines as the initial release.
+
+  Contact:
+
+    Please contact Kevin Gimpel (kgimpel@cs.cmu.edu) with any questions about this release.
+
+  References:
+
+    Kevin Gimpel, Nathan Schneider, Brendan O'Connor, Dipanjan Das, Daniel Mills, Jacob Eisenstein, Michael Heilman, Dani Yogatama, Jeffrey Flanigan, and Noah A. Smith.
+    Part-of-Speech Tagging for Twitter: Annotation, Features, and Experiments.
+    In Proceedings of the Annual Meeting of the Association for Computational Linguistics, companion volume, Portland, OR, June 2011.
+

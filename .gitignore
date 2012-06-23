@@ -11,4 +11,7 @@ out
 
 mybuild
 tokenizer_development
-bin
+mod/
+target/
+bin/
+*.bak

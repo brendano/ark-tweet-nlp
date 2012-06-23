@@ -1,19 +1,9 @@
 #!/bin/sh
-
-# Test the tagger on annotated data -- this script needs changes to work
-
-root=$(dirname $0)/..
-jhome=/usr/bin
-
-classpath="build:lib/jargs.jar:lib/posBerkeley.jar:lib/commons-codec-1.4.jar"
-
 set -eux
-(
-cd $root
-
-testfile=/Users/brendano/ark/blitz2011/blitz2011/data/newsplit/dev.goldtags.tab
-${jhome}/java -Xmx2g -Xms2g -cp ${classpath} \
-      edu.cmu.cs.lti.ark.ssl.pos.SemiSupervisedPOSTagger \
+# Test the tagger on annotated data
+testfile="$(dirname $0)/../data/twpos-data-v0.2/dev"
+java -Xmx2g -Xms2g -cp "$(dirname $0)/../ark-tweet-nlp/target/bin/ark-1.0-SNAPSHOT.jar" \
+      edu.cmu.cs.lti.ark.ssl.pos.SemiSupervisedPOSTagger	\
       --trainOrTest test \
       --testSet $testfile \
       --numLabeledSentences 100000 \
@@ -27,8 +17,7 @@ ${jhome}/java -Xmx2g -Xms2g -cp ${classpath} \
       --initialWeightsUpper 0.01 \
       --iters 1000 \
       --printRate 100 \
-      --runOutput $2     \
-      --execPoolDir tmp2  \
-      --modelFile $1     \
-      --noahsFeaturesFile noah.feats
-) 2>&1
+      --runOutput $1    \
+      --execPoolDir /tmp2  \
+      --modelFile $2     \
+      #--noahsFeaturesFile noah.feats
