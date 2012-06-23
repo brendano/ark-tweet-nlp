@@ -12,7 +12,7 @@ cp=$cp:$root/out/production/ark-tweet-nlp
 # our build dir
 cp=$cp:$root/mybuild
 
-cp=$cp:$(echo $root/lib/*.jar | tr ' ' :)
+cp=$cp:$(echo $root/lib/*.jar $root/lib/*/*.jar | tr ' ' :)
 # Twitter Commons text library stuff
 cp=$cp:$(echo $root/lib_twitter/*.jar | tr ' ' :)
 
