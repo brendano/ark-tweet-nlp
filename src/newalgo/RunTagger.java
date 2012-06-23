@@ -13,6 +13,7 @@ public class RunTagger {
 	String inputFilename;
 	String modelFilename;
 	PrintStream outputStream = System.out;
+	public boolean noOutput = false;
 	
 	Iterable<Sentence> inputIterable = null;
 	Model model;
@@ -38,8 +39,10 @@ public class RunTagger {
 			ModelSentence ms = new ModelSentence(sentence.T());
 			fe.computeFeatures(sentence, ms);
 			model.greedyDecode(ms);
-			outputTagging(sentence, ms);
 
+			if ( ! noOutput) {
+				outputTagging(sentence, ms);
+			}
 			if (evalMode) {
 				evaluateSentenceTagging(sentence, ms);
 			}
@@ -98,6 +101,9 @@ public class RunTagger {
         	} else if (args[i].equals("--output-format")) {
         		tagger.outputFormat = args[i+1];
         		i += 2;
+        	} else if (args[i].equals("-q")) {
+        		tagger.noOutput = true;
+        		i += 1;
         	}
         	else {
         		usage();        		
@@ -120,6 +126,7 @@ public class RunTagger {
 		"Options:" +
 		"\n  --input-format <Format>" + 
 		"\n  --output-format <Format>" +
+		"\n  -q                               Quiet: no output" +
 		"\n");
 		System.exit(1);
 	}
