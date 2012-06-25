@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import fig.basic.Pair;
-
 import newalgo.util.Util;
+
+import edu.stanford.nlp.util.Pair;
 
 /**
  * Extracts features and numberizes them
@@ -27,9 +27,9 @@ public class FeatureExtractor {
         initializeFeatureExtractors();
     }
 
-	/**
-	 * Does feature extraction on one sentence.
-	 * 
+    /**
+     * Does feature extraction on one sentence.
+     * 
      * Input: textual representation of sentence
      * Output: fills up modelSentence with numberized features
      */
@@ -60,7 +60,7 @@ public class FeatureExtractor {
     }
 
     private void computeObservationFeatures(Sentence sentence, ModelSentence modelSentence) {
-        PositionFeaturePairs pairs = new PositionFeaturePairs(new ArrayList<Integer>(), new ArrayList<String>());
+        PositionFeaturePairs pairs = new PositionFeaturePairs();
 
         // Extract in featurename form
         for (FeatureExtractorInterface fe : allFeatureExtractors) {
@@ -79,14 +79,15 @@ public class FeatureExtractor {
             	// these are base features that weren't seen for *any* label at training time -- of course they will be useless for us...
             	continue;
             }
-            modelSentence.observationFeatures.get(t).add(fID);
+            double fValue = pairs.featureValues.get(i);
+            modelSentence.observationFeatures.get(t).add(new Pair<Integer,Double>(fID, fValue));
         }
         if (dumpMode) {
-//        	Util.p("");
+        	Util.p("");
         	for (int t=0; t < sentence.T(); t++) {
         		System.out.printf("%s\n\t", sentence.tokens.get(t));
-        		for (int f : modelSentence.observationFeatures.get(t)) {
-        			System.out.printf("%s ", model.featureVocab.name(f));
+        		for (Pair<Integer,Double> fv : modelSentence.observationFeatures.get(t)) {
+        			System.out.printf("%s ", model.featureVocab.name(fv.first));
         		}
         		System.out.printf("\n");
         	}
@@ -107,15 +108,22 @@ public class FeatureExtractor {
     }
 
     public static class PositionFeaturePairs {
-        public List<Integer> labelIndexes;
-        public List<String> featureNames;
-        public PositionFeaturePairs(List<Integer> l, List<String> f) {
-            labelIndexes = l;
-            featureNames = f;
+        public ArrayList<Integer> labelIndexes;
+        public ArrayList<String> featureNames;
+        public ArrayList<Double> featureValues;
+        
+        public PositionFeaturePairs() {
+            labelIndexes = new ArrayList<Integer>();
+            featureNames = new ArrayList<String>();
+            featureValues = new ArrayList<Double>();
         }
         public void add(int labelIndex, String featureID) {
+        	add(labelIndex, featureID, 1.0);
+        }
+        public void add(int labelIndex, String featureID, double featureValue) {
             labelIndexes.add(labelIndex);
             featureNames.add(featureID);
+            featureValues.add(featureValue);
         }
         public int size() { return featureNames.size(); }
     }

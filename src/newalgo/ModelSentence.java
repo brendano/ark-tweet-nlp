@@ -2,7 +2,8 @@ package newalgo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+
+import edu.stanford.nlp.util.Pair;
 
 /**
  * One sequence structure -- typically, for one sentence
@@ -21,7 +22,8 @@ public class ModelSentence {
      * dim (T x M_t)  (variable # nnz featvals per t.)
      **/
 //    public int observationFeatures[][];
-    public ArrayList<ArrayList<Integer>> observationFeatures;
+//    public ArrayList<ArrayList<Integer>> observationFeatures;
+    public ArrayList<ArrayList< Pair<Integer, Double>>> observationFeatures;
 
     /** Runtime observed, Trainingtime observed (for MEMM).
      * dim T st: edgeFeatures[t] = ID of label@(t-1).
@@ -33,9 +35,9 @@ public class ModelSentence {
         this.T = T;
         labels = new int[T];
         edgeFeatures = new int[T];
-        observationFeatures = new ArrayList<ArrayList<Integer>>();
+        observationFeatures = new ArrayList<ArrayList< Pair<Integer, Double> >>();
         for (int t=0; t<T; t++) {
-            observationFeatures.add( new ArrayList<Integer>() );
+            observationFeatures.add( new ArrayList<Pair<Integer,Double>>() );
         }
         Arrays.fill(labels, -1);
         Arrays.fill(edgeFeatures, -1);

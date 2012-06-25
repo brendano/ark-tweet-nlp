@@ -18,7 +18,7 @@ import edu.berkeley.nlp.util.Triple;
 import edu.cmu.cs.lti.ark.ssl.util.BasicFileIO;
 import edu.stanford.nlp.math.ArrayMath;
 import edu.stanford.nlp.util.ArrayUtils;
-import fig.basic.Pair;
+import edu.stanford.nlp.util.Pair;
 
 /**
  * This contains
@@ -167,8 +167,10 @@ public class Model {
     /** Adds into labelScores **/
     public void computeObservedFeatureScores(int t, ModelSentence sentence, double[] labelScores) {
     	for (int k=0; k < numLabels(); k++) {
-    		for (int obsFeat : sentence.observationFeatures.get(t)) {
-    			labelScores[k] += observationFeatureCoefs[obsFeat][k];
+//    		for (int obsFeat : sentence.observationFeatures.get(t)) {
+    		for (Pair<Integer,Double> pair : sentence.observationFeatures.get(t)) {
+//    			labelScores[k] += observationFeatureCoefs[obsFeat][k];
+    			labelScores[k] += observationFeatureCoefs[pair.first][k] * pair.second;
     		}
     	}
     }
@@ -192,8 +194,8 @@ public class Model {
         		int empir = y==k ? 1 : 0;
         		grad[biasFeature_to_flatID(k)] 						+= empir - p;
         		grad[edgeFeature_to_flatID(prevLabel, k)] 			+= empir - p;
-        		for (int obsFeat : sentence.observationFeatures.get(t)) {
-        			grad[observationFeature_to_flatID(obsFeat, k)] 	+= empir - p;
+        		for (Pair<Integer,Double> fv : sentence.observationFeatures.get(t)) {
+        			grad[observationFeature_to_flatID(fv.first, k)] += (empir - p) * fv.second;
         		}
         	}
         }
