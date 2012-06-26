@@ -3,7 +3,7 @@ package newalgo;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import edu.berkeley.nlp.util.ArrayUtil;
+import edu.stanford.nlp.math.ArrayMath;
 import edu.stanford.nlp.optimization.DiffFunction;
 import newalgo.OWLQN.WeightsPrinter;
 import newalgo.io.CoNLLReader;
@@ -11,9 +11,9 @@ import newalgo.util.Util;
 
 public class Train {
 
-	public double l2penalty = 1;
+    public double l2penalty = 1;
     public double l1penalty = 0.01;
-	public double tol = 1e-5;
+    public double tol = 1e-5;
     public int maxIter = 500;
     public String modelLoadFilename = null;		
     public String examplesFilename = null;
@@ -130,12 +130,11 @@ public class Train {
 		@Override
 		public double[] derivativeAt(double[] flatCoefs) {
 			double[] g = new double[model.flatIDsize()];
-			assert ArrayUtil.sum(g)==0;
 			model.setCoefsFromFlat(flatCoefs);
 			for (ModelSentence s : mSentences) {
 				model.computeGradient(s, g);
 			}
-			ArrayUtil.multiplyInPlace(g, -1);
+			ArrayMath.multiplyInPlace(g, -1);
 			addL2regularizerGradient(g, flatCoefs);
 			return g;
 		}
@@ -147,23 +146,17 @@ public class Train {
     		grad[f] += l2penalty * flatCoefs[f]; 
     	}
     }
-    private double l2RegularizerValue(double[] flatCoefs) {
-    	double R = 0;
-    	for (int f=0; f<flatCoefs.length; f++) {
-    		R += Math.pow(f, 2);
-    	}
-    	return R * 0.5 * l2penalty;
-    }
+    
     /**
      * lambda_2 + (1/2) sum (beta_j)^2  +  lambda_1 + sum |beta_j|
+     * our OWLQN seems to only want the first term
      */
     private double regularizerValue(double[] flatCoefs) {
-    	double l2_term = 0, l1_term = 0;
+    	double l2_term = 0;
     	for (int f=0; f < flatCoefs.length; f++) {
     		l2_term += Math.pow(flatCoefs[f], 2);
-    		l1_term += Math.abs(flatCoefs[f]);    			
     	}
-    	return 0.5*l2penalty*l2_term+ l1penalty*l1_term;
+    	return 0.5*l2penalty*l2_term;
     }
     
     public class MyWeightsPrinter implements WeightsPrinter {

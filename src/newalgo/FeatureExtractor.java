@@ -47,7 +47,7 @@ public class FeatureExtractor {
     }
 
     /**
-     * Peak at the modelSentence to see its labels -- for training only!
+     * Peek at the modelSentence to see its labels -- for training only!
      * @param sentence
      * @param modelSentence
      */
@@ -67,7 +67,8 @@ public class FeatureExtractor {
         	fe.addFeatures(sentence.tokens, pairs);
         }
         
-        // Numberize
+        // Numberize.  This should be melded with the addFeatures() loop above, so no wasteful
+        // temporaries that later turn out to be OOV... but is this really an issue?
         
         for (int i=0; i < pairs.size(); i++) {
             int t = pairs.labelIndexes.get(i);
@@ -98,11 +99,12 @@ public class FeatureExtractor {
     public interface FeatureExtractorInterface {
         /**
          * Input: sentence
-         * Output: labelIndexes, featureIDs through positionFeaturePairs
+         * Output: labelIndexes, featureIDs/Values through positionFeaturePairs
          *
-         * We want to yield a sequence of (t, featID) pairs, to be conjuncted against label IDs at position t.
+         * We want to yield a sequence of (t, featID, featValue) pairs,
+         * to be conjuncted against label IDs at position t.
          * Represent as parallel arrays.  Ick yes, but we want to save object allocations (is this crazy?)
-         * This method should append to both of them.
+         * This method should append to them.
          */
         public void addFeatures(List<String> tokens, PositionFeaturePairs positionFeaturePairs);
     }

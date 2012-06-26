@@ -18,11 +18,9 @@ public class ModelSentence {
     public int labels[];
 
     /** Runtime observed, Trainingtime observed.
-     * This is an array-of-arrays of feature IDs.  Only handles binary features.
-     * dim (T x M_t)  (variable # nnz featvals per t.)
+     * This is an array-of-arrays of (featID, featValue) pairs.
+     * dim T, then variable nnz per t.
      **/
-//    public int observationFeatures[][];
-//    public ArrayList<ArrayList<Integer>> observationFeatures;
     public ArrayList<ArrayList< Pair<Integer, Double>>> observationFeatures;
 
     /** Runtime observed, Trainingtime observed (for MEMM).
