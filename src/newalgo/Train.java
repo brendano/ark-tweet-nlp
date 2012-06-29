@@ -11,9 +11,9 @@ import newalgo.util.Util;
 
 public class Train {
 
-    public double l2penalty = 1;
-    public double l1penalty = 0.01;
-    public double tol = 1e-5;
+	public double l2penalty = .7;
+    public double l1penalty = 0.05;
+	public double tol = 1e-5;
     public int maxIter = 500;
     public String modelLoadFilename = null;		
     public String examplesFilename = null;
