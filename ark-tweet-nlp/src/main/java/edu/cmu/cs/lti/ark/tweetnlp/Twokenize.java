@@ -203,6 +203,10 @@ public class Twokenize {
         String splitPunctText = splitEdgePunct(text);
 
         int textLength = splitPunctText.length();
+        
+        // BTO: the logic here got quite convoluted via the Scala porting detour
+        // It would be good to switch back to a nice simple procedural style like in the Python version
+        // ... Scala is such a pain.  Never again.
 
         // Find the matches for subsequences that should be protected,
         // e.g. URLs, 1.0, U.N.K.L.E., 12:53
@@ -212,7 +216,7 @@ public class Twokenize {
         List<Pair<Integer,Integer>> badSpans = new ArrayList<Pair<Integer,Integer>>();
         while(matches.find()){
             // The spans of the "bads" should not be split.
-            if (matches.start()!=matches.end()){ //unnecessary?
+            if (matches.start() != matches.end()){ //unnecessary?
                 List<String> bad = new ArrayList<String>(1);
                 bad.add(splitPunctText.substring(matches.start(),matches.end()));
                 bads.add(bad);
@@ -237,9 +241,9 @@ public class Twokenize {
 
         // Group the indices and map them to their respective portion of the string
         List<List<String>> splitGoods = new ArrayList<List<String>>(indices.size()/2);
-        for(int i=0; i<indices.size();i+=2){
-            String goodstr=splitPunctText.substring(indices.get(i),indices.get(i+1));
-            List<String> splitstr=Arrays.asList(goodstr.trim().split(" "));
+        for (int i=0; i<indices.size(); i+=2) {
+            String goodstr = splitPunctText.substring(indices.get(i),indices.get(i+1));
+            List<String> splitstr = Arrays.asList(goodstr.trim().split(" "));
             splitGoods.add(splitstr);
         }
 
@@ -247,11 +251,11 @@ public class Twokenize {
         //  additonal tokens from last good item get included
         List<String> zippedStr= new ArrayList<String>();
         int i;
-        for(i=0;i<bads.size();i++) {
-            zippedStr=addAllnonempty(zippedStr,splitGoods.get(i));
-            zippedStr=addAllnonempty(zippedStr,bads.get(i));
+        for(i=0; i < bads.size(); i++) {
+            zippedStr = addAllnonempty(zippedStr,splitGoods.get(i));
+            zippedStr = addAllnonempty(zippedStr,bads.get(i));
         }
-        zippedStr=addAllnonempty(zippedStr,splitGoods.get(i));
+        zippedStr = addAllnonempty(zippedStr,splitGoods.get(i));
 
 
         // Split based on special patterns (like contractions) and check all tokens are non empty
@@ -260,9 +264,9 @@ public class Twokenize {
     }  
 
     public static List<String> addAllnonempty(List<String> master, List<String> smaller){
-        for (String s:smaller){
-            String strim=s.trim();
-            if(strim.length()>0)
+        for (String s : smaller){
+            String strim = s.trim();
+            if (strim.length() > 0)
                 master.add(strim);
         }
         return master;
