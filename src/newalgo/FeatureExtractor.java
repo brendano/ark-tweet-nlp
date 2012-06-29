@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.text.Normalizer;
 import org.apache.commons.codec.language.DoubleMetaphone;
 import org.apache.commons.codec.language.Metaphone;
 
@@ -15,7 +14,6 @@ import edu.cmu.cs.lti.ark.ssl.pos.SemiSupervisedPOSTagger;
 import edu.cmu.cs.lti.ark.ssl.pos.TagDictionary;
 import edu.cmu.cs.lti.ark.ssl.util.BasicFileIO;
 import edu.cmu.cs.lti.ark.tweetnlp.Twokenize;
-import fig.basic.Pair;
 
 import newalgo.util.Util;
 
