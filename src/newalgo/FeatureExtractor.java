@@ -94,14 +94,14 @@ public class FeatureExtractor {
             modelSentence.observationFeatures.get(t).add(new Pair<Integer,Double>(fID, fValue));
         }
         if (dumpMode) {
-        	Util.p("");
-        	for (int t=0; t < sentence.T(); t++) {
-        		System.out.printf("%s\n\t", sentence.tokens.get(t));
-        		for (Pair<Integer,Double> fv : modelSentence.observationFeatures.get(t)) {
-        			System.out.printf("%s ", model.featureVocab.name(fv.first));
-        		}
-        		System.out.printf("\n");
-        	}
+            Util.p("");
+            for (int t=0; t < sentence.T(); t++) {
+                System.out.printf("%s\n\t", sentence.tokens.get(t));
+                for (Pair<Integer,Double> fv : modelSentence.observationFeatures.get(t)) {
+                    System.out.printf("%s ", model.featureVocab.name(fv.first));
+                }
+                System.out.printf("\n");
+            }
         }
     }
 
@@ -123,14 +123,14 @@ public class FeatureExtractor {
         public ArrayList<Integer> labelIndexes;
         public ArrayList<String> featureNames;
         public ArrayList<Double> featureValues;
-        
+
         public PositionFeaturePairs() {
             labelIndexes = new ArrayList<Integer>();
             featureNames = new ArrayList<String>();
             featureValues = new ArrayList<Double>();
         }
         public void add(int labelIndex, String featureID) {
-        	add(labelIndex, featureID, 1.0);
+            add(labelIndex, featureID, 1.0);
         }
         public void add(int labelIndex, String featureID, double featureValue) {
             labelIndexes.add(labelIndex);

@@ -7,14 +7,14 @@ import edu.berkeley.nlp.util.StringUtils;
 
 /** Could scrap this and use ark-regression's version -- that one has CheapStrings **/
 public class Vocabulary {
-	
+
     private HashMap<String,Integer> name2num;
     private ArrayList<String> num2name;
     private boolean isLocked = false;
-    
+
     Vocabulary() { 
-    	name2num = new HashMap<String, Integer>();
-    	num2name = new ArrayList<String>();
+        name2num = new HashMap<String, Integer>();
+        num2name = new ArrayList<String>();
     }
 
     public void lock() {
@@ -53,21 +53,21 @@ public class Vocabulary {
             return num2name.get(num);
         }
     }
-    
+
     public boolean contains(String name) {
-    	return name2num.containsKey(name);
+        return name2num.containsKey(name);
     }
-    
-    
+
+
     public String toString() {
-    	return "[" + StringUtils.join(num2name) + "]";
+        return "[" + StringUtils.join(num2name) + "]";
     }
 
     /** Throw an error if OOV **/
-	public int numStrict(String string) {
-		assert isLocked;
-		int n = num(string);
-		if (n == -1) throw new RuntimeException("OOV happened");
-		return n;
-	}
+    public int numStrict(String string) {
+        assert isLocked;
+        int n = num(string);
+        if (n == -1) throw new RuntimeException("OOV happened");
+        return n;
+    }
 }

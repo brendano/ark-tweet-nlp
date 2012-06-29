@@ -16,7 +16,7 @@ public class Sentence {
         this.tokens = new ArrayList<String>();
         this.labels = new ArrayList<String>();
     }
-    
+
     public int T() {
         return tokens.size();
     }

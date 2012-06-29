@@ -40,14 +40,14 @@ public class CoNLLReader {
 
     private static Sentence sentenceFromLines(List<String> lines) {
         Sentence s = new Sentence();
-        
+
         for (String line : lines) {
             String[] parts = line.split("\t");
             assert parts.length == 2;
             s.tokens.add( parts[0].trim() );
             s.labels.add( parts[1].trim() );
         }
-//        System.out.println(s);
+        //        System.out.println(s);
         return s;
     }
 }

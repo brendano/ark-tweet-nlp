@@ -16,21 +16,21 @@ import newalgo.io.CoNLLReader;
  * For basic usage of the tagger from Java, see Tagger.java.
  */
 public class RunTagger {
-    
+
     String inputFormat = "conll";
     String outputFormat = "conll";
     String inputFilename;
     String modelFilename; // Need to fill via defaults in a sane way
     PrintStream outputStream = System.out;
     public boolean noOutput = false;
-    
+
     Iterable<Sentence> inputIterable = null;
     Tagger tagger;
-    
+
     // Only for evaluation mode (conll inputs)
     int numTokensCorrect = 0;
     int numTokens = 0;
-    
+
     public void runTagger() throws IOException {
         if (inputFormat.equals("conll")) {
             List<Sentence> examples = CoNLLReader.readFile(inputFilename);
@@ -38,10 +38,10 @@ public class RunTagger {
         } else {
             assert false;
         }
-        
+
         tagger = new Tagger();
         tagger.loadModel(modelFilename);
-        
+
         boolean evalMode = inputFormat.equals("conll");
 
         for (Sentence sentence : inputIterable) {
@@ -56,7 +56,7 @@ public class RunTagger {
                 evaluateSentenceTagging(sentence, ms);
             }
         }
-        
+
         if (evalMode) {
             System.err.printf("%d / %d correct = %.4f acc, %.4f err\n", 
                     numTokensCorrect, numTokens,
@@ -74,7 +74,7 @@ public class RunTagger {
             numTokens += 1;
         }
     }
-    
+
     /**
      * assume ms' labels hold the tagging
      */
@@ -89,18 +89,18 @@ public class RunTagger {
         } else {
             assert false;
         }
-        
+
     }
-    
-    
+
+
     ///////////////////////////////////////////////////////////////////
 
-    
+
     public static void main(String[] args) throws IOException {        
         if (args.length < 2 || args[0].equals("-h") || args[1].equals("--help")) {
             usage();
         }
-        
+
         RunTagger tagger = new RunTagger();
 
         int i=0;
@@ -120,24 +120,24 @@ public class RunTagger {
                 usage();                
             }
         }
-        
+
         if (args.length - i > 2) usage();
-        
-        
+
+
         tagger.inputFilename = args[i];
         tagger.modelFilename = args[i+1];
-//        tagger.inputReader = BasicFileIO.openFileToRead(args[i]);
+        //        tagger.inputReader = BasicFileIO.openFileToRead(args[i]);
         tagger.runTagger();
-            
+
     }
-    
+
     public static void usage() {
         System.out.println(
-        "RunTagger [options] <ExamplesFilename> <ModelFilename>\n" +
-        "Options:" +
-        "\n  --input-format <Format>" + 
-        "\n  --output-format <Format>" +
-        "\n  -q                               Quiet: no output" +
+                "RunTagger [options] <ExamplesFilename> <ModelFilename>\n" +
+                "Options:" +
+                "\n  --input-format <Format>" + 
+                "\n  --output-format <Format>" +
+                "\n  -q                               Quiet: no output" +
         "\n");
         System.exit(1);
     }
