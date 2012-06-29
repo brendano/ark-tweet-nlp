@@ -173,7 +173,7 @@ public class FeatureExtractor {
         public void addFeatures(List<String> tokens, PositionFeaturePairs pairs) {
             for (int t=0; t < tokens.size(); t++) {
                 String tok = tokens.get(t);
-                String normalizedtok=tok.replaceAll("[’‘]", "'").replaceAll("“", "\"");
+                String normalizedtok=tok.replaceAll("[â€˜â€™]", "'").replaceAll("[â€œâ€]", "\"");
                 pairs.add(t, "Word|" + normalizedtok);
                 pairs.add(t, "Lower|" + normalizedtok.toLowerCase());
                 // pairs.add(t, "Xxdshape|" + Xxdshape(tok));
