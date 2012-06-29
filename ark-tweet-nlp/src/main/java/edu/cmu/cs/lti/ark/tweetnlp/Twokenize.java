@@ -51,7 +51,7 @@ public class Twokenize {
     static String urlBody    = "(?:[^\\.\\s<>][^\\s<>]*?)?";
     static String urlExtraCrapBeforeEnd = "(?:"+punctChars+"|"+entity+")+?";
     static String urlEnd     = "(?:\\.\\.+|[<>]|\\s|$)";
-    static String url        = "(?:"+urlStart1+"|"+urlStart2+")"+urlBody+"(?=(?:"+urlExtraCrapBeforeEnd+")?"+urlEnd+")";
+    public static String url        = "(?:"+urlStart1+"|"+urlStart2+")"+urlBody+"(?=(?:"+urlExtraCrapBeforeEnd+")?"+urlEnd+")";
 
 
     // Numeric
@@ -98,7 +98,7 @@ public class Twokenize {
 
     static String basicface= "(?i)(♥|0|o|t|x|>|\\u0CA0|<|@|ʘ|•|・|◕|\\^|¬|\\*)[\\._+\\-+]\\2";
     static String eastEmote= "[＼\\\\ƪ\\(（<>;ヽ\\-=~\\*]+(?:"+basicface+"|[^A-Za-z0-9\\s\\(\\):])+[\\-=\\);'\\u0022<>ʃ）/／ノﾉ丿╯σっµ~\\*]+";
-    static String emoticon = OR(
+    public static String emoticon = OR(
             // Standard version  :) :( :] :D :P
             OR(normalEyes, wink) + noseArea + OR(tongue, otherMouths, sadMouths, happyMouths),
 

@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import newalgo.util.Util;
+import newalgo.Vocabulary;
 
 import edu.berkeley.nlp.util.ArrayUtil;
 import edu.berkeley.nlp.util.StringUtils;
