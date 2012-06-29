@@ -857,7 +857,7 @@ public class SemiSupervisedPOSTagger {
 			int numLabels) {
 
 		List<Pair<Integer,Double>>[][] activeFeatures = new List[numLabels][numObservations];
-		System.out.println(""+numLabels+"  "+numObservations+"\n");
+		//System.out.println(""+numLabels+"  "+numObservations+"\n");
 		for (int s=0; s<numLabels; ++s) {
 			for (int i=0; i<numObservations; ++i) {
 				activeFeatures[s][i] = new ArrayList<Pair<Integer,Double>>();
