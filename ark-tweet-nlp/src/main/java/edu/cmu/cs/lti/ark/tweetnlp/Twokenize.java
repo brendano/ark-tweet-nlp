@@ -5,6 +5,25 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 import fig.basic.Pair;
+
+/**
+ * Twokenize -- a tokenizer designed for Twitter text in English and some other European languages.
+ * This tokenizer code has gone through a long history:
+ *
+ * (1) Brendan O'Connor wrote original version in Python, http://github.com/brendano/tweetmotif
+ *        TweetMotif: Exploratory Search and Topic Summarization for Twitter.
+ *        Brendan O'Connor, Michel Krieger, and David Ahn.
+ *        ICWSM-2010 (demo track), http://brenocon.com/oconnor_krieger_ahn.icwsm2010.tweetmotif.pdf
+ * (2a) Kevin Gimpel and Daniel Mills modified it for POS tagging for the CMU ARK Twitter POS Tagger
+ * (2b) Jason Baldridge and David Snyder ported it to Scala
+ * (3) Brendan bugfixed the Scala port and merged with POS-specific changes
+ *     for the CMU ARK Twitter POS Tagger  
+ * (4) Tobi Owoputi ported it back to Java and added many improvements (2012-06)
+ * 
+ * Current home is http://github.com/brendano/ark-tweet-nlp and http://www.ark.cs.cmu.edu/TweetNLP
+ *
+ * There have been at least 2 other Java ports, but they are not in the lineage for the code here.
+ */
 public class Twokenize {
 	  static String Contractions = "(?i)(?:\\w+)(?:n't|'ve|'ll|'d|'re|'s|'m)$";
 	  static Pattern Whitespace = Pattern.compile("[\\s\\u3000]+");
@@ -15,11 +34,9 @@ public class Twokenize {
 	  static Pattern Pentity   = Pattern.compile("&(amp|lt|gt|quot);");
 	  //  URLs
 
-	  // David: I give the Larry David eye to this whole URL regex
-	  // (http://www.youtube.com/watch?v=2SmoBvg-etU) There are
-	  // TODO potentially better options, see:
-	  //   http://daringfireball.net/2010/07/improved_regex_for_matching_urls
-	  //   http://mathiasbynens.be/demo/url-regex
+	  // BTO 2012-06: everyone thinks the daringfireball regex should be better, but they're wrong.
+	  // If you actually empirically test it the results are bad.
+	  // Please see https://github.com/brendano/ark-tweet-nlp/pull/9
 
 	  static String urlStart1  = "(?:https?://|\\bwww\\.)";
 	  static String commonTLDs = "(?:com|org|edu|gov|net|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|pro|tel|travel|xxx)";
