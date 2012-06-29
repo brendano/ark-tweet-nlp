@@ -22,5 +22,4 @@ cygwin*|msys)
 	cp=$(echo $cp | tr ':' ';')
 	;;
 esac
-set -x
-exec java -ea -cp "$cp" "$@"
+exec java -ea -Xmx2g -cp "$cp" "$@"
