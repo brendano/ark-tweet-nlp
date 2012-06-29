@@ -3,7 +3,6 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.cmu.cs.lti</groupId>
     <artifactId>ark-tweet-nlp-with-deps</artifactId>
-    <description>Master pom to build ark tweet nlp and maven install it's non-maven-repoed dependencies in ~/.m2</description>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <properties>
