@@ -9,12 +9,11 @@ cp=""
 # Eclipse and IDEA defaults
 cp=$cp:$root/bin
 cp=$cp:$root/out/production/ark-tweet-nlp
-# our build dir
+# our build dir from "compile.sh"
 cp=$cp:$root/mybuild
 
-cp=$cp:$(echo $root/lib/*.jar $root/lib/*/*.jar | tr ' ' :)
-# Twitter Commons text library stuff
-cp=$cp:$(echo $root/lib_twitter/*.jar | tr ' ' :)
+# Jar dependencies
+cp=$cp:$(find $root/lib $root/ark-tweet-nlp/target -name '*.jar' | tr '\n' :)
 
 exec java -ea -cp "$cp" "$@"
 
