@@ -277,7 +277,22 @@ public class Twokenize {
 	    }
 	    return res;
 	  }
+	  
 
+	  public static class Tokenization {
+	      public List<String> rawTokens;
+	      public List<String> normalizedTokens;
+	  }
+
+	  public static Tokenization tokenizeForTaggerAndOriginal(String text) {
+	      Tokenization tokenization = new Tokenization();
+	      tokenization.rawTokens = tokenize(text);
+	      tokenization.normalizedTokens = new ArrayList<String>();
+	      for (String token : tokenization.rawTokens) {
+	          tokenization.normalizedTokens.add( normalizeText(token) );
+	      }
+	      return tokenization;
+	  }
 	  /*
 	   * todo:use stringbuilder to port this function
 	  // Convenience method to produce a string representation of the 
