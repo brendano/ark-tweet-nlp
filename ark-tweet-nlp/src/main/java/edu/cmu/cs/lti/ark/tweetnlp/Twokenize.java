@@ -4,7 +4,6 @@ import java.util.regex.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
-import fig.basic.Pair;
 
 /**
  * Twokenize -- a tokenizer designed for Twitter text in English and some other European languages.
@@ -190,6 +189,12 @@ public class Twokenize {
         input = m1.replaceAll("$1 $2$3");
         return input;
     }
+    
+    private static class Pair<T1, T2> {
+        public T1 first;
+        public T2 second;
+        public Pair(T1 x, T2 y) { first=x; second=y; }
+    }
 
     // The main work of tokenizing a tweet.
     public static List<String> simpleTokenize (String text) {
@@ -225,8 +230,8 @@ public class Twokenize {
         List<Integer> indices = new ArrayList<Integer>(2+2*badSpans.size());
         indices.add(0);
         for(Pair<Integer,Integer> p:badSpans){
-            indices.add(p.getFirst());
-            indices.add(p.getSecond());
+            indices.add(p.first);
+            indices.add(p.second);
         }
         indices.add(textLength);
 
