@@ -65,6 +65,9 @@
 							<resources>
 								<JarResource>
 									<directory>../lib</directory>
+									<includes>
+										<include>**/*.jar</include>
+									</includes>
 								</JarResource>
 							</resources>						
 						</configuration>
