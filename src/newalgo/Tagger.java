@@ -21,7 +21,7 @@ import edu.cmu.cs.lti.ark.tweetnlp.Twokenize;
 public class Tagger {
     public Model model;
     public FeatureExtractor featureExtractor;
-    
+
     /**
      * Loads a model from a file.  The tagger should be ready to tag after calling this.
      * 
@@ -38,11 +38,10 @@ public class Tagger {
      * We give both the "raw" and "normalized" forms of the token. 
      **/
     public static class TaggedToken {
-        public String rawToken;
-        public String normalizedToken;
+        public String token;
         public String tag;
     }
-    
+
 
     /**
      * Run the tokenizer and tagger on one tweet; or rather, the text from one tweet.
@@ -50,7 +49,7 @@ public class Tagger {
     public List<TaggedToken> tokenizeAndTag(String text) {
         if (model == null) throw new RuntimeException("Must loadModel() first before tagging anything");
         Twokenize.Tokenization tokenization = Twokenize.tokenizeForTaggerAndOriginal(text);
-        
+
         Sentence sentence = new Sentence();
         sentence.tokens = tokenization.normalizedTokens;
         ModelSentence ms = new ModelSentence(sentence.T());
@@ -58,24 +57,23 @@ public class Tagger {
         model.greedyDecode(ms);
 
         ArrayList<TaggedToken> taggedTokens = new ArrayList<TaggedToken>();
-        
+
         for (int t=0; t < sentence.T(); t++) {
             TaggedToken tt = new TaggedToken();
-            tt.rawToken = tokenization.rawTokens.get(t);
-            tt.normalizedToken = tokenization.normalizedTokens.get(t);
+            tt.token = tokenization.rawTokens.get(t);
             tt.tag = model.labelVocab.name( ms.labels[t] );
             taggedTokens.add(tt);
         }
-        
+
         return taggedTokens;
     }
-    
+
     public static void main(String[] args) throws IOException {
         if (args.length < 1) {
             System.out.println("Supply the model filename as first argument.");
         }
         String modelFilename = args[0];
-        
+
         Tagger tagger = new Tagger();
         tagger.loadModel(modelFilename);
 
@@ -83,8 +81,8 @@ public class Tagger {
         List<TaggedToken> taggedTokens = tagger.tokenizeAndTag(text);
 
         for (TaggedToken token : taggedTokens) {
-            System.out.printf("%s\t%s\n", token.tag, token.rawToken);
+            System.out.printf("%s\t%s\n", token.tag, token.token);
         }
     }
-    
+
 }
