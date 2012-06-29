@@ -5,6 +5,9 @@
 set -eu
 root=$(dirname $0)/..
 
+# make sure cygwin doesn't use windows find
+FIND=/usr/bin/find
+
 cp=""
 # Eclipse and IDEA defaults
 cp=$cp:$root/bin
@@ -13,7 +16,7 @@ cp=$cp:$root/out/production/ark-tweet-nlp
 cp=$cp:$root/mybuild
 cp=$cp:$root/ark-tweet-nlp/target/classes
 # Jar dependencies
-cp=$cp:$(find $root/lib $root/ark-tweet-nlp/target -name '*.jar' | tr '\n' :)
+cp=$cp:$($FIND $root/lib $root/ark-tweet-nlp/target -name '*.jar' | tr '\n' :)
 case $OSTYPE in
 cygwin*|msys)
 	cp=$(echo $cp | tr ':' ';')
