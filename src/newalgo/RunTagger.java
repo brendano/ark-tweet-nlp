@@ -2,21 +2,30 @@ package newalgo;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.List;
+
+import edu.cmu.cs.lti.ark.tweetnlp.Twokenize;
 
 import newalgo.io.CoNLLReader;
 
+/**
+ * Commandline interface to run the tagger with a variety of possible input and output formats.
+ * Also does basic evaluation if given labeled input text.
+ * 
+ * For basic usage of the tagger from Java, see Tagger.java.
+ */
 public class RunTagger {
     
     String inputFormat = "conll";
     String outputFormat = "conll";
     String inputFilename;
-    String modelFilename;
+    String modelFilename; // Need to fill via defaults in a sane way
     PrintStream outputStream = System.out;
     public boolean noOutput = false;
     
     Iterable<Sentence> inputIterable = null;
-    Model model;
+    Tagger tagger;
     
     // Only for evaluation mode (conll inputs)
     int numTokensCorrect = 0;
@@ -30,15 +39,15 @@ public class RunTagger {
             assert false;
         }
         
-        model = Model.loadModelFromText(modelFilename);
-        FeatureExtractor fe = new FeatureExtractor(model, false);
+        tagger = new Tagger();
+        tagger.loadModel(modelFilename);
         
         boolean evalMode = inputFormat.equals("conll");
 
         for (Sentence sentence : inputIterable) {
             ModelSentence ms = new ModelSentence(sentence.T());
-            fe.computeFeatures(sentence, ms);
-            model.greedyDecode(ms);
+            tagger.featureExtractor.computeFeatures(sentence, ms);
+            tagger.model.greedyDecode(ms);
 
             if ( ! noOutput) {
                 outputTagging(sentence, ms);
@@ -56,10 +65,10 @@ public class RunTagger {
             );
         }
     }
-    
+
     public void evaluateSentenceTagging(Sentence lSent, ModelSentence mSent) {
         for (int t=0; t < mSent.T; t++) {
-            int trueLabel = model.labelVocab.num(lSent.labels.get(t));
+            int trueLabel = tagger.model.labelVocab.num(lSent.labels.get(t));
             int predLabel = mSent.labels[t];
             numTokensCorrect += (trueLabel == predLabel) ? 1 : 0;
             numTokens += 1;
@@ -72,7 +81,9 @@ public class RunTagger {
     public void outputTagging(Sentence lSent, ModelSentence mSent) {
         if (outputFormat.equals("conll")) {
             for (int t=0; t < mSent.T; t++) {
-                outputStream.printf("%s\t%s\n", lSent.tokens.get(t),  model.labelVocab.name(mSent.labels[t]) );
+                outputStream.printf("%s\t%s\n", 
+                        lSent.tokens.get(t),  
+                        tagger.model.labelVocab.name(mSent.labels[t]) );
             }
             outputStream.println("");
         } else {

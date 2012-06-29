@@ -40,8 +40,6 @@ public class CoNLLReader {
 
     private static Sentence sentenceFromLines(List<String> lines) {
         Sentence s = new Sentence();
-        s.tokens = new ArrayList<String>();
-        s.labels = new ArrayList<String>();
         
         for (String line : lines) {
             String[] parts = line.split("\t");
