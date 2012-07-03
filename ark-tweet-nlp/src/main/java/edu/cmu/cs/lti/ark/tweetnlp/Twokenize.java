@@ -78,7 +78,7 @@ public class Twokenize {
     static String happyMouths = "[D\\)\\]]+";
     static String sadMouths = "[\\(\\[]+";
     static String tongue = "[pP]";
-    static String otherMouths = "[doO/\\\\vV]+"; // remove forward slash if http://'s aren't cleaned
+    static String otherMouths = "[doO/\\\\vV|]+"; // remove forward slash if http://'s aren't cleaned
 
     // mouth repetition examples:
     // @aliciakeys Put it in a love song :-))
@@ -96,8 +96,8 @@ public class Twokenize {
         return sb.toString();
     }
 
-    static String basicface= "(?i)(♥|0|o|t|x|>|\\u0CA0|<|@|ʘ|•|・|◕|\\^|¬|\\*)[\\._+\\-+]\\2";
-    static String eastEmote= "[＼\\\\ƪ\\(（<>;ヽ\\-=~\\*]+(?:"+basicface+"|[^A-Za-z0-9\\s\\(\\):])+[\\-=\\);'\\u0022<>ʃ）/／ノﾉ丿╯σっµ~\\*]+";
+    static String basicface= allowEntities("(?:>[\\._-]*<)|(?:(?i)(♥|0|o|°|v|\\$|t|x|\\.|\\u0CA0|@|ʘ|•|・|◕|\\^|¬|\\*)[\\._-]+\\2)");
+    static String eastEmote= "[＼\\\\ƪԄ\\(（<>;ヽ\\-=~\\*]+(?:"+basicface+"|[^A-Za-z0-9\\n\\r\\t\\(\\):])+[\\-=\\);'\\u0022<>ʃ）/／ノﾉ丿╯σっµ~\\*]+";
     public static String emoticon = OR(
             // Standard version  :) :( :] :D :P
             OR(normalEyes, wink) + noseArea + OR(tongue, otherMouths, sadMouths, happyMouths),
