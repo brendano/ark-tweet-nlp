@@ -48,7 +48,7 @@ public class RunTagger {
 			ModelSentence ms = new ModelSentence(sentence.T());
 			tagger.featureExtractor.computeFeatures(sentence, ms);
 			tagger.model.greedyDecode(ms);
-
+			//tagger.model.viterbiDecode(ms);
 			if ( ! noOutput) {
 				outputTagging(sentence, ms);
 			}

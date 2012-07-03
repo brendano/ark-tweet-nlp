@@ -129,9 +129,63 @@ public class Model {
 		assert false : "Unimplemented";
 	return null;
 	}
-
+	/**
+	 * Converts array of scores to positive probabilities w. a sum of 1
+	 */
+	public void Probspace(double[] scores){
+		assert scores.length > 0;
+		ArrayUtil.expInPlace(scores);
+		ArrayUtil.normalize(scores);
+	}
+	/**
+	 *  vit[t][k] is the max probability such that the sequence
+	 *  from 0 to t has token t labeled with tag k.   (0<=t<T)
+	 *  bptr[t][k] gives the max prob. tag of token t-1 (t=0->startMarker)
+	 */
 	public void viterbiDecode(ModelSentence sentence) {
-		assert false : "Unimplemented";
+		int T = sentence.T;
+		sentence.labels = new int[T];
+		sentence.edgeFeatures[0] = startMarker();
+		int[][] bptr = new int[T][numLabels()];
+		double[][] vit = new double[T][numLabels()];
+		double[] BiasScores = new double[numLabels()];
+		double[] EdgeScores = new double[numLabels()];
+		double[] FeatScores = new double[numLabels()];
+		computeBiasScores(BiasScores);
+		computeEdgeScores(0, sentence, EdgeScores);
+		computeObservedFeatureScores(0, sentence, FeatScores);		
+		Probspace(BiasScores);
+		Probspace(EdgeScores);
+		Probspace(FeatScores);
+		double[] labelScores = ThreewiseMultiply(BiasScores,EdgeScores,FeatScores);
+		for (int k=0; k < numLabels(); k++){ //initialization
+			vit[0][k]=labelScores[k];
+		bptr[0][k]=startMarker();
+		}
+		for (int t=1; t < T; t++){ //recursion
+			computeObservedFeatureScores(t, sentence, FeatScores); 
+			Probspace(FeatScores);
+			for (int s=0; s < numLabels(); s++){
+				double[] candidates = new double[numLabels()];
+				viterbiEdgeScores(t, s, sentence, EdgeScores); //TODO: use transition matrix
+				Probspace(EdgeScores);    //EdgeScores[k] = Pr(s|k)
+				candidates = ArrayUtil.pairwiseMultiply(labelScores, EdgeScores);
+				bptr[t][s] = ArrayUtil.argmax(candidates);
+				vit[t][s] = candidates[bptr[t][s]] * FeatScores[s] * BiasScores[s];
+			}
+			labelScores=vit[t];
+		}
+		sentence.labels[T-1] = ArrayUtil.argmax(vit[T-1]);
+		//System.out.print(sentence.labels[T-1]);
+		//System.out.println(" with prob: "+vit[T-1][sentence.labels[T-1]]);
+		int backtrace = bptr[T-1][sentence.labels[T-1]];
+		for (int i=T-2; (i>=0)&&(backtrace != startMarker()); i--){ //termination
+			sentence.labels[i] = backtrace;
+			//System.out.print(backtrace);
+			//System.out.println(" with prob: "+vit[i][backtrace]);
+			backtrace = bptr[i][backtrace];
+		}
+		assert (backtrace == startMarker());
 	}
 
 	public void mbrDecode(ModelSentence sentence) {
@@ -164,6 +218,12 @@ public class Model {
 			labelScores[k] += edgeCoefs[prev][k];
 		}
 	}
+	/** @return dim T array s.t. labelScores[t]=score of label t followed by label curr **/
+	public void viterbiEdgeScores(int t, int curr, ModelSentence sentence, double[] labelScores) {
+		for (int k=0; k < numLabels(); k++) {
+			labelScores[k] += edgeCoefs[k][curr];
+		}
+	}
 
 	/** Adds into labelScores **/
 	public void computeObservedFeatureScores(int t, ModelSentence sentence, double[] labelScores) {
@@ -175,7 +235,16 @@ public class Model {
 			}
 		}
 	}
-
+	public double[] ThreewiseMultiply(double[] a, double[] b, double[] c) {
+		if ((a.length != b.length) || (b.length!=c.length)) {
+			throw new RuntimeException();
+		}
+		double[] result = new double[a.length];
+		for(int i = 0; i < result.length; i++){
+			result[i] = a[i] * b[i] * c[i];
+		}
+		return result;
+	}
 	/**
 	 * Training-only
 	 * 
@@ -339,11 +408,11 @@ public class Model {
 		String line;
 
 		ArrayList<Double> biasCoefs = 
-			new ArrayList<Double>();
+				new ArrayList<Double>();
 		ArrayList< Triple<Integer, Integer, Double> > edgeCoefs = 
-			new ArrayList< Triple<Integer, Integer, Double> >();
+				new ArrayList< Triple<Integer, Integer, Double> >();
 		ArrayList< Triple<Integer, Integer, Double> > obsCoefs  = 
-			new ArrayList< Triple<Integer, Integer, Double> >();
+				new ArrayList< Triple<Integer, Integer, Double> >();
 
 		while ( (line = reader.readLine()) != null ) {
 			String[] parts = line.split("\t");
