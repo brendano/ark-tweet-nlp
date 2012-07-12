@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.math.linear.Array2DRowRealMatrix;
+
 import newalgo.util.Util;
 import newalgo.Vocabulary;
 
@@ -145,33 +147,29 @@ public class Model {
 	public void viterbiDecode(ModelSentence sentence) {
 		int T = sentence.T;
 		sentence.labels = new int[T];
-		sentence.edgeFeatures[0] = startMarker();
 		int[][] bptr = new int[T][numLabels()];
 		double[][] vit = new double[T][numLabels()];
-		double[] BiasScores = new double[numLabels()];
-		double[] EdgeScores = new double[numLabels()];
-		double[] FeatScores = new double[numLabels()];
-		computeBiasScores(BiasScores);
-		computeEdgeScores(0, sentence, EdgeScores);
-		computeObservedFeatureScores(0, sentence, FeatScores);		
-		Probspace(BiasScores);
-		Probspace(EdgeScores);
-		Probspace(FeatScores);
-		double[] labelScores = ThreewiseMultiply(BiasScores,EdgeScores,FeatScores);
+		double[] labelScores = new double[numLabels()];
+		computeVitLabelScores(0, startMarker(), sentence, labelScores);
+		ArrayUtil.logNormalize(labelScores);
 		for (int k=0; k < numLabels(); k++){ //initialization
 			vit[0][k]=labelScores[k];
-		bptr[0][k]=startMarker();
+			bptr[0][k]=startMarker();
 		}
 		for (int t=1; t < T; t++){ //recursion
-			computeObservedFeatureScores(t, sentence, FeatScores); 
-			Probspace(FeatScores);
+			double[][] prevcurr = new double[numLabels()][numLabels()];
 			for (int s=0; s < numLabels(); s++){
-				double[] candidates = new double[numLabels()];
-				viterbiEdgeScores(t, s, sentence, EdgeScores); //TODO: use transition matrix
-				Probspace(EdgeScores);    //EdgeScores[k] = Pr(s|k)
-				candidates = ArrayUtil.pairwiseMultiply(labelScores, EdgeScores);
-				bptr[t][s] = ArrayUtil.argmax(candidates);
-				vit[t][s] = candidates[bptr[t][s]] * FeatScores[s] * BiasScores[s];
+				computeVitLabelScores(t, s, sentence, prevcurr[s]);
+				ArrayUtil.logNormalize(prevcurr[s]);
+				prevcurr[s] = ArrayUtil.add(prevcurr[s], labelScores[s]);
+				bptr[t][s] = 0;
+				vit[t][s] = prevcurr[0][s];
+			}
+			Array2DRowRealMatrix matrix = new Array2DRowRealMatrix(prevcurr);
+			for (int s=0; s < numLabels(); s++){
+				double[] sprobs = matrix.getColumn(s);
+				bptr[t][s] = ArrayUtil.argmax(sprobs);
+				vit[t][s] = sprobs[bptr[t][s]];	
 			}
 			labelScores=vit[t];
 		}
@@ -181,8 +179,7 @@ public class Model {
 		int backtrace = bptr[T-1][sentence.labels[T-1]];
 		for (int i=T-2; (i>=0)&&(backtrace != startMarker()); i--){ //termination
 			sentence.labels[i] = backtrace;
-			//System.out.print(backtrace);
-			//System.out.println(" with prob: "+vit[i][backtrace]);
+			//System.out.println(backtrace+" with prob: "+vit[i][backtrace]);
 			backtrace = bptr[i][backtrace];
 		}
 		assert (backtrace == startMarker());
@@ -202,6 +199,12 @@ public class Model {
 		computeEdgeScores(t, sentence, labelScores);
 		computeObservedFeatureScores(t, sentence, labelScores);
 	}
+	public void computeVitLabelScores(int t, int prior, ModelSentence sentence, double[] labelScores) {
+		Arrays.fill(labelScores, 0);
+		computeBiasScores(labelScores);
+		viterbiEdgeScores(prior, sentence, labelScores);
+		computeObservedFeatureScores(t, sentence, labelScores);
+	}
 
 	/** Adds into labelScores **/
 	public void computeBiasScores(double[] labelScores) {
@@ -218,10 +221,10 @@ public class Model {
 			labelScores[k] += edgeCoefs[prev][k];
 		}
 	}
-	/** @return dim T array s.t. labelScores[t]=score of label t followed by label curr **/
-	public void viterbiEdgeScores(int t, int curr, ModelSentence sentence, double[] labelScores) {
+	/** @return dim T array s.t. labelScores[t]+=score of label prior followed by label t **/
+	public void viterbiEdgeScores(int prior, ModelSentence sentence, double[] EdgeScores) {
 		for (int k=0; k < numLabels(); k++) {
-			labelScores[k] += edgeCoefs[k][curr];
+			EdgeScores[k] += edgeCoefs[prior][k];
 		}
 	}
 
