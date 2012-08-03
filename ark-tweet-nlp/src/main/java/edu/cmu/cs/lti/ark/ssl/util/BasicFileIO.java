@@ -32,7 +32,24 @@ public class BasicFileIO {
         }
         return null;
     }
-
+    public static BufferedReader openFileToReadUTF8(String file) {
+        try {
+            BufferedReader bReader = null;
+            if (file.endsWith(".gz")) {
+                bReader = new BufferedReader(new InputStreamReader(
+                        new GZIPInputStream(new FileInputStream(file)), "UTF-8"));
+            } else {
+                bReader = new BufferedReader(
+                        new InputStreamReader(new FileInputStream(file), "UTF-8"));
+            }
+            return bReader;
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.severe("Could not open file:" + file);
+            System.exit(-1);
+        }
+        return null;
+    }
     public static BufferedWriter openFileToWrite(String file) {
         try {
             BufferedWriter bWriter = null;
@@ -50,7 +67,24 @@ public class BasicFileIO {
         }
         return null;
     }
-
+    public static BufferedWriter openFileToWriteUTF8(String file) {
+        try {
+            BufferedWriter bWriter = null;
+            if (file.endsWith(".gz")) {
+                bWriter = new BufferedWriter(new OutputStreamWriter(
+                        new GZIPOutputStream(new FileOutputStream(file)), "UTF-8"));
+            } else {
+                bWriter = new BufferedWriter(new OutputStreamWriter(
+                	    new FileOutputStream(file), "UTF-8"));
+            }
+            return bWriter;
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.severe("Could not open file for writing:" + file);
+            System.exit(-1);
+        }
+        return null;
+    }
     public static void closeFileAlreadyRead(BufferedReader bReader) {
         try {
             bReader.close();

@@ -132,14 +132,6 @@ public class Model {
 	return null;
 	}
 	/**
-	 * Converts array of scores to positive probabilities w. a sum of 1
-	 */
-	public void Probspace(double[] scores){
-		assert scores.length > 0;
-		ArrayUtil.expInPlace(scores);
-		ArrayUtil.normalize(scores);
-	}
-	/**
 	 *  vit[t][k] is the max probability such that the sequence
 	 *  from 0 to t has token t labeled with tag k.   (0<=t<T)
 	 *  bptr[t][k] gives the max prob. tag of token t-1 (t=0->startMarker)
@@ -156,14 +148,12 @@ public class Model {
 			vit[0][k]=labelScores[k];
 			bptr[0][k]=startMarker();
 		}
-		for (int t=1; t < T; t++){ //recursion
+		for (int t=1; t < T; t++){
 			double[][] prevcurr = new double[numLabels()][numLabels()];
 			for (int s=0; s < numLabels(); s++){
 				computeVitLabelScores(t, s, sentence, prevcurr[s]);
 				ArrayUtil.logNormalize(prevcurr[s]);
 				prevcurr[s] = ArrayUtil.add(prevcurr[s], labelScores[s]);
-				bptr[t][s] = 0;
-				vit[t][s] = prevcurr[0][s];
 			}
 			Array2DRowRealMatrix matrix = new Array2DRowRealMatrix(prevcurr);
 			for (int s=0; s < numLabels(); s++){
@@ -174,12 +164,13 @@ public class Model {
 			labelScores=vit[t];
 		}
 		sentence.labels[T-1] = ArrayUtil.argmax(vit[T-1]);
-		//System.out.print(sentence.labels[T-1]);
-		//System.out.println(" with prob: "+vit[T-1][sentence.labels[T-1]]);
+		//System.out.print(labelVocab.name(sentence.labels[T-1]));
+		//System.out.println(" with prob: "+Math.exp(vit[T-1][sentence.labels[T-1]]));
 		int backtrace = bptr[T-1][sentence.labels[T-1]];
 		for (int i=T-2; (i>=0)&&(backtrace != startMarker()); i--){ //termination
 			sentence.labels[i] = backtrace;
-			//System.out.println(backtrace+" with prob: "+vit[i][backtrace]);
+			//System.err.println(labelVocab.name(backtrace)
+				//+" with prob: "+Math.exp(vit[i][backtrace]));
 			backtrace = bptr[i][backtrace];
 		}
 		assert (backtrace == startMarker());
@@ -382,7 +373,7 @@ public class Model {
 
 
 	public void saveModelAsText(String outputFilename) throws IOException {
-		BufferedWriter writer = BasicFileIO.openFileToWrite(outputFilename);
+		BufferedWriter writer = BasicFileIO.openFileToWriteUTF8(outputFilename);
 		PrintWriter out = new PrintWriter(writer);
 
 		for (int k=0; k<numLabels(); k++) {
@@ -407,7 +398,7 @@ public class Model {
 
 	public static Model loadModelFromText(String filename) throws IOException {
 		Model model = new Model();
-		BufferedReader reader = BasicFileIO.openFileToRead(filename);
+		BufferedReader reader = BasicFileIO.openFileToReadUTF8(filename);
 		String line;
 
 		ArrayList<Double> biasCoefs = 

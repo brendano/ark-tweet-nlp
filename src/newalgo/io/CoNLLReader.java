@@ -16,7 +16,7 @@ import edu.cmu.cs.lti.ark.ssl.util.BasicFileIO;
  */
 public class CoNLLReader {
 	public static ArrayList<Sentence> readFile(String filename) throws IOException {
-		BufferedReader reader = BasicFileIO.openFileToRead(filename);
+		BufferedReader reader = BasicFileIO.openFileToReadUTF8(filename);
 		ArrayList sentences = new ArrayList<String>();
 
 		ArrayList<String> curLines = new ArrayList<String>();
