@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 /**
  * Twokenize -- a tokenizer designed for Twitter text in English and some other European languages.
  * This tokenizer code has gone through a long history:
@@ -24,13 +26,13 @@ import java.util.ArrayList;
  * There have been at least 2 other Java ports, but they are not in the lineage for the code here.
  */
 public class Twokenize {
-    static String Contractions = "(?i)(?:\\w+)(?:n't|'ve|'ll|'d|'re|'s|'m)$";
-    static Pattern Whitespace = Pattern.compile("[\\s\\u3000]+");
+    static Pattern Contractions = Pattern.compile("(?i)(\\w+)(n['’′]t|['’′]ve|['’′]ll|['’′]d|['’′]re|['’′]s|['’′]m)$");
+    static Pattern Whitespace = Pattern.compile("[\\s\\p{Zs}]+");
 
-    static String punctChars = "['“\\u0022.?!,:;]";
-    static String punctSeq   = punctChars+"+";
+    static String punctChars = "['\"“”‘’.?!…,:;]"; 
+    //static String punctSeq   = punctChars+"+";	//'anthem'. => ' anthem '.
+    static String punctSeq   = "['\"“”‘’]+|[.?!,…]+|[:;]+";	//'anthem'. => ' anthem ' .
     static String entity     = "&(?:amp|lt|gt|quot);";
-    static Pattern Pentity   = Pattern.compile("&(amp|lt|gt|quot);");
     //  URLs
 
     // BTO 2012-06: everyone thinks the daringfireball regex should be better, but they're wrong.
@@ -47,7 +49,7 @@ public class Twokenize {
     "nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|sk|" +
     "sl|sm|sn|so|sr|ss|st|su|sv|sy|sz|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|" +
     "va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|za|zm|zw)";	//TODO: remove obscure country domains?
-    static String urlStart2  = "\\b(?:[A-Za-z\\d-])+(?:\\.[A-Za-z0-9]+){0,3}\\." + "(?:"+commonTLDs+"|"+ccTLDs+")"+"(?:\\."+ccTLDs+")?(?=[\\W])";
+    static String urlStart2  = "\\b(?:[A-Za-z\\d-])+(?:\\.[A-Za-z0-9]+){0,3}\\." + "(?:"+commonTLDs+"|"+ccTLDs+")"+"(?:\\."+ccTLDs+")?(?=\\W|$)";
     static String urlBody    = "(?:[^\\.\\s<>][^\\s<>]*?)?";
     static String urlExtraCrapBeforeEnd = "(?:"+punctChars+"|"+entity+")+?";
     static String urlEnd     = "(?:\\.\\.+|[<>]|\\s|$)";
@@ -58,7 +60,7 @@ public class Twokenize {
     static String timeLike   = "\\d+(?::\\d+){1,2}";
     //static String numNum     = "\\d+\\.\\d+";
     static String numberWithCommas = "(?:(?<!\\d)\\d{1,3},)+?\\d{3}" + "(?=(?:[^,\\d]|$))";
-    static String numComb	 = "\\$?\\d+(?:\\.\\d+)+%?";
+    static String numComb	 = "\\p{Sc}?\\d+(?:\\.\\d+)+%?";
 
     // Abbreviations
     static String boundaryNotDot = "(?:$|\\s|[“\\u0022?!,:;]|" + entity + ")";
@@ -66,25 +68,12 @@ public class Twokenize {
     static String aa2  = "[^A-Za-z](?:[A-Za-z]\\.){1,}[A-Za-z](?=" + boundaryNotDot + ")";
     static String standardAbbreviations = "\\b(?:[Mm]r|[Mm]rs|[Mm]s|[Dd]r|[Ss]r|[Jj]r|[Rr]ep|[Ss]en|[Ss]t)\\.";
     static String arbitraryAbbrev = "(?:" + aa1 +"|"+ aa2 + "|" + standardAbbreviations + ")";
-    static String separators  = "(?:--+|―|—|~|–)";
-    static String decorations = "([♫♪]|[★☆]|[♥❤]|[\\u2639-\\u263b]|[\\ue001-\\uebbb])\\3*"; //backreference for ♥♥♥ etc.
-    static String thingsThatSplitWords = "[^\\s\\.,]";
-    static String embeddedApostrophe = thingsThatSplitWords+"+'" + thingsThatSplitWords + "+";
-
-    //  Emoticons
-    static String normalEyes = "(?iu)[:=]";
-    static String wink = "[;]";
-    static String noseArea = "(?:|o|O|-|[^a-zA-Z0-9 ])";
-    static String happyMouths = "[D\\)\\]]+";
-    static String sadMouths = "[\\(\\[]+";
-    static String tongue = "[pP]";
-    static String otherMouths = "[doO/\\\\vV|]+"; // remove forward slash if http://'s aren't cleaned
-
-    // mouth repetition examples:
-    // @aliciakeys Put it in a love song :-))
-    // @hellocalyclops =))=))=)) Oh well
-
-    public static String OR(String... parts) {
+    static String separators  = "(?:--+|―|—|~|–|=)";
+    static String decorations = "(?:[♫♪]+|[★☆]+|[♥❤]+|[\\u2639-\\u263b]+|[\\ue001-\\uebbb]+)";
+    static String thingsThatSplitWords = "[^\\s\\.,?\"]";
+    static String embeddedApostrophe = thingsThatSplitWords+"+['’′]" + thingsThatSplitWords + "+";
+    
+    private static String OR(String... parts) {
         String prefix="(?:";
         StringBuilder sb = new StringBuilder();
         for (String s:parts){
@@ -95,32 +84,41 @@ public class Twokenize {
         sb.append(")");
         return sb.toString();
     }
+    
+    //  Emoticons
+    static String normalEyes = "(?iu)[:=]"; //8 and x are eyes but cause problems
+    static String wink = "[;]";
+    static String noseArea = "(?:|-|[^a-zA-Z0-9 ])";
+    static String happyMouths = "[D\\)\\]]+";
+    static String sadMouths = "[\\(\\[]+";
+    static String tongue = "[pPd3]+";
+    static String otherMouths = "(?:[oO]+|[/\\\\]+|[vV]+|[Ss]+|[|]+)"; // remove forward slash if http://'s aren't cleaned
 
-    static String basicface= allowEntities("(?:>[\\._-]*<)|(?:(?i)(♥|0|o|°|v|\\$|t|x|\\.|\\u0CA0|@|ʘ|•|・|◕|\\^|¬|\\*)[\\._-]+\\2)");
-    static String eastEmote= "[＼\\\\ƪԄ\\(（<>;ヽ\\-=~\\*]+(?:"+basicface+"|[^A-Za-z0-9\\n\\r\\t\\(\\):])+[\\-=\\);'\\u0022<>ʃ）/／ノﾉ丿╯σっµ~\\*]+";
+    // mouth repetition examples:
+    // @aliciakeys Put it in a love song :-))
+    // @hellocalyclops =))=))=)) Oh well
+
+    static String basicface = "(?:(?i)(♥|0|o|°|v|\\$|t|x|\\.|;|\\u0CA0|@|ʘ|•|・|◕|\\^|¬|\\*)[\\._-]+\\2)|(?:--['\"])"+
+    		"|(?:<|&lt;|>|&gt;)[\\._-]+(?:<|&lt;|>|&gt;)";
+    static String eastEmote = "[＼\\\\ƪԄ\\(（<>;ヽ\\-=~\\*]+(?:"+basicface+"|[^A-Za-z0-9\\s\\(\\):=-])+[\\-=\\);'\\u0022<>ʃ）/／ノﾉ丿╯σっµ~\\*]+";
     public static String emoticon = OR(
             // Standard version  :) :( :] :D :P
-            OR(normalEyes, wink) + noseArea + OR(tongue, otherMouths, sadMouths, happyMouths),
+    		"(?:>|&gt;)?" + OR(normalEyes, wink) + OR(noseArea,"[Oo]") + 
+            	OR(tongue+"(?=\\W|$|RT|rt|Rt)", otherMouths+"(?=\\W|$|RT|rt|Rt)", sadMouths, happyMouths),
 
             // reversed version (: D:  use positive lookbehind to remove "(word):"
             // because eyes on the right side is more ambiguous with the standard usage of : ;
-            "(?<=(?: |^))" + OR(sadMouths,happyMouths,otherMouths) + noseArea + OR(normalEyes, wink),
-
+            "(?<=(?: |^))" + OR(sadMouths,happyMouths,otherMouths) + noseArea + OR(normalEyes, wink) + "(?:<|&lt;)?",
 
             //inspired by http://en.wikipedia.org/wiki/User:Scapler/emoticons#East_Asian_style
-            eastEmote, basicface
+            eastEmote.replaceFirst("2", "1"), basicface
             // iOS 'emoji' characters (some smileys, some symbols) [\ue001-\uebbb]  
             // TODO should try a big precompiled lexicon from Wikipedia, Dan Ramage told me (BTO) he does this
     );
 
-    public static String allowEntities(String pat) {
-        // so we can write patterns with < and > and let them match escaped html too
-        return pat.replace("<", "(?:<|&lt;)").replace(">", "(?:>|&gt;)");
-    }
+    static String Hearts = "(?:<+/?3+)+"; //the other hearts are in decorations
 
-    static String Hearts = allowEntities("(?:<+/?3+)+"); //the other hearts are in decorations
-
-    static String Arrows = allowEntities("(?:<*[-―—=]*>+|<+[-―—=]*>*)");
+    static String Arrows = "(?:<*[-―—=]*>+|<+[-―—=]*>*)|\\p{InArrows}+";
 
     // BTO 2011-06: restored Hashtag, AtMention protection (dropped in original scala port) because it fixes
     // "hello (#hashtag)" ==> "hello (#hashtag )"  WRONG
@@ -132,31 +130,30 @@ public class Twokenize {
 
     // This also gets #1 #40 which probably aren't hashtags .. but good as tokens.
     // If you want good hashtag identification, use a different regex.
-    static String Hashtag = "#[a-zA-Z0-9_]+";  
+    static String Hashtag = "#[a-zA-Z0-9_]+";  //optional: lookbehind for \b
 
-    // TODO add alternate @-signs. The Twitter Text library does this.
-    static String AtMention = "@[a-zA-Z0-9_]+"; 
+    static String AtMention = "[@＠][a-zA-Z0-9_]+"; //optional: lookbehind for \b
 
     // I was worried this would conflict with at-mentions
     // but seems ok in sample of 5800: 7 changes all email fixes
     // http://www.regular-expressions.info/email.html
     static String Bound = "(?:\\W|^|$)";
-    static String Email = "(?<=" +Bound+ ")[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}(?=" +Bound+")";
+    public static String Email = "(?<=" +Bound+ ")[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}(?=" +Bound+")";
 
     // We will be tokenizing using these regexps as delimiters
     // Additionally, these things are "protected", meaning they shouldn't be further split themselves.
     static Pattern Protected  = Pattern.compile(
             OR(
                     Hearts,
-                    Arrows,
                     url,
                     Email,
-                    entity,
                     timeLike,
                     //numNum,
                     numberWithCommas,
                     numComb,
                     emoticon,
+                    Arrows,
+                    entity,
                     punctSeq,
                     arbitraryAbbrev,
                     separators,
@@ -175,10 +172,10 @@ public class Twokenize {
     // I remember it causing lots of trouble in the past as well.  Would be good to revisit or eliminate.
 
     // Note the 'smart quotes' (http://en.wikipedia.org/wiki/Smart_quotes)
-    static String edgePunctChars    = "'\"“”‘’«»{}\\(\\)\\[\\]\\*";
+    static String edgePunctChars    = "'\"“”‘’«»{}\\(\\)\\[\\]\\*&";
     static String edgePunct    = "[" + edgePunctChars + "]";
     static String notEdgePunct = "[a-zA-Z0-9]"; // content characters
-    static String offEdge = "(^|$|:|;|\\s)";  // colon here gets "(hello):" ==> "( hello ):"
+    static String offEdge = "(^|$|:|;|\\s|\\.|,)";  // colon here gets "(hello):" ==> "( hello ):"
     static Pattern EdgePunctLeft  = Pattern.compile(offEdge + "("+edgePunct+"+)("+notEdgePunct+")");
     static Pattern EdgePunctRight = Pattern.compile("("+notEdgePunct+")("+edgePunct+"+)" + offEdge);
 
@@ -197,7 +194,7 @@ public class Twokenize {
     }
 
     // The main work of tokenizing a tweet.
-    public static List<String> simpleTokenize (String text) {
+    private static List<String> simpleTokenize (String text) {
 
         // Do the no-brainers first
         String splitPunctText = splitEdgePunct(text);
@@ -256,14 +253,18 @@ public class Twokenize {
             zippedStr = addAllnonempty(zippedStr,bads.get(i));
         }
         zippedStr = addAllnonempty(zippedStr,splitGoods.get(i));
-
-
-        // Split based on special patterns (like contractions) and check all tokens are non empty
-        //zippedStr.map(splitToken(_)).flatten.filter(_.length > 0)
+        
+        // BTO: our POS tagger wants "ur" and "you're" to both be one token.
+        // Uncomment to get "you 're"
+        /*ArrayList<String> splitStr = new ArrayList<String>(zippedStr.size());
+        for(String tok:zippedStr)
+        	splitStr.addAll(splitToken(tok));
+        zippedStr=splitStr;*/
+        
         return zippedStr;
     }  
 
-    public static List<String> addAllnonempty(List<String> master, List<String> smaller){
+    private static List<String> addAllnonempty(List<String> master, List<String> smaller){
         for (String s : smaller){
             String strim = s.trim();
             if (strim.length() > 0)
@@ -272,16 +273,20 @@ public class Twokenize {
         return master;
     }
     // "foo   bar" => "foo bar"
-    public static String squeezeWhitespace (String input){
+    private static String squeezeWhitespace (String input){
         return Whitespace.matcher(input).replaceAll(" ").trim();
     }
 
     // Final pass tokenization based on special patterns
-    public String splitToken (String token) {
-        // BTO: our POS tagger wants "ur" and "you're" to both be one token.
-        // Uncomment to get "you 're"
-        //	      case Contractions(stem, contr) => List(stem.trim, contr.trim)
-        return token.trim();
+    private static List<String> splitToken (String token) {
+
+        Matcher m = Contractions.matcher(token);
+        if (m.find()){
+        	String[] contract = {m.group(1), m.group(2)};
+        	return Arrays.asList(contract);
+        }
+        String[] contract = {token};
+        return Arrays.asList(contract);
     }
 
     public static List<String> tokenize (String text){
@@ -295,14 +300,16 @@ public class Twokenize {
     // Hm: 2+ repeated character normalization here?
     // No, that's more linguistic, should be further down the pipeline 
     public static String normalizeText(String text) {
-        return text.replaceAll("&lt;", "<").replaceAll("&gt;",">").replaceAll("&amp;","&");
+        //return text.replaceAll("&lt;", "<").replaceAll("&gt;",">").replaceAll("&amp;","&").replaceAll("&lt;", "<").replaceAll("&gt;",">").replaceAll("&amp;","&");
+    	text = text.replaceAll("&amp;", "&");
+    	return StringEscapeUtils.unescapeHtml(text);
     }
 
     public static List<String> tokenizeForTagger (String text) {
         List<String> res = new ArrayList<String>();
-        List<String> pretokenized = tokenize(text);
+        List<String> pretokenized = tokenize(normalizeText(text));
         for(String token:pretokenized){
-            res.add(normalizeText(token));
+            res.add((token));
         }
         return res;
     }
@@ -322,12 +329,15 @@ public class Twokenize {
         }
         return tokenization;
     }
-    /*
-     * todo:use stringbuilder to port this function
+
 	  // Convenience method to produce a string representation of the 
 	  // tokenized tweet in a standard-ish format.
-	  def tokenizeToString (text: String): String = {
-	  	tokenizeForTagger(text).mkString(" ");
-	  }
-     */
+    public static String tokenizeToString (String text){
+		StringBuilder sb = new StringBuilder();
+		for(String s: tokenizeForTagger(text)) {
+		     sb.append(s).append(' ');
+		}
+		sb.deleteCharAt(sb.length()-1);
+		return sb.toString();
+    }
 }
