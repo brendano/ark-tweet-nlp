@@ -1,12 +1,12 @@
 package newalgo;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-
-import edu.cmu.cs.lti.ark.tweetnlp.Twokenize;
-
 import newalgo.io.CoNLLReader;
 
 /**
@@ -23,15 +23,21 @@ public class RunTagger {
 	String modelFilename; // Need to fill via defaults in a sane way
 	PrintStream outputStream = System.out;
 	public boolean noOutput = false;
-
+	public static HashSet<String> vocab;
 	Iterable<Sentence> inputIterable = null;
 	Tagger tagger;
-
+	public static double accuracy = 0.0;
 	// Only for evaluation mode (conll inputs)
 	int numTokensCorrect = 0;
 	int numTokens = 0;
-
-	public void runTagger() throws IOException {
+	int oovTokensCorrect = 0;
+	int oovTokens = 0;
+	public int clusterTokensCorrect = 0;
+	public static int clusterTokens = 0;
+	public static void getVocab() throws FileNotFoundException, IOException, ClassNotFoundException{
+	    //vocab = (HashSet<String>) BasicFileIO.readSerializedObject("traindevvocab");
+	}
+	public void runTagger() throws IOException, ClassNotFoundException {
 		if (inputFormat.equals("conll")) {
 			List<Sentence> examples = CoNLLReader.readFile(inputFilename);
 			inputIterable = examples;
@@ -41,9 +47,8 @@ public class RunTagger {
 
 		tagger = new Tagger();
 		tagger.loadModel(modelFilename);
-
+		int[][] confusion = new int[Model.numLabels][Model.numLabels];
 		boolean evalMode = inputFormat.equals("conll");
-
 		for (Sentence sentence : inputIterable) {
 			ModelSentence ms = new ModelSentence(sentence.T());
 			tagger.featureExtractor.computeFeatures(sentence, ms);
@@ -54,6 +59,8 @@ public class RunTagger {
 			}
 			if (evalMode) {
 				evaluateSentenceTagging(sentence, ms);
+				//evaluateOOV(sentence, ms);
+				//getconfusion(sentence, ms, confusion);
 			}
 		}
 
@@ -63,9 +70,42 @@ public class RunTagger {
 					numTokensCorrect*1.0 / numTokens,
 					1 - (numTokensCorrect*1.0 / numTokens)
 			);
+			System.err.printf("%d / %d InVocab correct = %.4f acc, %.4f err\n", 
+					oovTokensCorrect, oovTokens,
+					oovTokensCorrect*1.0 / oovTokens,
+					1 - (oovTokensCorrect*1.0 / oovTokens)
+			);
+/*			int i=0;
+			System.out.println("\t"+tagger.model.labelVocab.toString().replaceAll(" ", ", "));
+			for (int[] row:confusion){
+				System.out.println(tagger.model.labelVocab.name(i)+"\t"+Arrays.toString(row));
+				i++;
+			}*/
 		}
 	}
 
+	private void evaluateOOV(Sentence lSent, ModelSentence mSent) {
+		for (int t=0; t < mSent.T; t++) {
+			int trueLabel = tagger.model.labelVocab.num(lSent.labels.get(t));
+			int predLabel = mSent.labels[t];
+			if(vocab.contains(lSent.tokens.get(t))){
+				//System.err.println(lSent.tokens.get(t)+"\ttrue:"+tagger.model.labelVocab.name(trueLabel)+" pred:"+tagger.model.labelVocab.name(predLabel));
+				oovTokensCorrect += (trueLabel == predLabel) ? 1 : 0;
+				oovTokens += 1;
+			}
+			/*if (tagger.model.labelVocab.name(trueLabel).equals("U"))
+				if (!tagger.model.labelVocab.name(predLabel).equals("U"))
+					System.err.println(lSent.tokens.get(t)+"\t"+tagger.model.labelVocab.name(predLabel));*/			
+		}    
+    }
+	private void getconfusion(Sentence lSent, ModelSentence mSent, int[][] confusion) {
+		for (int t=0; t < mSent.T; t++) {
+			int trueLabel = tagger.model.labelVocab.num(lSent.labels.get(t));
+			int predLabel = mSent.labels[t];
+			if(trueLabel!=-1)
+				confusion[trueLabel][predLabel]++;
+		}    
+    }
 	public void evaluateSentenceTagging(Sentence lSent, ModelSentence mSent) {
 		for (int t=0; t < mSent.T; t++) {
 			int trueLabel = tagger.model.labelVocab.num(lSent.labels.get(t));
@@ -86,17 +126,17 @@ public class RunTagger {
 						tagger.model.labelVocab.name(mSent.labels[t]) );
 			}
 			outputStream.println("");
-		} else {
+		} 
+		else {
 			assert false;
 		}
-
 	}
 
 
 	///////////////////////////////////////////////////////////////////
 
 
-	public static void main(String[] args) throws IOException {        
+	public static void main(String[] args) throws IOException, ClassNotFoundException {        
 		if (args.length < 2 || args[0].equals("-h") || args[1].equals("--help")) {
 			usage();
 		}

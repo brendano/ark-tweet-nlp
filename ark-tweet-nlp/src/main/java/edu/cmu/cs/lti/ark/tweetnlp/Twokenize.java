@@ -69,9 +69,9 @@ public class Twokenize {
     static String standardAbbreviations = "\\b(?:[Mm]r|[Mm]rs|[Mm]s|[Dd]r|[Ss]r|[Jj]r|[Rr]ep|[Ss]en|[Ss]t)\\.";
     static String arbitraryAbbrev = "(?:" + aa1 +"|"+ aa2 + "|" + standardAbbreviations + ")";
     static String separators  = "(?:--+|―|—|~|–|=)";
-    static String decorations = "(?:[♫♪]+|[★☆]+|[♥❤]+|[\\u2639-\\u263b]+|[\\ue001-\\uebbb]+)";
+    static String decorations = "(?:[♫♪]+|[★☆]+|[♥❤♡]+|[\\u2639-\\u263b]+|[\\ue001-\\uebbb]+)";
     static String thingsThatSplitWords = "[^\\s\\.,?\"]";
-    static String embeddedApostrophe = thingsThatSplitWords+"+['’′]" + thingsThatSplitWords + "+";
+    static String embeddedApostrophe = thingsThatSplitWords+"+['’′]" + thingsThatSplitWords + "*";
     
     private static String OR(String... parts) {
         String prefix="(?:";
@@ -86,11 +86,11 @@ public class Twokenize {
     }
     
     //  Emoticons
-    static String normalEyes = "(?iu)[:=]"; //8 and x are eyes but cause problems
+    static String normalEyes = "(?iu)[:=]"; // 8 and x are eyes but cause problems
     static String wink = "[;]";
-    static String noseArea = "(?:|-|[^a-zA-Z0-9 ])";
-    static String happyMouths = "[D\\)\\]]+";
-    static String sadMouths = "[\\(\\[]+";
+    static String noseArea = "(?:|-|[^a-zA-Z0-9 ])"; // doesn't get :'-(
+    static String happyMouths = "[D\\)\\]\\}]+";
+    static String sadMouths = "[\\(\\[\\{]+";
     static String tongue = "[pPd3]+";
     static String otherMouths = "(?:[oO]+|[/\\\\]+|[vV]+|[Ss]+|[|]+)"; // remove forward slash if http://'s aren't cleaned
 
@@ -98,9 +98,9 @@ public class Twokenize {
     // @aliciakeys Put it in a love song :-))
     // @hellocalyclops =))=))=)) Oh well
 
-    static String basicface = "(?:(?i)(♥|0|o|°|v|\\$|t|x|\\.|;|\\u0CA0|@|ʘ|•|・|◕|\\^|¬|\\*)[\\._-]+\\2)|(?:--['\"])"+
+    static String basicface = "(?:(?i)(♥|0|o|°|v|\\$|t|x|\\.|;|\\u0CA0|@|ʘ|•|・|◕|\\^|¬|\\*)(?:[\\.]|[_-]+)\\2)|(?:--['\"])"+
     		"|(?:<|&lt;|>|&gt;)[\\._-]+(?:<|&lt;|>|&gt;)";
-    static String eastEmote = "[＼\\\\ƪԄ\\(（<>;ヽ\\-=~\\*]+(?:"+basicface+"|[^A-Za-z0-9\\s\\(\\):=-])+[\\-=\\);'\\u0022<>ʃ）/／ノﾉ丿╯σっµ~\\*]+";
+    static String eastEmote = "[＼\\\\ƪԄ\\(（<>;ヽ\\-=~\\*]+(?:"+basicface+"|[^A-Za-z0-9\\s\\(\\)\\*:=-])+[\\-=\\);'\\u0022<>ʃ）/／ノﾉ丿╯σっµ~\\*]+";
     public static String emoticon = OR(
             // Standard version  :) :( :] :D :P
     		"(?:>|&gt;)?" + OR(normalEyes, wink) + OR(noseArea,"[Oo]") + 
@@ -131,8 +131,8 @@ public class Twokenize {
     // This also gets #1 #40 which probably aren't hashtags .. but good as tokens.
     // If you want good hashtag identification, use a different regex.
     static String Hashtag = "#[a-zA-Z0-9_]+";  //optional: lookbehind for \b
-
-    static String AtMention = "[@＠][a-zA-Z0-9_]+"; //optional: lookbehind for \b
+    //optional: lookbehind for \b, max length 15
+    static String AtMention = "[@＠][a-zA-Z0-9_]+"; 
 
     // I was worried this would conflict with at-mentions
     // but seems ok in sample of 5800: 7 changes all email fixes
@@ -273,7 +273,7 @@ public class Twokenize {
         return master;
     }
     // "foo   bar" => "foo bar"
-    private static String squeezeWhitespace (String input){
+    public static String squeezeWhitespace (String input){
         return Whitespace.matcher(input).replaceAll(" ").trim();
     }
 
@@ -333,6 +333,9 @@ public class Twokenize {
 	  // Convenience method to produce a string representation of the 
 	  // tokenized tweet in a standard-ish format.
     public static String tokenizeToString (String text){
+    	List<String> tokenized = tokenizeForTagger(text);
+    	if (tokenized.size()==0)
+    		return "";
 		StringBuilder sb = new StringBuilder();
 		for(String s: tokenizeForTagger(text)) {
 		     sb.append(s).append(' ');

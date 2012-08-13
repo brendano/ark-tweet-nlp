@@ -2,7 +2,6 @@ package newalgo;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
 import edu.stanford.nlp.math.ArrayMath;
 import edu.stanford.nlp.optimization.DiffFunction;
 import newalgo.OWLQN.WeightsPrinter;
@@ -11,11 +10,11 @@ import newalgo.util.Util;
 
 public class Train {
 
-	public double l2penalty = .7;
-	public double l1penalty = 0.05;
+	public double l2penalty = 1.3;
+	public double l1penalty = 0.01;
 	public double tol = 1e-5;
 	public int maxIter = 500;
-	public String modelLoadFilename = null;		
+	public String modelLoadFilename = null;
 	public String examplesFilename = null;
 	public String modelSaveFilename = null;
 	public boolean dumpFeatures = false;
