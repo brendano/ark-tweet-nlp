@@ -47,7 +47,7 @@ public class RunTagger {
 
 		tagger = new Tagger();
 		tagger.loadModel(modelFilename);
-		int[][] confusion = new int[Model.numLabels][Model.numLabels];
+		int[][] confusion = new int[tagger.model.numLabels][tagger.model.numLabels];
 		boolean evalMode = inputFormat.equals("conll");
 		for (Sentence sentence : inputIterable) {
 			ModelSentence ms = new ModelSentence(sentence.T());
