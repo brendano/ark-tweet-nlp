@@ -45,6 +45,7 @@ public class Train {
 		constructLabelVocab();
 		extractFeatures();
 		model.lockdownAfterFeatureExtraction();
+		System.err.println(model.numLabels);
 		if (modelLoadFilename != null) {
 			readWarmStartModel();
 		}
@@ -66,6 +67,7 @@ public class Train {
 			}
 		}
 		model.labelVocab.lock();
+		model.numLabels = model.labelVocab.size();
 	}
 
 	public void dumpFeatures() {
@@ -213,7 +215,7 @@ public class Train {
 
 		trainer.examplesFilename = args[i];
 		trainer.modelSaveFilename = args[i+1];
-
+		
 		trainer.doTraining();
 
 	}
