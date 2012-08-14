@@ -45,7 +45,6 @@ public class Train {
 		constructLabelVocab();
 		extractFeatures();
 		model.lockdownAfterFeatureExtraction();
-		System.err.println(model.numLabels);
 		if (modelLoadFilename != null) {
 			readWarmStartModel();
 		}
