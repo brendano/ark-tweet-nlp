@@ -29,7 +29,6 @@ public class JsonTweetReader  {
 	public String getText(String tweetJson) {
 		JsonNode rootNode; 
 		
-		// wtf, we have to allocate a new parser for every line?
 		try {
 			rootNode = mapper.readValue(tweetJson, JsonNode.class);
 		} catch (JsonParseException e) {
