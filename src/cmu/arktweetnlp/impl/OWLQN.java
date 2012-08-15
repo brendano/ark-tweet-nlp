@@ -29,6 +29,8 @@ import java.util.*;
  *
  * @author Michel Galley
  * 
+ * (NOTE FROM BRENDAN 2012-08-14: What license did Stanford release this as?  GPL ??)
+ * 
  * modified by Michael Heilman (mheilman@cmu.edu) 
  * -allow for bias/intercept parameters that shouldn't be penalized
  * -make outside API calls easier (11/9/2010)

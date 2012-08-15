@@ -25,6 +25,8 @@ cp=$cp:$root/ark-tweet-nlp/src/main/resources
 # Jar dependencies:
 #  - lib/ are the ones we include
 #  - ark-tweet-nlp/target are ones that Maven copies in.
+# ... warning, if "mvn package" was executed, then the fully built jar will get
+# on the classpath, but the Eclipse versions should have higher priority above
 cp=$cp:$($FIND $root/lib $root/ark-tweet-nlp/target/bin -name '*.jar' | tr '\n' :)
 
 # Change to semicolons for cygwin/windows
