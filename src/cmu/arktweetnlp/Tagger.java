@@ -13,14 +13,18 @@ import cmu.arktweetnlp.impl.Sentence;
 
 
 /**
- * Tagger object -- wraps up the entire tagger for easy usage.
+ * Tagger object -- wraps up the entire tagger for easy usage from Java.
  * 
- * Call loadModel(), then start calling tokenizeAndTag() for every tweet.
+ * To use:
+ * 
+ * (1) call loadModel().
+ * 
+ * (2) call tokenizeAndTag() for every tweet.
  *  
  * See main() for example code.
  * 
  * (Note RunTagger.java has a more sophisticated runner.
- * This wrapper is intended to be easiest to use in other applications.)
+ * This class is intended to be easiest to use in other applications.)
  */
 public class Tagger {
 	public Model model;
@@ -39,7 +43,6 @@ public class Tagger {
 
 	/**
 	 * One token and its tag.
-	 * We give both the "raw" and "normalized" forms of the token. 
 	 **/
 	public static class TaggedToken {
 		public String token;

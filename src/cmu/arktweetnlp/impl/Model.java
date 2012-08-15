@@ -120,6 +120,8 @@ public class Model {
 		assert false : "Unimplemented";
 	return null;
 	}
+	
+	
 	/**
 	 *  vit[t][k] is the max probability such that the sequence
 	 *  from 0 to t has token t labeled with tag k.   (0<=t<T)

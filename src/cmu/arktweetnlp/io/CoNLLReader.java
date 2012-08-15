@@ -7,6 +7,7 @@ import java.util.List;
 
 import cmu.arktweetnlp.impl.Sentence;
 import cmu.arktweetnlp.util.BasicFileIO;
+import edu.stanford.nlp.util.Pair;
 
 
 /**
@@ -14,11 +15,13 @@ import cmu.arktweetnlp.util.BasicFileIO;
  *   Word \t POSTag
  *
  * With a blank line separating sentences.
+ * 
+ * Returns 'null' for the input record string
  */
 public class CoNLLReader {
 	public static ArrayList<Sentence> readFile(String filename) throws IOException {
 		BufferedReader reader = BasicFileIO.openFileToReadUTF8(filename);
-		ArrayList sentences = new ArrayList<String>();
+		ArrayList<Sentence> sentences = new ArrayList<Sentence>();
 
 		ArrayList<String> curLines = new ArrayList<String>();
 		String line;
@@ -38,6 +41,9 @@ public class CoNLLReader {
 		}
 		return sentences;
 	}
+//	private static Pair<String,Sentence> wrap(Sentence s) {
+//		return new Pair<String,Sentence>(null, s);
+//	}
 
 	private static Sentence sentenceFromLines(List<String> lines) {
 		Sentence s = new Sentence();
