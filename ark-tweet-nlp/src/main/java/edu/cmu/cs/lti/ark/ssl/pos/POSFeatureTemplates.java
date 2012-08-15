@@ -14,6 +14,8 @@ import java.util.logging.Logger;
 
 import org.apache.commons.codec.language.Metaphone;
 
+import cmu.arktweetnlp.impl.TagDictionary;
+
 import fig.basic.Pair;
 
 /**

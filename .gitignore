@@ -1,4 +1,5 @@
 .svn
+.DS_Store
 
 .idea
 *.iml

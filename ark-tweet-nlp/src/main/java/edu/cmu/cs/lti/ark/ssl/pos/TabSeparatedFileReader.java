@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
-import edu.cmu.cs.lti.ark.ssl.util.BasicFileIO;
+import cmu.arktweetnlp.util.BasicFileIO;
+
 import fig.basic.Pair;
 
 public class TabSeparatedFileReader {

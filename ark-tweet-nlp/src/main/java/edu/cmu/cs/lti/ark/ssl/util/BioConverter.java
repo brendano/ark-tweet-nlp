@@ -5,6 +5,8 @@ import java.io.BufferedWriter;
 import java.util.Collection;
 import java.util.List;
 
+import cmu.arktweetnlp.util.BasicFileIO;
+
 import edu.cmu.cs.lti.ark.ssl.pos.TabSeparatedFileReader;
 import edu.cmu.cs.lti.ark.ssl.pos.UnlabeledSentencesReader;
 

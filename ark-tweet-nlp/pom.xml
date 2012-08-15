@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>edu.cmu.cs.lti</groupId>
-    <artifactId>ark</artifactId>
+    <groupId>edu.cmu.cs</groupId>
+    <artifactId>ark-tweet-nlp</artifactId>
     <packaging>jar</packaging>
-    <version>1.0-SNAPSHOT</version>
-    <name>CMU Ark twitter POS tagger</name>
+    <version>0.3-SNAPSHOT</version>
+    <name>CMU ARK TweetNLP: Twitter POS tagger</name>
     <url>http://www.ark.cs.cmu.edu/TweetNLP/</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -25,7 +25,7 @@
                     </goals>
                     <configuration>
                       <sources>
-                          <source>${basedir}/../src/newalgo</source>
+                          <source>${basedir}/../src</source>
                       </sources>
                     </configuration>
                   </execution>
@@ -44,7 +44,7 @@
 						<configuration>
 							<transformers>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>edu.cmu.cs.lti.ark.tweetnlp.RunPOSTagger</mainClass>
+									<mainClass>cmu.arktweetnlp.RunTagger</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>
@@ -68,7 +68,7 @@
                     <archive>
                         <index>true</index>
                         <manifest>
-                            <mainClass>edu.cmu.cs.lti.ark.tweetnlp.RunPOSTagger</mainClass>
+                            <mainClass>cmu.arktweetnlp.RunTagger</mainClass>
                             <addClasspath>true</addClasspath>
                         </manifest>
                     </archive>

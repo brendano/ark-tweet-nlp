@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.List;
 import java.util.Set;
 
+import cmu.arktweetnlp.util.BasicFileIO;
+
 import edu.cmu.cs.lti.ark.ssl.pos.TabSeparatedFileReader;
 import fig.basic.Pair;
 

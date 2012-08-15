@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.util.ArrayList;
 
+import cmu.arktweetnlp.util.BasicFileIO;
+
 public class ConvertToCoNLLFormat {
 	public static final String[] inputArr = {"wsj-02-21.MRG.MST.suited", 
 									"wsj-22.MRG.MST.suited",

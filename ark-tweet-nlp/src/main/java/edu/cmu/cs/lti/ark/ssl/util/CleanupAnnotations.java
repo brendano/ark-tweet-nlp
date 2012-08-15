@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.util.StringTokenizer;
 
+import cmu.arktweetnlp.util.BasicFileIO;
+
 public class CleanupAnnotations {
 	public static void main(String[] args) {
 		String file = args[0];

@@ -1,7 +1,6 @@
 package edu.cmu.cs.lti.ark.ssl.pos.eval;
 
 import edu.cmu.cs.lti.ark.ssl.pos.TabSeparatedFileReader;
-import edu.cmu.cs.lti.ark.ssl.util.BasicFileIO;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -13,6 +12,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import cmu.arktweetnlp.util.BasicFileIO;
 
 import fig.basic.Pair;
 

@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import cmu.arktweetnlp.util.BasicFileIO;
+
 public class AverageMultinomials {
 	
 	public static Map<String, String> languageMap;

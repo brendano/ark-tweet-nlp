@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import cmu.arktweetnlp.util.BasicFileIO;
+
 import edu.cmu.cs.lti.ark.ssl.pos.POSModel;
 
 public class CheckPOSModel {

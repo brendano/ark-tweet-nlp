@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import cmu.arktweetnlp.util.BasicFileIO;
+
 import fig.basic.Pair;
 
 public class ProjectAlignedTags {

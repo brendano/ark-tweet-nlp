@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
+import cmu.arktweetnlp.util.BasicFileIO;
+
 import edu.cmu.cs.lti.ark.ssl.pos.POSFeatureTemplates;
 import edu.cmu.cs.lti.ark.ssl.pos.POSModel;
 import edu.cmu.cs.lti.ark.ssl.pos.POSOptions;
 import edu.cmu.cs.lti.ark.ssl.pos.SemiSupervisedPOSTagger;
-import edu.cmu.cs.lti.ark.ssl.util.BasicFileIO;
 import fig.basic.Pair;
 
 /** Wraps SemiSupervisedPOSTagger for easier inference-only usage (i.e. to tag new sentences) */

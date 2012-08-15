@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
+import cmu.arktweetnlp.util.BasicFileIO;
+
 import edu.berkeley.nlp.util.ArrayUtil;
 import edu.cmu.cs.lti.ark.ssl.pos.POSModel;
 

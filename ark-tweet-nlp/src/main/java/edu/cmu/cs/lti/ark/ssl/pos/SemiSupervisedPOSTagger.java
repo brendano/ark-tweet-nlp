@@ -5,6 +5,8 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.logging.Logger;
 
+import cmu.arktweetnlp.util.BasicFileIO;
+
 import edu.berkeley.nlp.math.DifferentiableFunction;
 import edu.berkeley.nlp.util.CallbackFunction;
 import edu.berkeley.nlp.util.Counter;

@@ -12,6 +12,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import cmu.arktweetnlp.util.BasicFileIO;
+
 public class ComputeInitialTransitionFeatures {
 	
 	public static Random baseRand = new Random(43569);

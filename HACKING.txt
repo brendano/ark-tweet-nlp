@@ -1,0 +1,22 @@
+Setting up Eclipse
+==================
+
+We use the following procedure to set up Eclipse for development. The tricky
+bit is to get the jar dependencies by invoking Maven. There may be other ways
+of doing it.
+
+(1) Type: "mvn package". Among other things, this downloads all dependencies
+    into ark-tweet-nlp/src/target .  It also puts tons of crap into ~/.m2.
+(2) Go to Eclipse and refresh the directory (e.g. F5)
+(3) In Eclipse, go to the project's
+    Properties -> Java Build Path -> Libraries -> "Add JARs".
+    Add jars from:
+    (a) lib/
+    (b) ark-tweet-nlp/src/target/bin/
+
+Once Eclipse is compiling all the source files, then we use scripts/java.sh to
+train and run the tagger. It invokes "java" with all dependencies and
+Eclipse-compiled .class files on the classpath. So you can tell Eclipse to
+build files (and in fact this happens automatically), then switch to the
+terminal to run the tagger.
+

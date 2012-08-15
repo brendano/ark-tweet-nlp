@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import cmu.arktweetnlp.util.BasicFileIO;
+
 import edu.cmu.cs.lti.ark.ssl.pos.TabSeparatedFileReader;
 import fig.basic.Pair;
 

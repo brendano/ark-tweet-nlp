@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import edu.cmu.cs.lti.ark.ssl.util.BasicFileIO;
+
+import cmu.arktweetnlp.util.BasicFileIO;
 
 
 

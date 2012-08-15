@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import cmu.arktweetnlp.util.BasicFileIO;
+
 public class ExpandCoarseTagDictionary {
 	public static void main(String[] args) {
 		String directory = "/home/dipanjan/Downloads";

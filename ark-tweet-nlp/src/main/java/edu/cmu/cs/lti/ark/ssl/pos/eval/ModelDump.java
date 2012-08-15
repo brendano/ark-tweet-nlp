@@ -6,9 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import cmu.arktweetnlp.util.BasicFileIO;
+
 import edu.berkeley.nlp.util.Counter;
 import edu.cmu.cs.lti.ark.ssl.pos.POSModel;
-import edu.cmu.cs.lti.ark.ssl.util.BasicFileIO;
 
 public class ModelDump {
 	public static void main(String[] args) {

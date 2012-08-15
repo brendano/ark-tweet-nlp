@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import cmu.arktweetnlp.Twokenize;
+import cmu.arktweetnlp.util.BasicFileIO;
+
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 
 import edu.cmu.cs.lti.ark.ssl.pos.POSOptions;
 import edu.cmu.cs.lti.ark.ssl.pos.SemiSupervisedPOSTagger;
-import edu.cmu.cs.lti.ark.ssl.util.BasicFileIO;
 import fig.basic.OptionsParser;
 import fig.basic.Option;
 
