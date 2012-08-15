@@ -1,14 +1,18 @@
 package cmu.arktweetnlp;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashSet;
 import java.util.List;
 
+import cmu.arktweetnlp.Twokenize.Tokenization;
 import cmu.arktweetnlp.impl.ModelSentence;
 import cmu.arktweetnlp.impl.Sentence;
 import cmu.arktweetnlp.io.CoNLLReader;
+import cmu.arktweetnlp.io.JsonTweetReader;
+import cmu.arktweetnlp.util.BasicFileIO;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
 
@@ -70,23 +74,42 @@ public class RunTagger {
 		} 
 		assert (inputFormat.equals("json") || inputFormat.equals("text"));
 		
-		die("TODO");
-		for (Pair<String, String> recordAndText : iterateTweets()) {
-			Sentence sentence=null;
-			ModelSentence mSent=null;
-			// run tokenizer to fill out Sentence
-			// run tagger to get tags
-			outputPrependedTagging(sentence, mSent, this.justTokenize, recordAndText.first);
+		JsonTweetReader jsonTweetReader = new JsonTweetReader();
+		
+		BufferedReader reader = BasicFileIO.openFileToReadUTF8(inputFilename);
+		String line;
+		while ( (line = reader.readLine()) != null) {
+			String[] parts = line.split("\t");
+			String tweetData = parts[inputField-1];
+			String text;
+			if (inputFormat.equals("json")) {
+				text = jsonTweetReader.getText(tweetData); 
+			} else {
+				text = tweetData;
+			}
+			
+			Sentence sentence = new Sentence();
+			
+//			Tokenization tokenization = Twokenize.tokenizeForTaggerAndOriginal(text);
+//			sentence.tokens = tokenization.normalizedTokens;
+
+			sentence.tokens = Twokenize.tokenizeForTagger(text);
+
+			ModelSentence modelSentence = new ModelSentence(sentence.T());
+			tagger.featureExtractor.computeFeatures(sentence, modelSentence);
+			goDecode(modelSentence);
+			
+			if (outputFormat.equals("conll")) {
+				outputJustTagging(sentence, modelSentence);
+			} else {
+				outputPrependedTagging(sentence, modelSentence,
+						this.justTokenize, tweetData);				
+			}
+
 		}
 	}
-	/** yields (FullInputLine, TweetText) pairs. **/
-	private Iterable<Pair<String, String>> iterateTweets() {
-		// TODO
-		return null;
-	}
 
-
-	/** Runs the correct algorithm (TODO make config option?) **/
+	/** Runs the correct algorithm (make config option perhaps) **/
 	public void goDecode(ModelSentence mSent) {
 		//tagger.model.greedyDecode(mSent);
 		tagger.model.viterbiDecode(mSent);		
@@ -234,6 +257,9 @@ public class RunTagger {
 				tagger.noOutput = true;
 				i += 1;
 			} else if (args[i].equals("--input-format")) {
+				String s = args[i+1];
+				if (!(s.equals("json")||s.equals("text")||s.equals("conll")))
+					usage("input format must be: json, text, or conll");
 				tagger.inputFormat = args[i+1];
 				i += 2;
 			} else if (args[i].equals("--output-format")) {
@@ -297,7 +323,7 @@ public class RunTagger {
 "\n(1) tweet-per-line, and (2) token-per-line." +
 "\nTweet-per-line input formats:" +
 "\n   json: Every input line has a JSON object containing the tweet," +
-"\n         as per certain Twitter APIs. (The 'text' field will be tagged.)" +
+"\n         as per the Streaming API. (The 'text' field gets used.)" +
 "\n   text: Every input line has the text for one tweet." +
 "\nFor both cases, we the lines in the input are actually TSV," +
 "\nand the tweets (text or json) are one particular field." +
