@@ -51,14 +51,14 @@ public class Tagger {
 
 
 	/**
-	 * Run the tokenizer and tagger on one tweet; or rather, the text from one tweet.
+	 * Run the tokenizer and tagger on one tweet's text.
 	 **/
 	public List<TaggedToken> tokenizeAndTag(String text) {
 		if (model == null) throw new RuntimeException("Must loadModel() first before tagging anything");
-		Twokenize.Tokenization tokenization = Twokenize.tokenizeForTaggerAndOriginal(text);
+		List<String> tokens = Twokenize.tokenizeRawTweetText(text);
 
 		Sentence sentence = new Sentence();
-		sentence.tokens = tokenization.normalizedTokens;
+		sentence.tokens = tokens;
 		ModelSentence ms = new ModelSentence(sentence.T());
 		featureExtractor.computeFeatures(sentence, ms);
 		model.greedyDecode(ms);
@@ -67,7 +67,7 @@ public class Tagger {
 
 		for (int t=0; t < sentence.T(); t++) {
 			TaggedToken tt = new TaggedToken();
-			tt.token = tokenization.rawTokens.get(t);
+			tt.token = tokens.get(t);
 			tt.tag = model.labelVocab.name( ms.labels[t] );
 			taggedTokens.add(tt);
 		}

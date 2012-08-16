@@ -27,34 +27,7 @@ public class Runner {
 	public static Pattern URL = Pattern.compile(Twokenize.url);
 	public static Pattern notChinese = Pattern.compile("[\\u0400-\\u1D7F\\u2E80-\\uDFFF\\uF900-\\uFAFF\\uFB50-\\uFDFF\\uFE20-\\uFE4F\\uFE70-\\uFEFF]{2}");
 	public static Pattern justbase = Pattern.compile("(?!www\\.|ww\\.|w\\.)[a-zA-Z0-9]+\\.[A-Za-z0-9\\.]+"); 
-	public static void oldmain(String[] args) throws IOException, InterruptedException {
-		if (args.length < 1) {
-			System.out.println("Supply the file to be tokenized.");
-		} else {
-			final JsonFactory factory = new JsonFactory();
-			for(String files:args){
-				File f = new File(files);
-				if (! new File("out/"+f.getName()).exists()){
-					GZIPInputStream gz = new GZIPInputStream(new FileInputStream(f));
-					JsonParser jp = factory.createJsonParser(gz);
-					BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-						new FileOutputStream("out/"+f.getName()), "UTF-8"));
-					String line;
-					if(jp.nextToken()==JsonToken.START_OBJECT){
-						while ((line = getLine(jp)) != null && !line.isEmpty()) {
-							if(!(notChinese.matcher(line).find())){
-								writer.write(normalize(Twokenize.tokenizeToString(line)));
-								writer.newLine();
-							}
-						}
-					}
-					gz.close();
-					jp.close(); 
-			        writer.close();
-				}
-			}
-		}
-	}
+
 	
 	public static String normalize(String str) {
 	    str = str.toLowerCase();
@@ -130,7 +103,7 @@ public class Runner {
 			}
 			String line;
 			while ((line = reader.readLine()) != null) {
-				List<String> tline = Twokenize.tokenizeForTagger(line);
+				List<String> tline = Twokenize.tokenizeRawTweetText(line);
 				for (String str : tline) {
 					writer.write(str + " ");
 				}

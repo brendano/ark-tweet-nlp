@@ -7,7 +7,6 @@ import java.io.PrintStream;
 import java.util.HashSet;
 import java.util.List;
 
-import cmu.arktweetnlp.Twokenize.Tokenization;
 import cmu.arktweetnlp.impl.ModelSentence;
 import cmu.arktweetnlp.impl.Sentence;
 import cmu.arktweetnlp.io.CoNLLReader;
@@ -93,7 +92,7 @@ public class RunTagger {
 //			Tokenization tokenization = Twokenize.tokenizeForTaggerAndOriginal(text);
 //			sentence.tokens = tokenization.normalizedTokens;
 
-			sentence.tokens = Twokenize.tokenizeForTagger(text);
+			sentence.tokens = Twokenize.tokenizeRawTweetText(text);
 
 			ModelSentence modelSentence = new ModelSentence(sentence.T());
 			tagger.featureExtractor.computeFeatures(sentence, modelSentence);
