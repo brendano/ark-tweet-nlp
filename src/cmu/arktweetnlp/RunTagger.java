@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import cmu.arktweetnlp.Twokenize.Tokenization;
 import cmu.arktweetnlp.impl.ModelSentence;
 import cmu.arktweetnlp.impl.Sentence;
 import cmu.arktweetnlp.io.CoNLLReader;
@@ -91,9 +90,9 @@ public class RunTagger {
 //			Tokenization tokenization = Twokenize.tokenizeForTaggerAndOriginal(text);
 //			sentence.tokens = tokenization.normalizedTokens;
 
-			sentence.tokens = Twokenize.tokenizeForTagger(text);
+			sentence.tokens = Twokenize.tokenizeRawTweetText(text);
+
 			if (sentence.T() > 0){
-				numtoks += sentence.tokens.size();
 				ModelSentence modelSentence = new ModelSentence(sentence.T());
 				tagger.featureExtractor.computeFeatures(sentence, modelSentence);
 				goDecode(modelSentence);

@@ -14,9 +14,8 @@ of doing it.
     (a) lib/
     (b) ark-tweet-nlp/src/target/bin/
 
-Once Eclipse is compiling all the source files, then we use scripts/java.sh to
-train and run the tagger. It invokes "java" with all dependencies and
-Eclipse-compiled .class files on the classpath. So you can tell Eclipse to
-build files (and in fact this happens automatically), then switch to the
-terminal to run the tagger.
-
+Once Eclipse is done compiling all the source files, then we use scripts/java.sh
+to train and run the tagger. It invokes "java" with all dependencies and
+Eclipse-compiled .class files on the classpath. So you can tell Eclipse to build
+files (and in fact this happens automatically), then switch to the terminal to
+run the tagger.

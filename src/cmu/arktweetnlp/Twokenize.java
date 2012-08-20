@@ -272,7 +272,7 @@ public class Twokenize {
         }
         return master;
     }
-    // "foo   bar" => "foo bar"
+    /** "foo   bar " => "foo bar" */
     public static String squeezeWhitespace (String input){
         return Whitespace.matcher(input).replaceAll(" ").trim();
     }
@@ -289,70 +289,29 @@ public class Twokenize {
         return Arrays.asList(contract);
     }
 
-    public static List<String> tokenize (String text){
+    /** Assume 'text' has no HTML escaping. **/
+    public static List<String> tokenize(String text){
         return simpleTokenize(squeezeWhitespace(text));
     }
 
 
-    // OLD COMMENT
-    // Very slight normalization for AFTER tokenization.
-    // The tokenization regexes are written to work on non-normalized text.
-    // (to make byte offsets easier to compute)
-    // Hm: 2+ repeated character normalization here?
-    // No, that's more linguistic, should be further down the pipeline 
-    public static String normalizeText(String text) {
-//    	text = text.replaceAll("&lt;", "<").replaceAll("&gt;",">");
+    /**
+     * Twitter text comes HTML-escaped, so unescape it.
+     * We also first unescape &amp;'s, in case the text has been buggily double-escaped.
+     */
+    public static String normalizeTextForTagger(String text) {
     	text = text.replaceAll("&amp;", "&");
     	text = StringEscapeUtils.unescapeHtml(text);
     	return text;
     }
 
     /**
-     * Note this normalizes text BEFORE calling the tokenizer. So the tokens you get back may not exactly correspond to
+     * Note this normalizes the input text BEFORE calling the tokenizer.
+     * So the tokens you get back may not exactly correspond to
      * substrings of the original text.
      */
-    public static List<String> tokenizeForTagger(String text) {
-        List<String> res = new ArrayList<String>();
-        List<String> pretokenized = tokenize(normalizeText(text));
-        for(String token:pretokenized){
-            res.add(token);
-        }
-        return res;
-    }
-
-
-    public static class Tokenization {
-        public List<String> rawTokens;
-        public List<String> normalizedTokens;
-    }
-
-    /**
-     * This is subtly broken dont use right now -
-     * to make it work, need to redo tokenizer regexes to handle unescaped html. 
-     **/
-    public static Tokenization tokenizeForTaggerAndOriginal(String text) {
-        Tokenization tokenization = new Tokenization();
-        tokenization.rawTokens = tokenize(text);
-        tokenization.normalizedTokens = new ArrayList<String>();
-        for (String token : tokenization.rawTokens) {
-            tokenization.normalizedTokens.add( normalizeText(token) );
-        }
-        return tokenization;
-    }
-
-    
-  /**
-   * Returns tokenization as a single string of space-separated tokens.
-   */
-    public static String tokenizeToString (String text){
-    	List<String> tokenized = tokenizeForTagger(text);
-    	if (tokenized.size()==0)
-    		return "";
-		StringBuilder sb = new StringBuilder();
-		for(String s: tokenizeForTagger(text)) {
-		     sb.append(s).append(' ');
-		}
-		sb.deleteCharAt(sb.length()-1);
-		return sb.toString();
+    public static List<String> tokenizeRawTweetText(String text) {
+        List<String> tokens = tokenize(normalizeTextForTagger(text));
+        return tokens;
     }
 }
