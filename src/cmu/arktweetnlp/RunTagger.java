@@ -75,7 +75,7 @@ public class RunTagger {
 		long currenttime = System.currentTimeMillis();
 		int numtoks = 0;
 		while ( (line = reader.readLine()) != null) {
-			if (line.isEmpty())	continue;//TODO output blank line?
+			if (line.isEmpty())	continue;	//TODO output blank line?
 			String[] parts = line.split("\t");
 			String tweetData = parts[inputField-1];
 			String text;
@@ -108,6 +108,7 @@ public class RunTagger {
 		long finishtime = System.currentTimeMillis();
 		System.err.println("tokenized and tagged " + reader.getLineNumber() + " tweets and "
 			+ numtoks + " tokens in " + (finishtime-currenttime)/1000L + " seconds");
+		reader.close();
 	}
 
 	/** Runs the correct algorithm (make config option perhaps) **/
