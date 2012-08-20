@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 import cmu.arktweetnlp.Twokenize;
+import cmu.arktweetnlp.io.JsonTweetReader;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -22,34 +23,40 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.twitter.Regex;
 
+import edu.stanford.nlp.util.StringUtils;
+
 
 public class Runner {
-	public static Pattern URL = Pattern.compile(Twokenize.url);
-	public static Pattern notChinese = Pattern.compile("[\\u0400-\\u1D7F\\u2E80-\\uDFFF\\uF900-\\uFAFF\\uFB50-\\uFDFF\\uFE20-\\uFE4F\\uFE70-\\uFEFF]{2}");
-	public static Pattern justbase = Pattern.compile("(?!www\\.|ww\\.|w\\.)[a-zA-Z0-9]+\\.[A-Za-z0-9\\.]+"); 
+	public static Pattern URL = Pattern.compile(Twokenize.OR(Twokenize.url, Twokenize.Email));
+	public static Pattern Chinese = Pattern.compile("[\\u0400-\\u1D7F\\u2E80-\\uDFFF\\uF900-\\uFAFF\\uFB50-\\uFDFF\\uFE20-\\uFE4F\\uFE70-\\uFEFF]{2}");
+	public static Pattern justbase = Pattern.compile("(?!www\\.|ww\\.|w\\.|@)[a-zA-Z0-9]+\\.[A-Za-z0-9\\.]+"); 
 	public static void oldmain(String[] args) throws IOException, InterruptedException {
 		if (args.length < 1) {
 			System.out.println("Supply the file to be tokenized.");
 		} else {
-			final JsonFactory factory = new JsonFactory();
+			JsonTweetReader jsonTweetReader = new JsonTweetReader();
+			GZIPInputStream gz;
+			BufferedReader br;
+			BufferedWriter writer;
 			for(String files:args){
 				File f = new File(files);
 				if (! new File("out/"+f.getName()).exists()){
-					GZIPInputStream gz = new GZIPInputStream(new FileInputStream(f));
-					JsonParser jp = factory.createJsonParser(gz);
-					BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+					gz = new GZIPInputStream(new FileInputStream(f));
+					br = new BufferedReader(new InputStreamReader(gz, "UTF-8"));
+					writer = new BufferedWriter(new OutputStreamWriter(
 						new FileOutputStream("out/"+f.getName()), "UTF-8"));
 					String line;
-					if(jp.nextToken()==JsonToken.START_OBJECT){
-						while ((line = getLine(jp)) != null && !line.isEmpty()) {
-							if(!(notChinese.matcher(line).find())){
-								writer.write(normalize(Twokenize.tokenizeToString(line)));
-								writer.newLine();
-							}
+					while ((line = br.readLine()) != null) {
+						if (line.isEmpty()) continue;
+						line = jsonTweetReader.getText(line);
+						if (line==null)	continue;
+						if(!(Chinese.matcher(line).find())){
+							writer.write(StringUtils.join(normalize(Twokenize.tokenizeForTagger(line))));
+							writer.newLine();
 						}
 					}
 					gz.close();
-					jp.close(); 
+					br.close();
 			        writer.close();
 				}
 			}
@@ -172,4 +179,5 @@ public class Runner {
 	
 	    return null;	//jParse is null (EOF)	
 	}
+
 }

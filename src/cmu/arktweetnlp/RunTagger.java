@@ -3,7 +3,9 @@ package cmu.arktweetnlp;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -42,21 +44,14 @@ public class RunTagger {
 	
 	
 	// Evaluation stuff
-	/** BTO what is this for? the OOV evals? TODO please rename appropriately, e.g. wordsSeenInTraining  */
-	public static HashSet<String> vocab;
-	public static double accuracy = 0.0;
+	public static HashSet<String> wordsInCluster;
 	// Only for evaluation mode (conll inputs)
 	int numTokensCorrect = 0;
 	int numTokens = 0;
 	int oovTokensCorrect = 0;
 	int oovTokens = 0;
-	public int clusterTokensCorrect = 0;
-	public static int clusterTokens = 0;
-
-	public static void getVocab() throws FileNotFoundException, IOException, ClassNotFoundException{
-		// BTO TODO: can we delete this?
-	    //vocab = (HashSet<String>) BasicFileIO.readSerializedObject("traindevvocab");
-	}
+	int clusterTokensCorrect = 0;
+	int clusterTokens = 0;
 	
 	public static void die(String message) {
 		// (BTO) I like "assert false" but assertions are disabled by default in java
@@ -76,9 +71,12 @@ public class RunTagger {
 		
 		JsonTweetReader jsonTweetReader = new JsonTweetReader();
 		
-		BufferedReader reader = BasicFileIO.openFileToReadUTF8(inputFilename);
+		LineNumberReader reader = new LineNumberReader(BasicFileIO.openFileToReadUTF8(inputFilename));
 		String line;
+		long currenttime = System.currentTimeMillis();
+		int numtoks = 0;
 		while ( (line = reader.readLine()) != null) {
+			if (line.isEmpty())	continue;//TODO output blank line?
 			String[] parts = line.split("\t");
 			String tweetData = parts[inputField-1];
 			String text;
@@ -94,19 +92,23 @@ public class RunTagger {
 //			sentence.tokens = tokenization.normalizedTokens;
 
 			sentence.tokens = Twokenize.tokenizeForTagger(text);
-
-			ModelSentence modelSentence = new ModelSentence(sentence.T());
-			tagger.featureExtractor.computeFeatures(sentence, modelSentence);
-			goDecode(modelSentence);
-			
-			if (outputFormat.equals("conll")) {
-				outputJustTagging(sentence, modelSentence);
-			} else {
-				outputPrependedTagging(sentence, modelSentence,
-						this.justTokenize, tweetData);				
+			if (sentence.T() > 0){
+				numtoks += sentence.tokens.size();
+				ModelSentence modelSentence = new ModelSentence(sentence.T());
+				tagger.featureExtractor.computeFeatures(sentence, modelSentence);
+				goDecode(modelSentence);
+				
+				if (outputFormat.equals("conll")) {
+					outputJustTagging(sentence, modelSentence);
+				} else {
+					outputPrependedTagging(sentence, modelSentence,
+							this.justTokenize, tweetData);				
+				}
 			}
-
 		}
+		long finishtime = System.currentTimeMillis();
+		System.err.println("tokenized and tagged " + reader.getLineNumber() + " tweets and "
+			+ numtoks + " tokens in " + (finishtime-currenttime)/1000L + " seconds");
 	}
 
 	/** Runs the correct algorithm (make config option perhaps) **/
@@ -121,8 +123,7 @@ public class RunTagger {
 		inputIterable = examples;
 
 		int[][] confusion = new int[tagger.model.numLabels][tagger.model.numLabels];
-
-		for (Sentence sentence : examples) {
+		for (Sentence sentence : examples) {	
 			ModelSentence mSent = new ModelSentence(sentence.T());
 			tagger.featureExtractor.computeFeatures(sentence, mSent);
 			goDecode(mSent);
@@ -131,8 +132,8 @@ public class RunTagger {
 				outputJustTagging(sentence, mSent);	
 			}
 			evaluateSentenceTagging(sentence, mSent);
-			//evaluateOOV(sentence, ms);
-			//getconfusion(sentence, ms, confusion);
+			//evaluateOOV(sentence, mSent);
+			//getconfusion(sentence, mSent, confusion);
 		}
 
 		System.err.printf("%d / %d correct = %.4f acc, %.4f err\n", 
@@ -140,32 +141,29 @@ public class RunTagger {
 				numTokensCorrect*1.0 / numTokens,
 				1 - (numTokensCorrect*1.0 / numTokens)
 		);
-		System.err.printf("%d / %d InVocab correct = %.4f acc, %.4f err\n", 
+/*		System.err.printf("%d / %d cluster words correct = %.4f acc, %.4f err\n", 
 				oovTokensCorrect, oovTokens,
 				oovTokensCorrect*1.0 / oovTokens,
 				1 - (oovTokensCorrect*1.0 / oovTokens)
-		);
-/*			int i=0;
-			System.out.println("\t"+tagger.model.labelVocab.toString().replaceAll(" ", ", "));
-			for (int[] row:confusion){
-				System.out.println(tagger.model.labelVocab.name(i)+"\t"+Arrays.toString(row));
-				i++;
-			}*/
+		);	*/
+/*		int i=0;
+		System.out.println("\t"+tagger.model.labelVocab.toString().replaceAll(" ", ", "));
+		for (int[] row:confusion){
+			System.out.println(tagger.model.labelVocab.name(i)+"\t"+Arrays.toString(row));
+			i++;
+		}		*/
 	}
 
-	private void evaluateOOV(Sentence lSent, ModelSentence mSent) {
+	private void evaluateOOV(Sentence lSent, ModelSentence mSent) throws FileNotFoundException, IOException, ClassNotFoundException {
+		if (wordsInCluster == null) wordsInCluster = new HashSet<String>();
 		for (int t=0; t < mSent.T; t++) {
 			int trueLabel = tagger.model.labelVocab.num(lSent.labels.get(t));
 			int predLabel = mSent.labels[t];
-			if(vocab.contains(lSent.tokens.get(t))){
-				//System.err.println(lSent.tokens.get(t)+"\ttrue:"+tagger.model.labelVocab.name(trueLabel)+" pred:"+tagger.model.labelVocab.name(predLabel));
+			if(wordsInCluster.contains(lSent.tokens.get(t))){
 				oovTokensCorrect += (trueLabel == predLabel) ? 1 : 0;
 				oovTokens += 1;
 			}
-			/*if (tagger.model.labelVocab.name(trueLabel).equals("U"))
-				if (!tagger.model.labelVocab.name(predLabel).equals("U"))
-					System.err.println(lSent.tokens.get(t)+"\t"+tagger.model.labelVocab.name(predLabel));*/			
-		}    
+		}
     }
 	private void getconfusion(Sentence lSent, ModelSentence mSent, int[][] confusion) {
 		for (int t=0; t < mSent.T; t++) {
@@ -173,7 +171,9 @@ public class RunTagger {
 			int predLabel = mSent.labels[t];
 			if(trueLabel!=-1)
 				confusion[trueLabel][predLabel]++;
-		}    
+		}
+		
+		
     }
 	public void evaluateSentenceTagging(Sentence lSent, ModelSentence mSent) {
 		for (int t=0; t < mSent.T; t++) {
