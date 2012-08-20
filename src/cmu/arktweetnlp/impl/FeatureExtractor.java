@@ -45,7 +45,7 @@ public class FeatureExtractor {
 	 */
 	public void computeFeatures(Sentence linguisticSentence, ModelSentence modelSentence) {
 		int T = linguisticSentence.T();
-		assert linguisticSentence.T() > 0;
+		assert linguisticSentence.T() > 0; //TODO: handle this when assertions are off
 		computeObservationFeatures(linguisticSentence, modelSentence);
 		if (isTrainingTime) {
 			for (int t=0; t < T; t++) {
@@ -148,45 +148,38 @@ public class FeatureExtractor {
 
 	private void initializeFeatureExtractors() {
 		allFeatureExtractors = new ArrayList<FeatureExtractorInterface>();
-		allFeatureExtractors.add(new WordformFeatures());
-		allFeatureExtractors.add(new SimpleOrthFeatures());
-		allFeatureExtractors.add(new URLFeatures());
-		allFeatureExtractors.add(new Positions());
-		
+		allFeatureExtractors.add(new Paths3());
 		allFeatureExtractors.add(new NgramSuffix(140));
 		allFeatureExtractors.add(new NgramPrefix(140));
-		allFeatureExtractors.add(new CapitalizationFeatures()); 
-		//allFeatureExtractors.add(new MetaphoneLexical());
+		allFeatureExtractors.add(new POSTagDict());
 		allFeatureExtractors.add(new MetaphonePOSDict());
 		allFeatureExtractors.add(new PrevWord());
 		allFeatureExtractors.add(new Prev2Words());
 		allFeatureExtractors.add(new NextWord());
 		allFeatureExtractors.add(new Next2Words());
-		//allFeatureExtractors.add(new Paths());
-		//allFeatureExtractors.add(new Embeddings());
-		//allFeatureExtractors.add(new Paths2());
-		allFeatureExtractors.add(new Paths3());
-		//allFeatureExtractors.add(new RitterPath());
-		allFeatureExtractors.add(new PrevNext());
-		allFeatureExtractors.add(new POSTagDict());
-		allFeatureExtractors.add(new Listofnames("celebs")); //june 7 version of freebase celebrity list
+		//allFeatureExtractors.add(new URLFeatures());
+		allFeatureExtractors.add(new WordformFeatures());
+		allFeatureExtractors.add(new Listofnames("proper_names"));
+		allFeatureExtractors.add(new Listofnames("celebs")); //2012-08-09 version of freebase celebrity list
 		allFeatureExtractors.add(new Listofnames("videogame")); //june 22 version of freebase video game list
 		allFeatureExtractors.add(new Listofnames("mobyplaces"));	//moby dictionary of US locations
 		allFeatureExtractors.add(new Listofnames("family"));
 		allFeatureExtractors.add(new Listofnames("male"));
-		allFeatureExtractors.add(new Listofnames("female"));
-		allFeatureExtractors.add(new Listofnames("proper_names"));
+		allFeatureExtractors.add(new Listofnames("female"));		
+		allFeatureExtractors.add(new CapitalizationFeatures());
+		allFeatureExtractors.add(new SimpleOrthFeatures());
+		allFeatureExtractors.add(new PrevNext());
+		allFeatureExtractors.add(new Positions());
 	}
-
 	public class WordformFeatures implements FeatureExtractorInterface {
 		public void addFeatures(List<String> tokens, PositionFeaturePairs pairs) {
 			for (int t=0; t < tokens.size(); t++) {
 				String tok = tokens.get(t);
 				String normalizedtok=tok.replaceAll("[‘’´`]", "'").replaceAll("[“”]", "\"");
 				pairs.add(t, "Word|" + normalizedtok);
-				pairs.add(t, "Lower|" + normalizedtok.toLowerCase());
-				pairs.add(t, "Xxdshape|" + Xxdshape(normalizedtok), .3);
-				pairs.add(t, "charclass|" + charclassshape(tok), .3);
+				pairs.add(t, "Lower|" + Runner.normalize(normalizedtok));
+				pairs.add(t, "Xxdshape|" + Xxdshape(normalizedtok), .5);
+				pairs.add(t, "charclass|" + charclassshape(tok), .5);
 			}
 		}
 
@@ -232,8 +225,11 @@ public class FeatureExtractor {
 				if (tok.contains("-")){
 					pairs.add(t, "Hyphenated");
 					String[] splithyph = Runner.normalize(tok).split("-", 2);
-					pairs.add(t, "preHyph|"+splithyph[0]);//quote -Ben Franklin
-					pairs.add(t, "postHyph|"+splithyph[1]);//-esque
+					//pairs.add(t, "preHyph|"+splithyph[0]);//quote -Ben Franklin
+					//pairs.add(t, "postHyph|"+splithyph[1]);//-esque
+					for (String part:splithyph){
+						pairs.add(t, "hyph|" + part);
+					}
 				}
 			}
 		}    
@@ -251,7 +247,7 @@ public class FeatureExtractor {
 					if(l>=i){
 						pairs.add(t, i+"gramSuff|"+tok.substring(l-i, l));
 						/*if (t<tokens.size()-1 && i==3)
-							pairs.add(t+1, "prev"+i+"gramSuff|"+tok.substring(l-i, l).toLowerCase());*/ 
+							pairs.add(t+1, "prev"+i+"gramSuff|"+tok.substring(l-i, l).toLowerCase()); */
 					}
 					else break;
 				}
@@ -295,8 +291,10 @@ public class FeatureExtractor {
 		public void addFeatures(List<String> tokens, PositionFeaturePairs pairs) {
 			for (int t=0; t < Math.min(tokens.size(), 4); t++) {
 				pairs.add(t, "t="+t);
-				//pairs.add(t, "t="+(t-tokens.size())+"|"+tok);
 			}
+			for (int t=tokens.size()-1; t > Math.max(tokens.size()-4, -1); t--) {
+				pairs.add(t, "t=-"+t);
+			}			
 		}
 	}
 
@@ -372,10 +370,9 @@ public class FeatureExtractor {
 			for (int t=0; t < tokens.size(); t++) {
 				String tok = tokens.get(t);
 				if(tok.length()>1){
-					//tok=tok.replace("4", "four").replace("2", "two"); //?
-					String ppword=MetaphoneNum(tok);
-					String metaphone_word = getDblMetaphone().encode(ppword);
-					String alternate_word = getDblMetaphone().doubleMetaphone(ppword, true);
+					//String ppword=MetaphoneNum(tok);
+					String metaphone_word = getDblMetaphone().encode(tok);
+					String alternate_word = getDblMetaphone().doubleMetaphone(tok, true);
 					pairs.add(t, "metaphone_word|"+metaphone_word);
 					if(!metaphone_word.equals(alternate_word))
 						pairs.add(t, "metaphone_word|"+alternate_word);
@@ -432,7 +429,7 @@ public class FeatureExtractor {
 						pairs.add(t-1, "NextPOSTag|" + poses.get(0));
 					if (t < tokens.size()-1)
 						pairs.add(t+1, "PrevPOSTag|" + poses.get(0));					
-					for (int i=1; i < poses.size(); i++) {	//POSTagfirst and POSTagnotfirst works well too
+					for (int i=1; i < poses.size(); i++) {
 						pairs.add(t, "POSTagDict|" + poses.get(i), (poses.size()-(double)i)/poses.size());
 					}
 				} 	    		
@@ -444,52 +441,11 @@ public class FeatureExtractor {
 	/** TODO this should be moved into config somehow **/
 	public static String clusterResourceName = "/cmu/arktweetnlp/6mpaths";
 	
-	
-	public static class Paths implements FeatureExtractorInterface {
-		static HashMap<String,String> path;
-		public Paths(){
-			//read in paths file
-			BufferedReader bReader = BasicFileIO.getResourceReader(clusterResourceName);
-			String[] splitline = new String[3];
-			String line = BasicFileIO.getLine(bReader);
-			path = new HashMap<String,String>(); 
-			while(line != null){
-				splitline = line.split("\\t");
-				path.put(splitline[1], splitline[0]);
-				line=BasicFileIO.getLine(bReader);
-			}
-			RunTagger.vocab = new HashSet<String>(path.keySet());
-		}
-		public void addFeatures(List<String> tokens, PositionFeaturePairs pairs) {
-			String bitstring = null;
-			for (int t=0; t < tokens.size(); t++) {
-				String tok = tokens.get(t);
-			    String normaltok = Runner.normalize(tok);
-				bitstring = path.get(normaltok);
-				if (!(bitstring==null)){
-					int i;
-					for(i=2; i<=bitstring.length(); i+=2){
-						pairs.add(t, "Cluster|"+bitstring.substring(0,i));
-/*						if (t<tokens.size()-1)
-							pairs.add(t+1, "PrevCluster|"+bitstring.substring(0,i));*/
-					}
-					if (i-2<bitstring.length()){
-						pairs.add(t, "Cluster"+bitstring.length()+"|" + bitstring);
-					}
-/*				if (t<tokens.size()-1)
-					pairs.add(t+1, "PrevCluster"+bitstring.length()+"|" + bitstring);*/
-				}
-				else
-					pairs.add(t, "Cluster|none");
-			}
-		}
-	}
 	public static class Paths3 implements FeatureExtractorInterface{
 		public static HashMap<String,String> path;
 		Pattern URL = Pattern.compile(Twokenize.url);
 		static Pattern repeatchar = Pattern.compile("([\\w])\\1{2,}");
 		static Pattern repeatvowel = Pattern.compile("(a|e|i|o|u)\\1+");
-		//HashSet<String> smallvocab = (HashSet<String>) BasicFileIO.readSerializedObject("traindevvocab");
 		public Paths3() {
 			//read in paths file
 			BufferedReader bReader = BasicFileIO.getResourceReader(clusterResourceName);
@@ -502,11 +458,10 @@ public class FeatureExtractor {
 					path.put(splitline[1], splitline[0]);
 				line = BasicFileIO.getLine(bReader);
 			}
-			RunTagger.vocab = new HashSet<String>(path.keySet());
+			RunTagger.wordsInCluster = new HashSet<String>(path.keySet());
 		}
 		public void addFeatures(List<String> tokens, PositionFeaturePairs pairs) {
 			String bitstring = null;
-			String prevbitstring = "start";
 			for (int t=0; t < tokens.size(); t++) {
 				String tok = tokens.get(t);
 			    String normaltok = Runner.normalize(tok);
@@ -519,43 +474,26 @@ public class FeatureExtractor {
 			    			break;
 			    		}
 			    	}
-/*			    if (bitstring==null && !(normaltok.endsWith("s"))){
-			    	int[] distances = new int[keys.length];
-			    	int i=0;
-				    for (String clusterword:keys){
-				    	distances[i]=StringUtils.computeLevenshteinDistance(normaltok, clusterword);
-				    	i++;
-				    }
-				    int min=ArrayUtil.argmin(distances);
-				    if (distances[min]==1){
-				    	System.err.println(normaltok+"->"+keys[min]);
-				    	bitstring=path.get(keys[min]);
-				    }
-			    }*/
 			    }
 			    
 				if (bitstring!=null){
 					int i;
 					bitstring = StringUtils.pad(bitstring, 16).replace(' ', '0');
-					for(i=2; i<=bitstring.length()-4; i+=2){
+					for(i=2; i<=bitstring.length(); i+=2){
 						pairs.add(t, "BigCluster|" + bitstring.substring(0,i));
 					}
-/*					if (i==1+bitstring.length()){
-						pairs.add(t, "BigCluster|" + bitstring);					
-					}*/
-					//pairs.add(t, "PrevCurrBigCluster|" + prevbitstring + "|" + bitstring.substring(0,4));
 					if (t<tokens.size()-1){
 						pairs.add(t+1, "PrevBigCluster"+"|" + bitstring.substring(0,4));
+						//pairs.add(t+1, "PrevBigCluster"+"|" + bitstring);
 					}
 					if (t>0){
 						pairs.add(t-1, "NextBigCluster"+"|" + bitstring.substring(0,4));
+						//pairs.add(t-1, "NextBigCluster"+"|" + bitstring);
 					}
-					prevbitstring = bitstring.substring(0,8);
 				}
-				else{
-					prevbitstring = "none";
+/*				else{
 					pairs.add(t, "BigCluster|none");
-				}
+				}*/
 
 			}
 		}
@@ -574,34 +512,7 @@ public class FeatureExtractor {
 	        return fuzz;
         }
 	}
-	public class Paths2 implements FeatureExtractorInterface{
-		HashMap<String,Integer> path;
-		public Paths2(){
-			//read in paths file
-			BufferedReader bReader = BasicFileIO.getResourceReader("/cmu/arktweetnlp/1012mkcls.txt");
-			String[] splitline = new String[2];
-			String line=BasicFileIO.getLine(bReader);
-			path = new HashMap<String,Integer>(); 
-			while(line != null && line.length()!=0){
-				splitline = line.split("\\t");
-				path.put(splitline[0], Integer.valueOf(splitline[1]));
-				line=BasicFileIO.getLine(bReader);
-			}
-		}
-		public void addFeatures(List<String> tokens, PositionFeaturePairs pairs) {
-			Integer cluster = null;
-			for (int t=0; t < tokens.size(); t++) {
-				String tok = tokens.get(t);
-			    String normaltok = tok.toLowerCase();
-				cluster = path.get(normaltok);
-				if (!(cluster==null)){
-					pairs.add(t, "Kluster|"+cluster);
-				}
-				else
-					pairs.add(t, "Kluster|none");
-			}
-		}
-	}
+
 	public class RitterPath implements FeatureExtractorInterface{
 		HashMap<String,Integer> path;
 		public RitterPath(){
@@ -661,7 +572,6 @@ public class FeatureExtractor {
 				path.put(wordembed[0], wordembed[1]);
 				line=BasicFileIO.getLine(bReader);
 			}
-			RunTagger.vocab = new HashSet<String>(path.keySet());
 		}
 		public void addFeatures(List<String> tokens, PositionFeaturePairs pairs) {
 			String[]embeds = null;
@@ -769,7 +679,7 @@ public class FeatureExtractor {
 		HashSet<String> members;
 		public Listofnames(String str) {
 			Listname=str;
-			members = initDict(Listname);
+			this.members = initDict(Listname);
 		}
 		public void addFeatures(List<String> tokens, PositionFeaturePairs pairs) {
 			for (int t=0; t < tokens.size(); t++) {

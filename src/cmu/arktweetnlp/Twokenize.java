@@ -73,7 +73,7 @@ public class Twokenize {
     static String thingsThatSplitWords = "[^\\s\\.,?\"]";
     static String embeddedApostrophe = thingsThatSplitWords+"+['’′]" + thingsThatSplitWords + "*";
     
-    private static String OR(String... parts) {
+    public static String OR(String... parts) {
         String prefix="(?:";
         StringBuilder sb = new StringBuilder();
         for (String s:parts){
@@ -172,7 +172,7 @@ public class Twokenize {
     // I remember it causing lots of trouble in the past as well.  Would be good to revisit or eliminate.
 
     // Note the 'smart quotes' (http://en.wikipedia.org/wiki/Smart_quotes)
-    static String edgePunctChars    = "'\"“”‘’«»{}\\(\\)\\[\\]\\*&";
+    static String edgePunctChars    = "'\"“”‘’«»{}\\(\\)\\[\\]\\*&"; //add \\p{So}? (symbols)
     static String edgePunct    = "[" + edgePunctChars + "]";
     static String notEdgePunct = "[a-zA-Z0-9]"; // content characters
     static String offEdge = "(^|$|:|;|\\s|\\.|,)";  // colon here gets "(hello):" ==> "( hello ):"

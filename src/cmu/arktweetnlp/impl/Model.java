@@ -135,8 +135,9 @@ public class Model {
 		double[] labelScores = new double[numLabels];
 		computeVitLabelScores(0, startMarker(), sentence, labelScores);
 		ArrayUtil.logNormalize(labelScores);
-		for (int k=0; k < numLabels; k++){ //initialization
-			vit[0][k]=labelScores[k];
+		//initialization
+		vit[0]=labelScores;
+		for (int k=0; k < numLabels; k++){
 			bptr[0][k]=startMarker();
 		}
 		for (int t=1; t < T; t++){
@@ -166,7 +167,7 @@ public class Model {
 		assert (backtrace == startMarker());
 	}
 
-	public double[] getColumn(double[][] matrix, int col){
+	private double[] getColumn(double[][] matrix, int col){
 		double[] column = new double[matrix.length];
 		for (int i=0; i<matrix[0].length; i++){
 			column[i] = matrix[i][col];
