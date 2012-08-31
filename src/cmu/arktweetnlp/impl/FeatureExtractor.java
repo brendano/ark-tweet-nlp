@@ -154,9 +154,9 @@ public class FeatureExtractor {
 		allFeatureExtractors.add(new POSTagDict());
 		allFeatureExtractors.add(new MetaphonePOSDict());
 		allFeatureExtractors.add(new PrevWord());
-		allFeatureExtractors.add(new Prev2Words());
+		//allFeatureExtractors.add(new Prev2Words());
 		allFeatureExtractors.add(new NextWord());
-		allFeatureExtractors.add(new Next2Words());
+		//allFeatureExtractors.add(new Next2Words());
 		//allFeatureExtractors.add(new URLFeatures());
 		allFeatureExtractors.add(new WordformFeatures());
 		allFeatureExtractors.add(new Listofnames("proper_names"));
@@ -165,12 +165,13 @@ public class FeatureExtractor {
 		allFeatureExtractors.add(new Listofnames("mobyplaces"));	//moby dictionary of US locations
 		allFeatureExtractors.add(new Listofnames("family"));
 		allFeatureExtractors.add(new Listofnames("male"));
-		allFeatureExtractors.add(new Listofnames("female"));		
+		allFeatureExtractors.add(new Listofnames("female"));
 		allFeatureExtractors.add(new CapitalizationFeatures());
 		allFeatureExtractors.add(new SimpleOrthFeatures());
 		allFeatureExtractors.add(new PrevNext());
 		allFeatureExtractors.add(new Positions());
 	}
+
 	public class WordformFeatures implements FeatureExtractorInterface {
 		public void addFeatures(List<String> tokens, PositionFeaturePairs pairs) {
 			for (int t=0; t < tokens.size(); t++) {
@@ -216,9 +217,9 @@ public class FeatureExtractor {
 				if (tok.charAt(0) == '#')
 					pairs.add(t, "InitHash");
 
-				if (allPunct.matcher(tok).matches()){
+				/*if (allPunct.matcher(tok).matches()){
 					pairs.add(t, "AllPunct");
-				}
+				}*/
 				if (emoticon.matcher(tok).matches()){
 					pairs.add(t, "Emoticon");
 				}
@@ -294,7 +295,7 @@ public class FeatureExtractor {
 			}
 			for (int t=tokens.size()-1; t > Math.max(tokens.size()-4, -1); t--) {
 				pairs.add(t, "t=-"+t);
-			}			
+			}
 		}
 	}
 
@@ -439,12 +440,12 @@ public class FeatureExtractor {
 	
 	
 	/** TODO this should be moved into config somehow **/
-	public static String clusterResourceName = "/cmu/arktweetnlp/6mpaths";
+	public static String clusterResourceName = "/cmu/arktweetnlp/50mpaths2";
 	
 	public static class Paths3 implements FeatureExtractorInterface{
 		public static HashMap<String,String> path;
 		Pattern URL = Pattern.compile(Twokenize.url);
-		static Pattern repeatchar = Pattern.compile("([\\w])\\1{2,}");
+		static Pattern repeatchar = Pattern.compile("([\\w])\\1{1,}");
 		static Pattern repeatvowel = Pattern.compile("(a|e|i|o|u)\\1+");
 		public Paths3() {
 			//read in paths file
@@ -479,22 +480,21 @@ public class FeatureExtractor {
 				if (bitstring!=null){
 					int i;
 					bitstring = StringUtils.pad(bitstring, 16).replace(' ', '0');
-					for(i=2; i<=bitstring.length(); i+=2){
+					for(i=2; i<=16; i+=2){
 						pairs.add(t, "BigCluster|" + bitstring.substring(0,i));
 					}
 					if (t<tokens.size()-1){
-						pairs.add(t+1, "PrevBigCluster"+"|" + bitstring.substring(0,4));
-						//pairs.add(t+1, "PrevBigCluster"+"|" + bitstring);
+						for(i=4; i<=12; i+=4)
+							pairs.add(t+1, "PrevBigCluster"+"|" + bitstring.substring(0,i));
 					}
 					if (t>0){
-						pairs.add(t-1, "NextBigCluster"+"|" + bitstring.substring(0,4));
-						//pairs.add(t-1, "NextBigCluster"+"|" + bitstring);
+						for(i=4; i<=12; i+=4)
+							pairs.add(t-1, "NextBigCluster"+"|" + bitstring.substring(0,i));
 					}
 				}
 /*				else{
 					pairs.add(t, "BigCluster|none");
 				}*/
-
 			}
 		}
 		public static ArrayList<String> fuzztoken(String tok, boolean apos) {
@@ -513,86 +513,6 @@ public class FeatureExtractor {
         }
 	}
 
-	public class RitterPath implements FeatureExtractorInterface{
-		HashMap<String,Integer> path;
-		public RitterPath(){
-			//read in paths file
-			BufferedReader bReader = BasicFileIO.getResourceReader("/cmu/arktweetnlp/60KCL.txt");
-			String[] splitline = new String[2];
-			String line=BasicFileIO.getLine(bReader);
-			path = new HashMap<String,Integer>(); 
-			while(line != null && line.length()!=0){
-				splitline = line.split("\\t");
-				path.put(splitline[0], Integer.valueOf(splitline[1]));
-				line=BasicFileIO.getLine(bReader);
-			}
-		}
-		public void addFeatures(List<String> tokens, PositionFeaturePairs pairs) {
-			Integer cluster = null;
-			for (int t=0; t < tokens.size(); t++) {
-				String tok = tokens.get(t);
-			    String normaltok = tok.toLowerCase();
-				cluster = path.get(normaltok);
-			    if (cluster==null){
-			    	for (String fuzz:Paths3.fuzztoken(normaltok, false)){
-			    		cluster = path.get(fuzz);
-			    		if (cluster!=null){
-			    			//System.err.println(normaltok+"->"+fuzz);
-			    			break;
-			    		}
-			    	}
-			    }				
-				if (!(cluster==null)){
-					String bitstring = "000000000000"+Integer.toBinaryString(cluster); //pad left
-					pairs.add(t, "Ruster4|"+bitstring.substring(bitstring.length()-4, bitstring.length()));
-					pairs.add(t, "Ruster8|"+bitstring.substring(bitstring.length()-8, bitstring.length()));
-					pairs.add(t, "Ruster12|"+bitstring.substring(bitstring.length()-12, bitstring.length()));
-					if (t<tokens.size()-1)
-						pairs.add(t+1, "PrevRuster|"+bitstring.substring(bitstring.length()-12, bitstring.length()));
-					if (t>0)
-						pairs.add(t-1, "NextRuster|"+bitstring.substring(bitstring.length()-12, bitstring.length()));
-				}
-/*				else
-					pairs.add(t, "Ruster|none");*/
-			}
-		}
-	}
-	
-	public class Embeddings implements FeatureExtractorInterface{
-		HashMap<String,String> path;
-		Pattern URL = Pattern.compile(Twokenize.url);
-		public Embeddings(){
-			//read in paths file
-			BufferedReader bReader = BasicFileIO.getResourceReader("/cmu/arktweetnlp/embeddings.txt");
-			String[] wordembed = new String[2];
-			String line=BasicFileIO.getLine(bReader);
-			path = new HashMap<String,String>(); 
-			while(line != null){
-				wordembed = line.split("\\t");
-				path.put(wordembed[0], wordembed[1]);
-				line=BasicFileIO.getLine(bReader);
-			}
-		}
-		public void addFeatures(List<String> tokens, PositionFeaturePairs pairs) {
-			String[]embeds = null;
-			for (int t=0; t < tokens.size(); t++) {
-				String tok = tokens.get(t);
-			    String normaltok = tok.toLowerCase();
-				String embedlist = path.get(normaltok);
-				Double[] sign = new Double[50];
-				if (!(embedlist==null)){
-					embeds = embedlist.split(" ");
-					for(int i=0; i<50; i++){
-						sign[i] = Math.signum(Double.parseDouble(embeds[i]));
-						pairs.add(t, "embed-"+i+"|"+sign[i]);
-						//pairs.add(t, "embed-"+i, Double.parseDouble(embeds[i]));
-					}
-				}
-/*				else
-					pairs.add(t, "noembed");*/
-			}
-		}
-	}
 	//Transitive Features    
 	public class NextWord implements FeatureExtractorInterface{
 		public void addFeatures(List<String> tokens, PositionFeaturePairs pairs) {

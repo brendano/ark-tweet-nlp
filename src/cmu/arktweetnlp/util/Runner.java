@@ -19,6 +19,10 @@ public class Runner {
 	public static Pattern URL = Pattern.compile(Twokenize.OR(Twokenize.url, Twokenize.Email));
 	public static Pattern justbase = Pattern.compile("(?!www\\.|ww\\.|w\\.|@)[a-zA-Z0-9]+\\.[A-Za-z0-9\\.]+"); 
 	
+	/**
+	 * @param str
+	 * @return Lowercase normalized string
+	 */
 	public static String normalize(String str) {
 	    str = str.toLowerCase();
 		if (URL.matcher(str).matches()){	    	
@@ -76,7 +80,10 @@ public class Runner {
 						new FileOutputStream("newer" + Filename), "UTF-8"));
 			}
 			String line;
+			int numtweets = 0;
+			long currtime = System.currentTimeMillis();
 			while ((line = reader.readLine()) != null) {
+				numtweets++;
 				List<String> tline = Twokenize.tokenizeRawTweetText(line);
 				for (String str : tline) {
 					writer.write(str + " ");
@@ -85,6 +92,8 @@ public class Runner {
 				writer.flush();
 			}
 			writer.close();
+			long elapsed = System.currentTimeMillis()-currtime;
+			System.err.println("tokenized "+numtweets+" in "+elapsed/1000L+" seconds.");
 		}
 	}	
 }
