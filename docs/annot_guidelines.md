@@ -90,11 +90,16 @@ Due to space constraints, words at the ends of tweets are sometimes cut off.
 If it is apparent from context what the partial word is (or at least what its tag is most likely to be), we tag the partial word as that tag. If it is unclear, we tag it as G. Consider the following examples:
 
 <!--28905710274-->
+
 * (5) RT @BroderickWalton : Usually the people that need our help the most are the ones that are hardest 2 get through 2 . Be patient , love on t ...
+
 <!--~ @ ~ R D N P V D N D A V D N D V R P V P P , V N , V P G ~-->
 <!--28841569916-->
+
 * (6) RT @ucsantabarbara : Tonight's memorial for Lucas Ransom starts at 8:00 p.m. and is being held at the open space at the corner of Del Pla ...
+
 <!--~ @ ~ S N P ^ ^ V P $ N & V V V P D A N P D N P ^ ^ ~-->
+
 In example `(5)` the “t” at the end is tagged as G, since it 
 is clearly truncated due to space constraints and it is unknown what tag the 
 full word would receive. However, in example `(6)`, even though “Pla” is 
@@ -112,31 +117,45 @@ When multiple words are written together without spaces, or when spaces are inse
 For example:
 
 <!--28873458992-->
+
 * (7) It's Been Coldd :/ iGuess It's Better Than Beingg Hot Tho . Where Do Yuhh Live At ? @iKnow_YouWantMe
+
 <!--L V A E G L A P V A R , R V O V P ,-->
+
 We tag “iGuess” as G.
 
 <!--28899336035-->
+
 * (8) This yearâs almond crop is a great one . And the crop is being shipped fresh to youâŠNow !
+
 <!--D S N N V D A $ , & D N V V V A P G ,-->
+
 “youâŠNow” is tagged as G.
 
 * (9) RT @Mz_GoHAM Um ..... #TeamHeat ........ wut Happend ?? Haha &lt;== #TeamCeltics showin that ass what's good...That's wat happened !!! LMAO
 The tokenizer erroneously left “good...That's” as a single token, which we tag as G.
 
 <!--28847830495-->
+
 * (10) #uWasCoolUntil you unfollowed me ! R E T W E E T if you Hate when people do that for no reason .
+
 <!--# O V O , G G G G G G G P O V R N V D P D N ,-->
+
 All tokens in “R E T W E E T” are tagged as G.
 
 ### Symbols, Arrows, etc. ###
 
 <!--28860873076-->
+
 * (11) RT @YourFavWhiteGuy : Helppp meeeee . I'mmm meltiiinngggg --&gt; http://twitpic.com/316cjg
+
 <!--~ @ ~ V O , L A G U-->
 <!--28841534211-->
+
 * (12) http://bit.ly/cLRm23 &lt;-- #ICONLOUNGE 257 Trinity Ave , Downtown Atlanta ... Party This Wednesday ! RT
+
 <!--U G # $ ^ ^ , A ^ , N D ^ , V-->
+
 The arrow (“--&gt;”) is tagged as G. In some cases, arrows 
 like these are used to indicate when a comment is a response to another tweet, 
 in which case the tag `~` is used. Section XYZ below shows examples 
@@ -147,8 +166,11 @@ of this.
 A common phenomenon in Twitter is the “retweet construction”, shown in the following example:
 
 <!--28841537250-->
+
 * (13) RT @Solodagod : Miami put a fork in it ...
+
 <!--~ @ ~ ^ V D N P O ,-->
+
 The token “RT” indicates that what follows is a “retweet” of another tweet. Typically it is 
 followed by a Twitter username in the form of an at-mention followed by a colon (:). In this 
 construction, we tag both the “RT” and “:” as `~`.
@@ -158,9 +180,12 @@ not enough space for the entirety of the original tweet, as in the
 following example:
 
 <!--28841503214-->
+
 * (14) RT @donnabrazile : Because of the crisis in Haiti , I must now turn down the volume . We are one people . Let us find a way to show our huma ...
+
 <!--~ @ ~ P P D N P ^ , O V R V T D N , O V A N , V O V D N P V D G ~-->
 <!--huma = G-->
+
 In this tweet, in addition to tagging the “RT” and “:” as `~`, 
 the final “...” is also tagged as `~` because it is not 
 intentional punctuation but rather indicates that the tweet has been cut short 
@@ -171,21 +196,31 @@ item of interest on the internet. Typically the headline/title and beginning of 
 begins the tweet, followed by “...” and the URL, as in the following example:
 
 <!--28841540324-->
+
 * (15) New NC Highway Signs Welcome Motorists To " Most Military Friendly State ": New signs going up on the major highways ... http://bit.ly/cPNH6e
+
 <!--A ^ N N V N P , R A A N , A N V T P D A N ~ U-->
+
 Since the “...” is used to indicate that the text in the tweet is continued elsewhere (namely at the subsequent URL), we tag it as `~`. Sometimes instead of “...”, the token “cont” (abbreviation for “continued”) is used to indicate continuation, as in the following:
 
 <!--28936861036-->
+
 * (16) I predict I won't win a single game I bet on . Got Cliff Lee today , so if he loses its on me RT @e_one : Texas ( cont ) http://tl.gd/6meogh
+
 <!--O V O V V D A N O V P , V ^ ^ N , P P O V L P O ~ @ ~ ^ , ~ , U-->
+
 Here, “cont” is tagged as `~` and the surrounding parentheses are tagged as puncutation.
 
 Another use for `~` is for tokens that indicate that one part of a tweet is a response to another part, particularly when used in an RT construction. Consider the following example:
+
 <!--RT @ayy_yoHONEY : . #walesaid dt @its_a_hair_flip should go DOWNTOWN ! Lol !!.. #jammy --&gt;~LMAO !! Man BIANCA !!!-->
 
 <!--28860458956-->
+
 * (17) RT @Love_JAsh : First time seeing Ye's film on VH1 « -What do you think about it ?
+
 <!--~ @ ~ A N V Z N P ^ ~ O V O V P O ,-->
+
 The “«” token indicates that the text after it is a response to the text before it, and is therefore tagged with `~`. 
 
 <!--arrows = ~-->
@@ -244,24 +279,38 @@ It is assumed that the author meant to use “at” instead of “are” (possib
 
 Words of direct address such as “girl”, “miss”, “man”, and “dude” are used frequently in 
 tweets directed to another person. They are tagged as nouns. Consider the following example:
+
 <!--28909766051-->
+
 * (18) RT @iLoveTaraBriona : Shout-out to @ImLuckyFeCarter definition of lil webbies i-n-d-e-p-e-n-d-e-n-t --&gt; do you know what means man ??? &lt;&lt; Ayyye !
+
 <!--~ @ ~ V P @ N P ^ Z A G V O V O V N , ~ ! ,-->
 <!--28841447123-->
+
 * (19) I need to go home man . Got some thangs I wanna try . Lol .
+
 <!--O V T V N N , V D N O V V , ! ,-->
+
 In these two examples, “man” is tagged as N. More generally, words of direct 
 address are tagged as nouns when they refer to an actual person, and 
 interjections otherwise, as in the following examples:
+
 <!--28851460183-->
+
 * (20) RT @ayy\_yoHONEY : . #walesaid dt @its_a_hair_flip should go DOWNTOWN ! Lol !!.. #jammy --&gt;~LMAO !! Man BIANCA !!!
+
 <!--~ @ ~ , # G @ V V N , ! , # ~ ! , ! ^ ,-->
 <!--28848789014-->
+
 * (21) Bbm yawn face * Man that #napflow felt so refreshing .
+
 <!--^ A N , ! D # V R A ,-->
 <!--28853024982-->
+
 * (22) Man da #Lakers have a fucking all-star squad fuck wit it !!
+
 <!--! D # V D R A N V P O ,-->
+
 In all these cases, “Man” is tagged as an interjection (!).
 
 <!--
