@@ -3,7 +3,40 @@ Annotation Guidelines for Twitter Part-of-Speech Tagging
 
 Authors: Kevin Gimpel, Nathan Schneider, ...?
 
-This document is a DRAFT.
+This document is a DRAFT. Note that comments ported from the 2011-02-23 LaTeX version are retained as HTML comments.
+
+Recent Issues
+-------------
+
+### Nathan's notes from annotation ###
+
+* days of week, months are ^
+* a big issue with the default tags: 'that' functioning as a pronoun but tagged as D.
+
+Difficult cases:
+
+* 25244937167568896 x2 - emoticon? 2 times?
+* 26042601522073600 that one - one tagged as pronoun
+* 26085492428636161 Prime Minister
+* 26085492428636161 cash-for-sex
+* 28569472516235264 ass clitic
+* 30656193286377472 mention of the word "aint" (metalinguistic)
+* 30656193286377472 yes, no
+* 32189630715535361 you two
+* 32468904269844480 Let's (verbal + nominal)? 38756380194254849 buy'em
+* 32942659601440768 (several issues)
+* 36246374219522048 vocative 'dude' (noun? interjection?)
+  - per below, should be a noun
+* 36246374219522048 down there
+* 36949436257013760, 37310741828603905 Valentine's Day (^ ^ or Z N?)
+* 37935252550860800 up for grabs
+* 38756380194254849 All-star Weekend (^ ^ or N N?)
+* 41198546862616576 Trueshit (! or N?)
+
+#### Preposition-y things ####
+
+difficult decision in annotation: preposition-like verb modifiers. preposition, particle, or adverb? i am only tagging as particles (T) intransitive prepositions for verbs which can be transitive (e.g., 'up' in 'wake up'/'wake up his friend'). I do not use T for the rare verbs and adjectives that can serve as particles (cut *short*, let *go*). For 41852812245598208 (stick around) I went with P because 'stick around' cannot be transitive (I think 'stick around the house' is [stick [around the house]], not [[stick around\] \[the house]]).
+
 
 Introduction
 ------------
