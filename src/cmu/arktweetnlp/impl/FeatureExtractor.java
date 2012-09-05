@@ -388,10 +388,9 @@ public class FeatureExtractor {
 				if(tok.length()>1){
 					//tok=tok.replace("4", "four").replace("2", "two").replace("3","three");
 					String metaphone_word = getMetaphone().encode(tok);
-					TagDictionary d = TagDictionary.instance();
 					String key = String.format("**MP**%s", metaphone_word);
-					if (d.WORD_TO_POS.containsKey(key)) {
-						List<String> poses = d.WORD_TO_POS.get(key);
+					if (TagDictionary.WORD_TO_POS.containsKey(key)) {
+						List<String> poses = TagDictionary.WORD_TO_POS.get(key);
 						for (String pos : poses) {
 							pairs.add(t, "metaph_POSDict|"+pos);
 						}    				
@@ -406,17 +405,17 @@ public class FeatureExtractor {
 		public void addFeatures(List<String> tokens, PositionFeaturePairs pairs) {
 			for (int t=0; t < tokens.size(); t++) {
 				String tok = tokens.get(t);
-				TagDictionary d = TagDictionary.instance();
-				List<String> poses = d.WORD_TO_POS.get(tok);
+
+				List<String> poses = TagDictionary.WORD_TO_POS.get(tok);
 				if (poses == null && letter.matcher(tok).find() && (!URL.matcher(tok).matches())) {
 					String normtok = Runner.normalizecap(tok);
-					poses = d.WORD_TO_POS.get(normtok);
+					poses = TagDictionary.WORD_TO_POS.get(normtok);
 					if (poses==null) {
 						ArrayList<String> fuzz = new ArrayList<String>(); 
 						fuzz.addAll(Paths3.fuzztoken(normtok, true));
 						fuzz.addAll(Paths3.fuzztoken(Runner.normalize(tok), true));
 				    	for (String f:fuzz){
-				    		poses = d.WORD_TO_POS.get(f);
+				    		poses = TagDictionary.WORD_TO_POS.get(f);
 				    		if (poses!=null){
 				    			//System.err.println(tok+"->"+f);
 				    			break;
