@@ -6,10 +6,10 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import cmu.arktweetnlp.impl.FeatureExtractor;
 import cmu.arktweetnlp.impl.Model;
 import cmu.arktweetnlp.impl.ModelSentence;
 import cmu.arktweetnlp.impl.Sentence;
+import cmu.arktweetnlp.impl.features.FeatureExtractor;
 
 
 /**

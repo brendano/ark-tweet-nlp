@@ -1,4 +1,4 @@
-package cmu.arktweetnlp.impl;
+package cmu.arktweetnlp.impl.features;
 import java.io.*;
 import java.util.*;
 
@@ -8,11 +8,12 @@ import cmu.arktweetnlp.util.BasicFileIO;
 
 public class TagDictionary {
 	public final static Map<String, List<String>> WORD_TO_POS;
-    static {
+
+	static {
         WORD_TO_POS = loadData();
     }
-    //FIXME(alexander) get rid of this
-	public static TagDictionary instance() {
+
+    public static TagDictionary instance() {
         return new TagDictionary();
 	}
 
@@ -22,8 +23,8 @@ public class TagDictionary {
 		_metaphone.setMaxCodeLen(100);
         HashMap<String, List<String>> wordToPos  =
                 new HashMap<String, List<String>>();
-			BufferedReader in = BasicFileIO.getResourceReader("/cmu/arktweetnlp/tagdict.txt");
-			String line;
+		BufferedReader in = BasicFileIO.getResourceReader("/cmu/arktweetnlp/tagdict.txt");
+		String line;
         try {
             while((line = in.readLine()) != null) {
                 String[] parts = line.trim().split("\t");

@@ -9,6 +9,8 @@ import java.util.List;
 
 import cmu.arktweetnlp.impl.ModelSentence;
 import cmu.arktweetnlp.impl.Sentence;
+import cmu.arktweetnlp.impl.features.FeatureExtractor;
+import cmu.arktweetnlp.impl.features.WordClusterPaths;
 import cmu.arktweetnlp.io.CoNLLReader;
 import cmu.arktweetnlp.io.JsonTweetReader;
 import cmu.arktweetnlp.util.BasicFileIO;
@@ -40,7 +42,7 @@ public class RunTagger {
 	
 	
 	// Evaluation stuff
-	public static HashSet<String> wordsInCluster;
+	private static HashSet<String> _wordsInCluster;
 	// Only for evaluation mode (conll inputs)
 	int numTokensCorrect = 0;
 	int numTokens = 0;
@@ -152,11 +154,10 @@ public class RunTagger {
 	}
 
 	private void evaluateOOV(Sentence lSent, ModelSentence mSent) throws FileNotFoundException, IOException, ClassNotFoundException {
-		if (wordsInCluster == null) wordsInCluster = new HashSet<String>();
 		for (int t=0; t < mSent.T; t++) {
 			int trueLabel = tagger.model.labelVocab.num(lSent.labels.get(t));
 			int predLabel = mSent.labels[t];
-			if(wordsInCluster.contains(lSent.tokens.get(t))){
+			if(wordsInCluster().contains(lSent.tokens.get(t))){
 				oovTokensCorrect += (trueLabel == predLabel) ? 1 : 0;
 				oovTokens += 1;
 			}
@@ -265,7 +266,11 @@ public class RunTagger {
 			} else if (args[i].equals("--input-field")) {
 				tagger.inputField = Integer.parseInt(args[i+1]);
 				i += 2;
+			} else if (args[i].equals("--word-clusters")) {
+				WordClusterPaths.clusterResourceName = args[i+1];
+				i += 1;
 			}
+				
 			else {
 				System.out.println("bad option " + args[i]);
 				usage();                
@@ -315,6 +320,7 @@ public class RunTagger {
 "\n                            Which tab-separated field contains the input" +
 "\n                            (1-indexed, like unix 'cut')" +
 "\n                            Only for {json, text} input formats." +
+"\n  --word-clusters <File>    Alternate word clusters file (see FeatureExtractor)" +
 "\n" +
 "\nThere are two types of input-output formats: " +
 "\n(1) tweet-per-line, and (2) token-per-line." +
@@ -346,5 +352,11 @@ public class RunTagger {
 			System.out.println("ERROR: " + extra);
 		}
 		System.exit(1);
+	}
+	public static HashSet<String> wordsInCluster() {
+		if (_wordsInCluster==null) {
+			_wordsInCluster = new HashSet<String>(WordClusterPaths.wordToPath.keySet());
+		}
+		return _wordsInCluster;
 	}
 }

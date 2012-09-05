@@ -3,12 +3,12 @@ package cmu.arktweetnlp;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import cmu.arktweetnlp.impl.FeatureExtractor;
 import cmu.arktweetnlp.impl.Model;
 import cmu.arktweetnlp.impl.ModelSentence;
 import cmu.arktweetnlp.impl.OWLQN;
 import cmu.arktweetnlp.impl.Sentence;
 import cmu.arktweetnlp.impl.OWLQN.WeightsPrinter;
+import cmu.arktweetnlp.impl.features.FeatureExtractor;
 import cmu.arktweetnlp.io.CoNLLReader;
 import cmu.arktweetnlp.util.Util;
 import edu.stanford.nlp.math.ArrayMath;
