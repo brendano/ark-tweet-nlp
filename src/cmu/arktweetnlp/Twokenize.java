@@ -306,7 +306,9 @@ public class Twokenize {
     }
 
     /**
-     * Note this normalizes the input text BEFORE calling the tokenizer.
+     * This is intended for raw tweet text -- we do some HTML entity unescaping before running the tagger.
+     * 
+     * This function normalizes the input text BEFORE calling the tokenizer.
      * So the tokens you get back may not exactly correspond to
      * substrings of the original text.
      */

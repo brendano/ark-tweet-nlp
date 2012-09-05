@@ -1,11 +1,9 @@
 package cmu.arktweetnlp;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.PrintStream;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -14,7 +12,6 @@ import cmu.arktweetnlp.impl.Sentence;
 import cmu.arktweetnlp.io.CoNLLReader;
 import cmu.arktweetnlp.io.JsonTweetReader;
 import cmu.arktweetnlp.util.BasicFileIO;
-import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
 
 /**
@@ -258,7 +255,7 @@ public class RunTagger {
 				i += 1;
 			} else if (args[i].equals("--input-format")) {
 				String s = args[i+1];
-				if (!(s.equals("json")||s.equals("text")||s.equals("conll")))
+				if (!(s.equals("json") || s.equals("text") || s.equals("conll")))
 					usage("input format must be: json, text, or conll");
 				tagger.inputFormat = args[i+1];
 				i += 2;
@@ -312,12 +309,12 @@ public class RunTagger {
 "\n  --quiet                   Quiet: no output" +
 "\n  --input-format <Format>   Default: json." +
 "\n                            Options: json, text, conll" +
-"\n  --output-format <Format>  Default: auto decide based on input format." +
+"\n  --output-format <Format>  Default: automatically decide from input format." +
 "\n                            Options: pretsv, conll" +
 "\n  --input-field NUM         Default: 1" +
 "\n                            Which tab-separated field contains the input" +
 "\n                            (1-indexed, like unix 'cut')" +
-"\n                            Only for (json, text) input formats." +
+"\n                            Only for {json, text} input formats." +
 "\n" +
 "\nThere are two types of input-output formats: " +
 "\n(1) tweet-per-line, and (2) token-per-line." +
