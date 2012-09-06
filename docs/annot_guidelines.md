@@ -12,6 +12,8 @@ Recent Issues
 
 * days of week, months are ^
 * a big issue with the default tags: 'that' functioning as a pronoun but tagged as D.
+ - Kevin points out that always tagging 'that' as a determiner follows the PTB (where the distinction can be seen not in the POS tag but in the containing phrase—the pronoun-like use is annotated as a DT which is its own NP).
+ - I have been tagging that/O but those are easy converted as postprocessing if we want to ensure consistency.
 
 Difficult cases:
 
@@ -40,7 +42,10 @@ Difficult cases:
   - tagged as N per below...this would be a good example to list
 * 49931213963665408 "mfw" = my face when (not sure I've ever seen an abbreviation ending with a complementizer!)
   - tagged as G
-* 51858412669124608 at-mentions @wordpress and @joomla are clearly used within the sentence. tag as proper nouns, or is that only allowed for hashtags?
+* 51858412669124608 at-mentions @wordpress and @joomla are clearly used within the sentence. cf. 58666191618719744, 65450293604777984
+  - we still use @ regardless of context (unlike with hashtags)
+* Citizens United? Media Lab? are the nouns here N or ^?
+  - (clarifying the discussion below) For most proper names, all content words are ^ regardless of whether there is internal syntactic structure. An exception is made for titles of works which have an "internal interpretation" independent of the reference to the work: in that case 
 
 #### Preposition-y things ####
 
