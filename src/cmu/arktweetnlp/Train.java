@@ -16,8 +16,8 @@ import edu.stanford.nlp.optimization.DiffFunction;
 
 public class Train {
 
-	public double l2penalty = 1.3;
-	public double l1penalty = 0.01;
+	public double l2penalty = 2;
+	public double l1penalty = 0.25;
 	public double tol = 1e-5;
 	public int maxIter = 500;
 	public String modelLoadFilename = null;
@@ -204,6 +204,12 @@ public class Train {
 			else if (args[i].equals("--dump-feat")) {
 				trainer.dumpFeatures = true;
 				i += 1;
+			} else if (args[i].equals("--l2")) {
+				trainer.l2penalty = Double.parseDouble(args[i+1]);
+				i += 2;
+			} else if (args[i].equals("--l1")) {
+				trainer.l1penalty = Double.parseDouble(args[i+1]);
+				i += 2;
 			}
 			else {
 				usage();        		
