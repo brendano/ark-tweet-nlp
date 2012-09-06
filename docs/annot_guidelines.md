@@ -32,6 +32,15 @@ Difficult cases:
 * 37935252550860800 up for grabs
 * 38756380194254849 All-star Weekend (^ ^ or N N?)
 * 41198546862616576 Trueshit (! or N?)
+* 43341785887543296 "It kinda feels like a junk food kinda day." - second _kinda_ is really _kind of_ 
+  - tagged as G
+* 49149970200272896 "Xbox Kinect FAIL"
+  - FAIL as N (because it would be _spectacular FAIL_, not _*spectacularly FAIL_)
+* 49559011401531392 "SHM" = shower, hair, makeup
+  - tagged as N per below...this would be a good example to list
+* 49931213963665408 "mfw" = my face when (not sure I've ever seen an abbreviation ending with a complementizer!)
+  - tagged as G
+* 51858412669124608 at-mentions @wordpress and @joomla are clearly used within the sentence. tag as proper nouns, or is that only allowed for hashtags?
 
 #### Preposition-y things ####
 
