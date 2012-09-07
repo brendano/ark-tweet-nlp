@@ -14,6 +14,7 @@ Recent Issues
 * a big issue with the default tags: 'that' functioning as a pronoun but tagged as D.
  - Kevin points out that always tagging 'that' as a determiner follows the PTB (where the distinction can be seen not in the POS tag but in the containing phrase—the pronoun-like use is annotated as a DT which is its own NP).
  - I have been tagging that/O but those are easy converted as postprocessing if we want to ensure consistency.
+ - similarly, I have noticed a couple instances of all/D which could arguably be pronouns (_all who/that VP_), but I haven't changed these.
 
 Difficult cases:
 
@@ -34,8 +35,8 @@ Difficult cases:
 * 37935252550860800 up for grabs
 * 38756380194254849 All-star Weekend (^ ^ or N N?)
 * 41198546862616576 Trueshit (! or N?)
-* 43341785887543296 "It kinda feels like a junk food kinda day." - second _kinda_ is really _kind of_ 
-  - tagged as G
+* 43341785887543296 "It kinda feels like a junk food kinda day." - different senses of _kinda_! first one is a hedge; second one is really _kind of_ (like _type of_).
+  - first tagged as R, second tagged as G
 * 49149970200272896 "Xbox Kinect FAIL"
   - FAIL as N (because it would be _spectacular FAIL_, not _*spectacularly FAIL_)
 * 49559011401531392 "SHM" = shower, hair, makeup
@@ -46,10 +47,20 @@ Difficult cases:
   - we still use @ regardless of context (unlike with hashtags)
 * Citizens United? Media Lab? are the nouns here N or ^?
   - (clarifying the discussion below) For most proper names, all content words are ^ regardless of whether there is internal syntactic structure. An exception is made for titles of works which have an "internal interpretation" independent of the reference to the work, and which contain non-nouns: for such cases the title is tagged as if it were a normal phrase. Function words are only tagged with ^ if they are not behaving in a normal syntactic fashion, e.g. Ace/^ of/^ Base/^.
+* 81421997929795585 "the other person feelings" - SAE would be person's/S, but should this just be N?
 
 #### Preposition-y things ####
 
-difficult decision in annotation: preposition-like verb modifiers. preposition, particle, or adverb? i am only tagging as particles (T) intransitive prepositions for verbs which can be transitive (e.g., 'up' in 'wake up'/'wake up his friend'). I do not use T for the rare verbs and adjectives that can serve as particles (cut *short*, let *go*). For 41852812245598208 (stick around) I went with P because 'stick around' cannot be transitive (I think 'stick around the house' is [stick [around the house]], not [[stick around\] \[the house]]).
+difficult decision in annotation: preposition-like verb modifiers. preposition, particle, or adverb?
+
+* I am only tagging as particles (T) intransitive prepositions for verbs which can be transitive 
+(e.g., 'up' in 'wake up'/'wake up his friend'). I do not use T for the rare verbs and adjectives that 
+can serve as particles (cut *short*, let *go*). 'around' in 'turn around the company/turn the company around' 
+is also a particle.
+* For 41852812245598208 (stick around) I went with P because 'stick around' cannot be transitive 
+(I think 'stick around the house' is [stick [around the house]], not [[stick around\] \[the house]]). 
+* For 'turn (a)round' meaning rotate oneself to face another direction, I tagged as R. I guess this feels 
+right because 'around' in this case indicates a path without relating two (overt or implied) entities. (The path is intrinsic?)
 
 
 Introduction
@@ -75,7 +86,7 @@ adjectives in the PTB, such as the following: _upcoming_, _annoying_, _amazing_,
 _related_ (as in _the related article_), and _unexpected_. 
 We follow the PTB in tagging these as adjectives or nouns, appropriately. 
 
-When times are mentioned along with _AM_ or _PM_, we tag these as nouns, like the PTB.
+Times: Following the Treebank, _A.M._ and _P.M._ are common nouns, while time zones (_EST_, etc.) are proper nouns.
 
 For tagging numberic tokens, cardinals are tagged as `$`.
 Ordinals are typically tagged as adjectives, following the PTB, except for examples like 
