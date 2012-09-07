@@ -11,10 +11,15 @@ Recent Issues
 ### Nathan's notes from annotation ###
 
 * days of week, months are ^
+* proposed rule: titles/forms of address with personal names are ^: Mr., Mrs., Sir, Aunt, President, Captain. 
+On their own, they are common nouns, even in the official name of an office: _President/^ Obama/^ said/V_, _the/D president/N said/V_, _he/O is/V president/N of/P the/D U.S./^_
+[PTB looks inconsistent, relying too much on capitalization]
 * a big issue with the default tags: 'that' functioning as a pronoun but tagged as D.
  - Kevin points out that always tagging 'that' as a determiner follows the PTB (where the distinction can be seen not in the POS tag but in the containing phrase—the pronoun-like use is annotated as a DT which is its own NP).
  - I have been tagging that/O but those are easy converted as postprocessing if we want to ensure consistency.
  - similarly, I have noticed a couple instances of all/D which could arguably be pronouns (_all who/that VP_), but I haven't changed these.
+* proposed rule: units of measurement are common nouns, even if they come from a person's name (like _Celsius_)
+* proposed rule: cardinal directions (_east_, _NNW_) are common nouns (in all cases?)
 
 Difficult cases:
 
