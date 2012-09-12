@@ -10,29 +10,31 @@ Recent Issues
 
 ### Nathan's notes from annotation ###
 
-* proposed rule: titles/forms of address with personal names are ^: Mr., Mrs., Sir, Aunt, President, Captain. 
+(✓ = added below)
+
+* ✓ proposed rule: titles/forms of address with personal names are ^: Mr., Mrs., Sir, Aunt, President, Captain.- 
 On their own, they are common nouns, even in the official name of an office: _President/^ Obama/^ said/V_, _the/D president/N said/V_, _he/O is/V president/N of/P the/D U.S./^_
 [PTB looks inconsistent, relying too much on capitalization]
 * a big issue with the default tags: 'that' functioning as a pronoun but tagged as D.
  - Kevin points out that always tagging 'that' as a determiner follows the PTB (where the distinction can be seen not in the POS tag but in the containing phrase—the pronoun-like use is annotated as a DT which is its own NP).
  - I have been tagging that/O but those are easy converted as postprocessing if we want to ensure consistency.
  - similarly, I have noticed a couple instances of all/D which could arguably be pronouns (_all who/that VP_), but I haven't changed these.
-* proposed rule: units of measurement are common nouns, even if they come from a person's name (like _Celsius_)
-* proposed rule: cardinal directions (_east_, _NNW_) are common nouns (in all cases?)
+* ✓ proposed rule: units of measurement are common nouns, even if they come from a person's name (like _Celsius_)
+* ✓ proposed rule: cardinal directions (_east_, _NNW_) are common nouns (in all cases?)
 
 Difficult cases:
 
 * 25244937167568896 x2 - emoticon? 2 times?
 * 26042601522073600 that one - one tagged as pronoun
-* 26085492428636161 Prime Minister
+* ✓ 26085492428636161 Prime Minister
 * 26085492428636161 cash-for-sex
 * 28569472516235264 ass clitic
 * 30656193286377472 mention of the word "aint" (metalinguistic)
 * 30656193286377472 yes, no
 * 32189630715535361 you two
-* 32468904269844480 Let's (verbal + nominal)? 38756380194254849 buy'em
+* ✓ 32468904269844480 Let's (verbal + nominal)? 38756380194254849 buy'em
 * 32942659601440768 (several issues)
-* 36246374219522048 vocative 'dude' (noun? interjection?)
+* ✓ 36246374219522048 vocative 'dude' (noun? interjection?)
   - per below, should be a noun
 * 36246374219522048 down there
 * 36949436257013760, 37310741828603905 Valentine's Day (^ ^ or Z N?)
@@ -45,11 +47,11 @@ Difficult cases:
   - FAIL as N (because it would be _spectacular FAIL_, not _*spectacularly FAIL_)
 * 49559011401531392 "SHM" = shower, hair, makeup
   - tagged as N per below...this would be a good example to list
-* 49931213963665408 "mfw" = my face when (not sure I've ever seen an abbreviation ending with a complementizer!)
+* ✓ 49931213963665408 "mfw" = my face when (not sure I've ever seen an abbreviation ending with a complementizer!)
   - tagged as G
-* 51858412669124608 at-mentions @wordpress and @joomla are clearly used within the sentence. cf. 58666191618719744, 65450293604777984
+* ✓ 51858412669124608 at-mentions @wordpress and @joomla are clearly used within the sentence. cf. 58666191618719744, 65450293604777984
   - we still use @ regardless of context (unlike with hashtags)
-* Citizens United? Media Lab? are the nouns here N or ^?
+* ✓ Citizens United? Media Lab? are the nouns here N or ^?
   - (clarifying the discussion below) For most proper names, all content words are ^ regardless of whether there is internal syntactic structure. An exception is made for titles of works which have an "internal interpretation" independent of the reference to the work, and which contain non-nouns: for such cases the title is tagged as if it were a normal phrase. Function words are only tagged with ^ if they are not behaving in a normal syntactic fashion, e.g. Ace/^ of/^ Base/^.
 * 81421997929795585 "the other person feelings" - SAE would be person's/S, but should this just be N?
 
@@ -171,8 +173,10 @@ _28th October_, in which _28th_ is tagged as `$`.
   We follow the PTB convention of tagging numbers (house numbers, street numbers, and zip codes) as `$` and all other words 
   in the address as proper nouns. Consider the following PTB example:
   - 153/CD East/NNP 53rd/CD St./NNP
+  
   However, certain street numbers in the PTB are tagged as proper nouns:
   - Fifth/NNP Ave/NNP
+  
   Annotators are to use their best judgment in tagging street numbers.
 * __Cardinal directions__ (_east_, _NNW_) are common nouns [TODO: in all cases?]
 * __Units of measurement__ are common nouns, even if they come from a person’s name (like _Celsius_)
@@ -204,7 +208,7 @@ if they are not behaving in a normal syntactic fashion, e.g. _Ace/^ of/^ Base/^_
   Titles/forms of address with personal names should be tagged as proper nouns: 
   _Mr._, _Mrs._, _Sir_, _Aunt_, _President_, _Captain_
   
-  On their own—not preceding someone's given name or surname—they are common nouns, 
+  On their own—not preceding someone’s given name or surname—they are common nouns, 
   even in the official name of an office: _President/^ Obama/^ said/V_, 
   _the/D president/N said/V_, _he/O is/V president/N of/P the/D U.S./^_
 * __Titles of works__  
@@ -271,8 +275,11 @@ we fall back to `G`:
 <!--~ @ ~ R D N P V D N D A V D N D V R P V P P , V N , V P G ~-->
 
 * RT @ucsantabarbara : Tonight's memorial for Lucas Ransom starts at 8:00 p.m. and is being held at the open space at the corner of Del __Pla__ ...  
+
   > We infer that _Pla_ is a clipped proper name, and accordingly tag it as `^`.
+
 * RT @BroderickWalton : Usually the people that need our help the most are the ones that are hardest 2 get through 2 . Be patient , love on __t__ ...  
+
   > The continuation is unclear, so we fall back to _t/G_.
 
 <!--Why does the wifi on my boyfriend& #8217 ; s macbook pro have speed ...: We were trying to figure out why download sp ... http://bit.ly/dbpcE1
@@ -338,6 +345,7 @@ continuation:
 <!--O V O V V D A N O V P , V ^ ^ N , P P O V L P O ~ @ ~ ^ , ~ , U-->
 
 * I predict I won't win a single game I bet on . Got Cliff Lee today , so if he loses its on me RT @e\_one : Texas ( cont ) http://tl.gd/6meogh  
+
   > Here, _cont_ is tagged as `~` and the surrounding parentheses are tagged as punctutation.
 
 Another use of `~` is for tokens that indicate that one part of a tweet is a response to 
@@ -349,6 +357,7 @@ another part, particularly when used in an RT construction. Consider:
 <!--~ @ ~ A N V Z N P ^ ~ O V O V P O ,-->
 
 * RT @Love\_JAsh : First time seeing Ye's film on VH1 « -What do you think about it ?  
+
   > The _«_ indicates that the text after it is a response to the text before it, and is therefore tagged with `~`.
 
 <!--arrows = ~-->
