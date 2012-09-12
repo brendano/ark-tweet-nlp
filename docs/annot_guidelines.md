@@ -300,10 +300,10 @@ These arrows (_--&gt;_ and _&lt;--_) are tagged as `G`. But see the next section
 Twitter discourse uses of arrows, which receive the `~` tag.
 
 
-Twitter Discourse Tokens
-------------------------
+Twitter Discourse Tokens: Retweets, Continuation Markers, and Arrow Deixis
+--------------------------------------------------------------------------
 
-A common phenomenon in Twitter is the “retweet construction”, shown in the following example:
+A common phenomenon in Twitter is the __“retweet construction”__, shown in the following example:
 
 <!--28841537250-->
 <!--~ @ ~ ^ V D N P O ,-->
@@ -335,7 +335,8 @@ begins the tweet, followed by _..._ and the URL:
 <!--A ^ N N V N P , R A A N , A N V T P D A N ~ U-->
 
 * New NC Highway Signs Welcome Motorists To " Most Military Friendly State ": New signs going up on the major highways ... http://bit.ly/cPNH6e  
-  Since the ellipsis indicates that the text in the tweet is continued elsewhere (namely 
+
+  > Since the ellipsis indicates that the text in the tweet is continued elsewhere (namely 
 at the subsequent URL), we tag it as `~`. 
 
 Sometimes instead of _..._, the token _cont_ (short for “continued”) is used to indicate 
