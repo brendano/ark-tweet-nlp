@@ -165,9 +165,9 @@ Numbers and Values
 _28th October_, in which _28th_ is tagged as `$`.
 * __Times__  
   Following the Treebank, _A.M._ and _P.M._ are common nouns, while time zones (_EST_, etc.) are proper nouns.
-* __Days, months, and seasons__
+* __Days, months, and seasons__  
   Like the PTB, days of the week and months of the year are always tagged as proper nouns, while seasons are common nouns.
-* __Street addresses__
+* __Street addresses__  
   We follow the PTB convention of tagging numbers (house numbers, street numbers, and zip codes) as `$` and all other words 
   in the address as proper nouns. Consider the following PTB example:
   - 153/CD East/NNP 53rd/CD St./NNP
@@ -192,6 +192,7 @@ Names
 In general, every noun within a proper name should be tagged as a proper noun (`^`):
 * Jesse/^ and/& the/D Rippers/^ 
 * the/D California/^ Chamber/^ of/P Commerce/^
+
 Company and web site names (_Twitter_, _Yahoo ! News_) are tagged as proper nouns.
 
 <!-- the/DT California/NNP Chamber/NNP of/IN Commerce/NNP -- this was a PTB example, I have substituted Twitter tags -->
@@ -199,16 +200,19 @@ Company and web site names (_Twitter_, _Yahoo ! News_) are tagged as proper noun
 Function words are only ever tagged as proper nouns
 if they are not behaving in a normal syntactic fashion, e.g. _Ace/^ of/^ Base/^_.
 
-* __Personal names__
+* __Personal names__  
   Titles/forms of address with personal names should be tagged as proper nouns: 
-  _Mr._, _Mrs._, _Sir_, _Aunt_, _President_, _Captain_ 
+  _Mr._, _Mrs._, _Sir_, _Aunt_, _President_, _Captain_
+  
   On their own—not preceding someone's given name or surname—they are common nouns, 
   even in the official name of an office: _President/^ Obama/^ said/V_, 
   _the/D president/N said/V_, _he/O is/V president/N of/P the/D U.S./^_
-* __Titles of works__
+* __Titles of works__  
   In PTB, simple titles like _Star Wars_ and _Cheers_ are tagged as proper nouns, 
   but titles with more extensive phrasal structure are tagged as ordinary phrases:
+  
   - A/DT Fish/NN Called/VBN Wanda/NNP
+  
   Note that _Fish_ is tagged as NN (common noun). Therefore, we adopt the following 
   rule: __titles containing only nouns should be tagged as proper nouns, and other titles as ordinary phrases__.
 
@@ -266,10 +270,10 @@ we fall back to `G`:
 <!--28905710274-->
 <!--~ @ ~ R D N P V D N D A V D N D V R P V P P , V N , V P G ~-->
 
-* RT @ucsantabarbara : Tonight's memorial for Lucas Ransom starts at 8:00 p.m. and is being held at the open space at the corner of Del Pla ...  
-  We infer that _Pla_ is a clipped proper name, and accordingly tag it as `^`.
+* RT @ucsantabarbara : Tonight's memorial for Lucas Ransom starts at 8:00 p.m. and is being held at the open space at the corner of Del __Pla__ ...  
+  > We infer that _Pla_ is a clipped proper name, and accordingly tag it as `^`.
 * RT @BroderickWalton : Usually the people that need our help the most are the ones that are hardest 2 get through 2 . Be patient , love on __t__ ...  
-  The continuation is unclear, so we fall back to _t/G_.
+  > The continuation is unclear, so we fall back to _t/G_.
 
 <!--Why does the wifi on my boyfriend& #8217 ; s macbook pro have speed ...: We were trying to figure out why download sp ... http://bit.ly/dbpcE1
 "sp" is clearly trimmed due to space constraints, so we tag it as G.-->
@@ -327,14 +331,14 @@ begins the tweet, followed by _..._ and the URL:
   Since the ellipsis indicates that the text in the tweet is continued elsewhere (namely 
 at the subsequent URL), we tag it as `~`. 
 
-Sometimes instead of _..._, the token _cont_ 
-(short for “continued”) is used to indicate continuation:
+Sometimes instead of _..._, the token _cont_ (short for “continued”) is used to indicate 
+continuation:
 
 <!--28936861036-->
 <!--O V O V V D A N O V P , V ^ ^ N , P P O V L P O ~ @ ~ ^ , ~ , U-->
 
-* I predict I won't win a single game I bet on . Got Cliff Lee today , so if he loses its on me RT @e_one : Texas ( cont ) http://tl.gd/6meogh  
-  Here, _cont_ is tagged as `~` and the surrounding parentheses are tagged as punctutation.
+* I predict I won't win a single game I bet on . Got Cliff Lee today , so if he loses its on me RT @e\_one : Texas ( cont ) http://tl.gd/6meogh  
+  > Here, _cont_ is tagged as `~` and the surrounding parentheses are tagged as punctutation.
 
 Another use of `~` is for tokens that indicate that one part of a tweet is a response to 
 another part, particularly when used in an RT construction. Consider:
@@ -345,7 +349,7 @@ another part, particularly when used in an RT construction. Consider:
 <!--~ @ ~ A N V Z N P ^ ~ O V O V P O ,-->
 
 * RT @Love\_JAsh : First time seeing Ye's film on VH1 « -What do you think about it ?  
-  The _«_ indicates that the text after it is a response to the text before it, and is therefore tagged with `~`.
+  > The _«_ indicates that the text after it is a response to the text before it, and is therefore tagged with `~`.
 
 <!--arrows = ~-->
 
@@ -420,7 +424,7 @@ tweets directed to another person. They are tagged as nouns in such cases:
 * I need to go home __man__ . Got some thangs I wanna try . Lol .
 
 On the other hand, when such words do not refer to an individual but provide general 
-emphasis, they are tagged as interjections:
+emphasis, they are tagged as interjections (`!`):
 
 <!--28851460183-->
 <!--~ @ ~ , # G @ V V N , ! , # ~ ! , ! ^ ,-->
