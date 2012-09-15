@@ -1,4 +1,4 @@
-These notes were taken during Daily 547 annotations.  Not all final annotation decisions followed the below.
+These notes were taken by Nathan during Daily 547 annotations.  Not all final annotation decisions followed the below.
 
 
 #### Preposition-y things ####

@@ -1,7 +1,7 @@
 Annotation Guidelines for Twitter Part-of-Speech Tagging
 ========================================================
 
-Authors: Kevin Gimpel and Nathan Schneider
+Authors: Kevin Gimpel, Nathan Schneider, Brendan O'Connor
 2012-09-14
 
 
@@ -19,14 +19,12 @@ tagger improved.)
 Table 1 of the paper provides an overview of the 25 tags. Each is represented with a 
 single ASCII symbol. In brief:
 
-* __Nominal, Nominal + Verbal__  
+* __Nominal__  
   `N` common noun  
   `O` pronoun (personal/WH; not possessive)  
-  `S` nominal + possessive  
   `^` proper noun  
+  `S` nominal + possessive  
   `Z` proper noun + possessive  
-  `L` nominal + verbal  
-  `M` proper noun + verbal  
 * __Other open-class words__  
   `V` verb incl. copula, auxiliaries  
   `A` adjective  
@@ -38,19 +36,22 @@ single ASCII symbol. In brief:
   `&` coordinating conjunction  
   `T` verb particle  
   `X` existential _there_, predeterminers  
-  `Y` `X` + verbal  
 * __Twitter/online-specific__  
   `#` hashtag (indicates topic/category for tweet)  
   `@` at-mention (indicates another user as a recipient of a tweet)  
-  `~` discourse marker, indications of continuation of a message across multiple tweets  
+  `~` discourse marker, indications of continuation of a message across multiple tweets
   `U` URL or email address  
   `E` emoticon  
 * __Miscellaneous__  
   `$` numeral  
   `,` punctuation  
   `G` other abbreviations, foreign words, possessive endings, symbols, garbage
+* __Other Compounds__  
+  `L` nominal + verbal  
+  `M` proper noun + verbal  
+  `Y` `X` + verbal  
 
-Since our tokenization scheme avoids splitting most surface words, so we opt for 
+Since our tokenization scheme avoids splitting most surface words, we opt for 
 complex parts of speech where necessary; for instance, _Noah’s_ would receive the `Z` 
 (proper noun + possessive) tag.
 
@@ -58,7 +59,7 @@ Tokenization
 ------------
 
 The __twokenize__ tool included with the ARK TweetNLP package handles tokenization. 
-It seeks to identify word-external punctuation tokens and emoticons—not an easy task given 
+It seeks to identify word-external punctuation tokens and emoticons -— not an easy task given 
 Twitter’s lack of orthographic orthodoxy!
 
 When multiple words are written together without spaces, or when there are spaces 
@@ -66,17 +67,16 @@ between all characters of a word, or when the tokenizer fails to split words,
 we tag the resulting tokens as `G`. This is illustrated by the bolded tokens in the 
 following examples:
 
-<!--28873458992-->
-<!--L V A E G L A P V A R , R V O V P ,-->
-<!--28899336035-->
-<!--D S N N V D A $ , & D N V V V A P G ,-->
-<!--28847830495-->
-<!--# O V O , G G G G G G G P O V R N V D P D N ,-->
-
 * It's Been Coldd :/ __iGuess__ It's Better Than Beingg Hot Tho . Where Do Yuhh Live At ? @iKnow\_YouWantMe
 * This yearâs almond crop is a great one . And the crop is being shipped fresh to __youâŠNow__ !
 * RT @Mz\_GoHAM Um ..... #TeamHeat ........ wut Happend ?? Haha &lt;== #TeamCeltics showin that ass what's __good...That's__ wat happened !!! LMAO
 * #uWasCoolUntil you unfollowed me ! __R E T W E E T__ if you Hate when people do that for no reason .
+
+<!--
+28873458992   L V A E G L A P V A R , R V O V P ,
+28899336035   D S N N V D A $ , & D N V V V A P G ,
+28847830495   # O V O , G G G G G G G P O V R N V D P D N ,
+-->
 
 Penn Treebank Conventions
 -------------------------
@@ -147,6 +147,7 @@ if they are not behaving in a normal syntactic fashion, e.g. _Ace/^ of/^ Base/^_
   On their own—not preceding someone’s given name or surname—they are common nouns, 
   even in the official name of an office: _President/^ Obama/^ said/V_, 
   _the/D president/N said/V_, _he/O is/V president/N of/P the/D U.S./^_
+
 * __Titles of works__  
   In PTB, simple titles like _Star Wars_ and _Cheers_ are tagged as proper nouns, 
   but titles with more extensive phrasal structure are tagged as ordinary phrases:
@@ -170,7 +171,44 @@ Pronouns
 Prepositions, Particles, and Adverbs
 ------------------------------------
 
-[TODO: attempt to clarify these]
+Verb particle examples
+* what's going on/T
+* check it out/T
+* shoutout:
+ * `s/o` and `SO` are V
+ * shout/V out/T
+
+TODO talk about adverb test for verb particles
+
+
+that/this: O, D, P, and relativizers
+------------------------------------
+
+PTB almost always tags `this`/`that` as a determiner, but in cases where it is used nominally, it immediately surrounds with a singleton NP, e.g.
+* (NP (DT This)) is Japan
+
+For our purposes, since we do not have parse trees and want to straightforwardly use the tags in POS patterns, it is better to tag it nominally, so we use __This/O__ here.  E.g. 
+* i just orgasmed over __this/O__
+
+<!-- 28139103509815297 -->
+
+__this/D__ is reserved for modifier usage. E.g. 
+* __this/D__ wind is serious
+
+<!-- 194552682147610625 -->
+
+Words where we were careful about the D/O distinction include, but are not limited to: _that, this, these, those, dat, daht, dis, tht_.  Also a few cases of _some_ (`get some/O`) though we use `some/D of`, `any/D of`.
+
+When `this`/`that` is used as a relativizer, we use __this/P__, and never this/O.  (Some relativizer instances could plausibly be nominal, but some clearly are not.)  E.g. 
+* You should know , __that/P__ if you come any closer ...
+* Never cheat on a woman __that/P__ holds you down
+
+<!-- 87519526148780032 115821393559552000 -->
+
+Version 0.2 of the ACL-2011 data often used this/D for nominal usage, but was somewhat inconsistent.
+For the 0.3 release, we changed the tags on the ACL-2011 tweets to conform to the new style; all Daily547 tags conform as well.
+
+WH-word relativizers are treated differently than the above: they are sometimes tagged as O, sometimes as D, but never P.  [TODO: should we normalize them somehow? or another can of worms?]
 
 
 Hashtags and At-mentions
@@ -198,6 +236,7 @@ Miscellaneous kinds of abbreviations are tagged with `G`:
 * _let's_ (let us), _buy'em_ (buy them)
 * _mfw_ (my face when)
 
+
 Clipping
 --------
 
@@ -205,10 +244,6 @@ Due to space constraints, words at the ends of tweets are sometimes cut off.
 We attempt to tag the partial word as if it had not been clipped. If the tag is unclear, 
 we fall back to `G`:
 
-<!--28841569916-->
-<!--~ @ ~ S N P ^ ^ V P $ N & V V V P D A N P D N P ^ ^ ~-->
-<!--28905710274-->
-<!--~ @ ~ R D N P V D N D A V D N D V R P V P P , V N , V P G ~-->
 
 * RT @ucsantabarbara : Tonight's memorial for Lucas Ransom starts at 8:00 p.m. and is being held at the open space at the corner of Del __Pla__ ...  
 
@@ -218,16 +253,21 @@ we fall back to `G`:
 
   > The continuation is unclear, so we fall back to _t/G_.
 
+<!--
+28841569916   ~ @ ~ S N P ^ ^ V P $ N & V V V P D A N P D N P ^ ^ ~
+28905710274   ~ @ ~ R D N P V D N D A V D N D V R P V P P , V N , V P G ~
+-->
+
 <!--Why does the wifi on my boyfriend& #8217 ; s macbook pro have speed ...: We were trying to figure out why download sp ... http://bit.ly/dbpcE1
 "sp" is clearly trimmed due to space constraints, so we tag it as G.-->
 
 Symbols, Arrows, etc.
 ---------------------
 
-<!--28860873076-->
-<!--~ @ ~ V O , L A G U-->
-<!--28841534211-->
-<!--U G # $ ^ ^ , A ^ , N D ^ , V-->
+<!--
+28860873076   ~ @ ~ V O , L A G U
+28841534211   U G # $ ^ ^ , A ^ , N D ^ , V
+-->
 
 * RT @YourFavWhiteGuy : Helppp meeeee . I'mmm meltiiinngggg --&gt; http://twitpic.com/316cjg
 * http://bit.ly/cLRm23 &lt;-- #ICONLOUNGE 257 Trinity Ave , Downtown Atlanta ... Party This Wednesday ! RT
@@ -241,8 +281,7 @@ Twitter Discourse Tokens: Retweets, Continuation Markers, and Arrow Deixis
 
 A common phenomenon in Twitter is the __“retweet construction”__, shown in the following example:
 
-<!--28841537250-->
-<!--~ @ ~ ^ V D N P O ,-->
+<!--28841537250   ~ @ ~ ^ V D N P O ,-->
 
 * RT @Solodagod : Miami put a fork in it ...
 
@@ -278,8 +317,7 @@ at the subsequent URL), we tag it as `~`.
 Sometimes instead of _..._, the token _cont_ (short for “continued”) is used to indicate 
 continuation:
 
-<!--28936861036-->
-<!--O V O V V D A N O V P , V ^ ^ N , P P O V L P O ~ @ ~ ^ , ~ , U-->
+<!--28936861036   O V O V V D A N O V P , V ^ ^ N , P P O V L P O ~ @ ~ ^ , ~ , U-->
 
 * I predict I won't win a single game I bet on . Got Cliff Lee today , so if he loses its on me RT @e\_one : Texas ( cont ) http://tl.gd/6meogh  
 
@@ -290,8 +328,7 @@ another part, particularly when used in an RT construction. Consider:
 
 <!--RT @ayy_yoHONEY : . #walesaid dt @its_a_hair_flip should go DOWNTOWN ! Lol !!.. #jammy --&gt;~LMAO !! Man BIANCA !!!-->
 
-<!--28860458956-->
-<!--~ @ ~ A N V Z N P ^ ~ O V O V P O ,-->
+<!--28860458956   ~ @ ~ A N V Z N P ^ ~ O V O V P O ,-->
 
 * RT @Love\_JAsh : First time seeing Ye's film on VH1 « -What do you think about it ?  
 
@@ -361,10 +398,10 @@ Direct Address
 Words such as _girl_, _miss_, _man_, and _dude_ are often used vocatively in 
 tweets directed to another person. They are tagged as nouns in such cases:
 
-<!--28909766051-->
-<!--~ @ ~ V P @ N P ^ Z A G V O V O V N , ~ ! ,-->
-<!--28841447123-->
-<!--O V T V N N , V D N O V V , ! ,-->
+<!--
+28909766051   ~ @ ~ V P @ N P ^ Z A G V O V O V N , ~ ! ,
+28841447123   O V T V N N , V D N O V V , ! ,
+-->
 
 * RT @iLoveTaraBriona : Shout-out to @ImLuckyFeCarter definition of lil webbies i-n-d-e-p-e-n-d-e-n-t --&gt; do you know what means __man__ ??? &lt;&lt; Ayyye !
 * I need to go home __man__ . Got some thangs I wanna try . Lol .
@@ -372,25 +409,17 @@ tweets directed to another person. They are tagged as nouns in such cases:
 On the other hand, when such words do not refer to an individual but provide general 
 emphasis, they are tagged as interjections (`!`):
 
-<!--28851460183-->
-<!--~ @ ~ , # G @ V V N , ! , # ~ ! , ! ^ ,-->
-<!--28848789014-->
-<!--^ A N , ! D # V R A ,-->
-<!--28853024982-->
-<!--! D # V D R A N V P O ,-->
+<!--
+28851460183   ~ @ ~ , # G @ V V N , ! , # ~ ! , ! ^ ,
+28848789014   ^ A N , ! D # V R A ,
+28853024982   ! D # V D R A N V P O ,
+-->
 
 * RT @ayy\_yoHONEY : . #walesaid dt @its\_a\_hair\_flip should go DOWNTOWN ! Lol !!.. #jammy --&gt;~LMAO !! __Man__ BIANCA !!!
 * Bbm yawn face * __Man__ that #napflow felt so refreshing .
 * __Man__ da #Lakers have a fucking all-star squad fuck wit it !!
 
 
-<!--
-Discuss verb particles -- insert adverb test
-what's going on = on is T
-check it out = out is T
-
-s/o SO shout out = V V V T
--->
 <!--
 asian european greek -- all A
 
@@ -400,7 +429,4 @@ So = P when used in beginning of sentence
 
 28887923159, 28913460489, 28917281684 = good examples for why this is hard
 good example: 28841534211
-
-"For those that are confused..." - that is D
-things that I can do -- that is D
 -->
