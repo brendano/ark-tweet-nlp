@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.List;
 
@@ -33,7 +35,8 @@ public class RunTagger {
 	String inputFilename;
 	String modelFilename;
 	
-	PrintStream outputStream = System.out;
+	PrintStream outputStream;
+
 	Iterable<Sentence> inputIterable = null;
 	
 	// More options
@@ -55,6 +58,10 @@ public class RunTagger {
 		// (BTO) I like "assert false" but assertions are disabled by default in java
 		System.err.println(message);
 		System.exit(-1);
+	}
+	public RunTagger() throws UnsupportedEncodingException {
+		// force UTF-8 here, so don't need -Dfile.encoding
+		this.outputStream = new PrintStream(System.out, true, "UTF-8");
 	}
 	public void runTagger() throws IOException, ClassNotFoundException {
 		
@@ -124,6 +131,7 @@ public class RunTagger {
 		inputIterable = examples;
 
 		int[][] confusion = new int[tagger.model.numLabels][tagger.model.numLabels];
+		
 		for (Sentence sentence : examples) {
 			n++;
 			
@@ -194,11 +202,12 @@ public class RunTagger {
 	 * assume mSent's labels hold the tagging.
 	 */
 	public void outputJustTagging(Sentence lSent, ModelSentence mSent) {
+
 		if (outputFormat.equals("conll")) {
 			for (int t=0; t < mSent.T; t++) {
 				outputStream.printf("%s\t%s\n", 
 						lSent.tokens.get(t),  
-						tagger.model.labelVocab.name(mSent.labels[t]) );
+						tagger.model.labelVocab.name(mSent.labels[t]));
 			}
 			outputStream.println("");
 		} 
@@ -236,7 +245,7 @@ public class RunTagger {
 		sb.append(inputLine);
 //		sb.append(org.apache.commons.lang.StringUtils.join(inputFields, '\t'));
 		
-		System.out.println(sb.toString());
+		outputStream.println(sb.toString());
 	}
 
 
