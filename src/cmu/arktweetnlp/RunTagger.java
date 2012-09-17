@@ -34,15 +34,15 @@ public class RunTagger {
 	
 	String inputFilename;
 	String modelFilename;
-	
-	PrintStream outputStream;
 
-	Iterable<Sentence> inputIterable = null;
-	
-	// More options
 	public boolean noOutput = false;
 	public boolean justTokenize = false;
 	
+	public static enum Decoder { GREEDY, VITERBI };
+	public Decoder decoder = Decoder.VITERBI; 
+
+	PrintStream outputStream;
+	Iterable<Sentence> inputIterable = null;
 	
 	// Evaluation stuff
 	private static HashSet<String> _wordsInCluster;
@@ -66,7 +66,9 @@ public class RunTagger {
 	public void runTagger() throws IOException, ClassNotFoundException {
 		
 		tagger = new Tagger();
-		tagger.loadModel(modelFilename);
+		if (!justTokenize) {
+			tagger.loadModel(modelFilename);			
+		}
 		
 		if (inputFormat.equals("conll")) {
 			runTaggerInEvalMode();
@@ -93,9 +95,10 @@ public class RunTagger {
 			Sentence sentence = new Sentence();
 			
 			sentence.tokens = Twokenize.tokenizeRawTweetText(text);
-			ModelSentence modelSentence = new ModelSentence(sentence.T());
+			ModelSentence modelSentence = null;
 
-			if (sentence.T() > 0) {
+			if (sentence.T() > 0 && !justTokenize) {
+				modelSentence = new ModelSentence(sentence.T());
 				tagger.featureExtractor.computeFeatures(sentence, modelSentence);
 				goDecode(modelSentence);
 			}
@@ -103,12 +106,13 @@ public class RunTagger {
 			if (outputFormat.equals("conll")) {
 				outputJustTagging(sentence, modelSentence);
 			} else {
-				outputPrependedTagging(sentence, modelSentence, this.justTokenize, tweetData);				
+				outputPrependedTagging(sentence, modelSentence, justTokenize, tweetData);				
 			}
 			numtoks += sentence.T();
 		}
 		long finishtime = System.currentTimeMillis();
-		System.err.printf("Tokenized and tagged %d tweets (%d tokens) in %.1f seconds: %.1f tweets/sec, %.1f tokens/sec\n",
+		System.err.printf("Tokenized%s %d tweets (%d tokens) in %.1f seconds: %.1f tweets/sec, %.1f tokens/sec\n",
+				justTokenize ? "" : " and tagged", 
 				reader.getLineNumber(), numtoks, (finishtime-currenttime)/1000.0,
 				reader.getLineNumber() / ((finishtime-currenttime)/1000.0),
 				numtoks / ((finishtime-currenttime)/1000.0)
@@ -118,8 +122,11 @@ public class RunTagger {
 
 	/** Runs the correct algorithm (make config option perhaps) **/
 	public void goDecode(ModelSentence mSent) {
-		//tagger.model.greedyDecode(mSent);
-		tagger.model.viterbiDecode(mSent);		
+		if (decoder == Decoder.GREEDY) {
+			tagger.model.greedyDecode(mSent);
+		} else if (decoder == Decoder.VITERBI) {
+			tagger.model.viterbiDecode(mSent);
+		}		
 	}
 	
 	public void runTaggerInEvalMode() throws IOException, ClassNotFoundException {
@@ -267,7 +274,13 @@ public class RunTagger {
 				tagger.modelFilename = args[i+1];
 				i += 2;
 			} else if (args[i].equals("--just-tokenize")) {
-				die("TODO implement");
+				tagger.justTokenize = true;
+				i += 1;
+			} else if (args[i].equals("--decoder")) {
+				if (args[i+1].equals("viterbi")) tagger.decoder = Decoder.VITERBI;
+				else if (args[i+1].equals("greedy"))  tagger.decoder = Decoder.GREEDY;
+				else die("unknown decoder " + args[i+1]);
+				i += 2;
 			} else if (args[i].equals("--quiet")) {
 				tagger.noOutput = true;
 				i += 1;
@@ -293,7 +306,7 @@ public class RunTagger {
 				usage();                
 			}
 		}
-		if (tagger.modelFilename == null) {
+		if (!tagger.justTokenize && tagger.modelFilename == null) {
 			usage("Need to specify model");
 		}
 		
