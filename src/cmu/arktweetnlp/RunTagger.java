@@ -74,7 +74,6 @@ public class RunTagger {
 		long currenttime = System.currentTimeMillis();
 		int numtoks = 0;
 		while ( (line = reader.readLine()) != null) {
-			if (line.isEmpty())	continue;	//TODO output blank line?
 			String[] parts = line.split("\t");
 			String tweetData = parts[inputField-1];
 			String text;
@@ -86,27 +85,27 @@ public class RunTagger {
 			
 			Sentence sentence = new Sentence();
 			
-//			Tokenization tokenization = Twokenize.tokenizeForTaggerAndOriginal(text);
-//			sentence.tokens = tokenization.normalizedTokens;
-
 			sentence.tokens = Twokenize.tokenizeRawTweetText(text);
+			ModelSentence modelSentence = new ModelSentence(sentence.T());
 
-			if (sentence.T() > 0){
-				ModelSentence modelSentence = new ModelSentence(sentence.T());
+			if (sentence.T() > 0) {
 				tagger.featureExtractor.computeFeatures(sentence, modelSentence);
 				goDecode(modelSentence);
-				
-				if (outputFormat.equals("conll")) {
-					outputJustTagging(sentence, modelSentence);
-				} else {
-					outputPrependedTagging(sentence, modelSentence,
-							this.justTokenize, tweetData);				
-				}
 			}
+				
+			if (outputFormat.equals("conll")) {
+				outputJustTagging(sentence, modelSentence);
+			} else {
+				outputPrependedTagging(sentence, modelSentence, this.justTokenize, tweetData);				
+			}
+			numtoks += sentence.T();
 		}
 		long finishtime = System.currentTimeMillis();
-		System.err.println("tokenized and tagged " + reader.getLineNumber() + " tweets and "
-			+ numtoks + " tokens in " + (finishtime-currenttime)/1000L + " seconds");
+		System.err.printf("Tokenized and tagged %d tweets (%d tokens) in %.1f seconds: %.1f tweets/sec, %.1f tokens/sec\n",
+				reader.getLineNumber(), numtoks, (finishtime-currenttime)/1000.0,
+				reader.getLineNumber() / ((finishtime-currenttime)/1000.0),
+				numtoks / ((finishtime-currenttime)/1000.0)
+		);
 		reader.close();
 	}
 
@@ -117,12 +116,17 @@ public class RunTagger {
 	}
 	
 	public void runTaggerInEvalMode() throws IOException, ClassNotFoundException {
+		
+		long t0 = System.currentTimeMillis();
+		int n=0;
 
 		List<Sentence> examples = CoNLLReader.readFile(inputFilename); 
 		inputIterable = examples;
 
 		int[][] confusion = new int[tagger.model.numLabels][tagger.model.numLabels];
-		for (Sentence sentence : examples) {	
+		for (Sentence sentence : examples) {
+			n++;
+			
 			ModelSentence mSent = new ModelSentence(sentence.T());
 			tagger.featureExtractor.computeFeatures(sentence, mSent);
 			goDecode(mSent);
@@ -140,6 +144,10 @@ public class RunTagger {
 				numTokensCorrect*1.0 / numTokens,
 				1 - (numTokensCorrect*1.0 / numTokens)
 		);
+		double elapsed = ((double) (System.currentTimeMillis() - t0)) / 1000.0;
+		System.err.printf("%d tweets in %.1f seconds, %.1f tweets/sec\n",
+				n, elapsed, n*1.0/elapsed);
+		
 /*		System.err.printf("%d / %d cluster words correct = %.4f acc, %.4f err\n", 
 				oovTokensCorrect, oovTokens,
 				oovTokensCorrect*1.0 / oovTokens,
@@ -152,7 +160,7 @@ public class RunTagger {
 			i++;
 		}		*/
 	}
-
+	
 	private void evaluateOOV(Sentence lSent, ModelSentence mSent) throws FileNotFoundException, IOException, ClassNotFoundException {
 		for (int t=0; t < mSent.T; t++) {
 			int trueLabel = tagger.model.labelVocab.num(lSent.labels.get(t));
@@ -286,6 +294,7 @@ public class RunTagger {
 		tagger.inputFilename = args[i];
 		
 		tagger.runTagger();
+		
 	}
 	
 	public void finalizeOutputFormat() {
