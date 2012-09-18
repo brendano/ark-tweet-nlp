@@ -40,6 +40,7 @@ public class RunTagger {
 	
 	public static enum Decoder { GREEDY, VITERBI };
 	public Decoder decoder = Decoder.VITERBI; 
+	public boolean showConfidence = true;
 
 	PrintStream outputStream;
 	Iterable<Sentence> inputIterable = null;
@@ -123,8 +124,9 @@ public class RunTagger {
 	/** Runs the correct algorithm (make config option perhaps) **/
 	public void goDecode(ModelSentence mSent) {
 		if (decoder == Decoder.GREEDY) {
-			tagger.model.greedyDecode(mSent);
+			tagger.model.greedyDecode(mSent, showConfidence);
 		} else if (decoder == Decoder.VITERBI) {
+//			if (showConfidence) throw new RuntimeException("--confidence only works with greedy decoder right now, sorry, yes this is a lame limitation");
 			tagger.model.viterbiDecode(mSent);
 		}		
 	}
@@ -204,6 +206,11 @@ public class RunTagger {
 			numTokens += 1;
 		}
 	}
+	
+	private String formatConfidence(double confidence) {
+		// too many decimal places wastes space
+		return String.format("%.3f", confidence);
+	}
 
 	/**
 	 * assume mSent's labels hold the tagging.
@@ -212,9 +219,13 @@ public class RunTagger {
 
 		if (outputFormat.equals("conll")) {
 			for (int t=0; t < mSent.T; t++) {
-				outputStream.printf("%s\t%s\n", 
+				outputStream.printf("%s\t%s", 
 						lSent.tokens.get(t),  
 						tagger.model.labelVocab.name(mSent.labels[t]));
+				if (mSent.confidences != null) {
+					outputStream.printf("\t%s", formatConfidence(mSent.confidences[t]));
+				}
+				outputStream.printf("\n");
 			}
 			outputStream.println("");
 		} 
@@ -235,10 +246,14 @@ public class RunTagger {
 		int T = lSent.T();
 		String[] tokens = new String[T];
 		String[] tags = new String[T];
+		String[] confs = new String[T];
 		for (int t=0; t < T; t++) {
 			tokens[t] = lSent.tokens.get(t);
 			if (!suppressTags) {
 				tags[t] = tagger.model.labelVocab.name(mSent.labels[t]);	
+			}
+			if (showConfidence) {
+				confs[t] = formatConfidence(mSent.confidences[t]);
 			}
 		}
 		
@@ -249,8 +264,11 @@ public class RunTagger {
 			sb.append(StringUtils.join(tags));
 			sb.append("\t");
 		}
+		if (showConfidence) {
+			sb.append(StringUtils.join(confs));
+			sb.append("\t");
+		}
 		sb.append(inputLine);
-//		sb.append(org.apache.commons.lang.StringUtils.join(inputFields, '\t'));
 		
 		outputStream.println(sb.toString());
 	}
@@ -299,8 +317,10 @@ public class RunTagger {
 			} else if (args[i].equals("--word-clusters")) {
 				WordClusterPaths.clusterResourceName = args[i+1];
 				i += 1;
-			}
-				
+			} else if (args[i].equals("--no-confidence")) {
+				tagger.showConfidence = false;
+				i += 1;
+			}	
 			else {
 				System.out.println("bad option " + args[i]);
 				usage();                
@@ -352,6 +372,7 @@ public class RunTagger {
 "\n                            (1-indexed, like unix 'cut')" +
 "\n                            Only for {json, text} input formats." +
 "\n  --word-clusters <File>    Alternate word clusters file (see FeatureExtractor)" +
+"\n  --no-confidence           Don't output confidence probabilities" +
 "\n" +
 "\nThere are two types of input-output formats: " +
 "\n(1) tweet-per-line, and (2) token-per-line." +

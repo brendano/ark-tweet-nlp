@@ -16,7 +16,9 @@ public class ModelSentence {
 	 * dim T
 	 **/
 	public int labels[];
-
+	
+	public double confidences[];
+	
 	/** Runtime observed, Trainingtime observed.
 	 * This is an array-of-arrays of (featID, featValue) pairs.
 	 * dim T, then variable nnz per t.

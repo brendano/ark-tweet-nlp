@@ -98,16 +98,25 @@ public class Model {
 	 * THIS CLOBBERS THE LABELS, stores its decoding into them.
 	 * Does progressive rolling edge feature extraction
 	 **/
-	public void greedyDecode(ModelSentence sentence) {
+	public void greedyDecode(ModelSentence sentence, boolean storeConfidences) {
 		int T = sentence.T;
 		sentence.labels = new int[T];
 		sentence.edgeFeatures[0] = startMarker();
+		
+		if (storeConfidences) sentence.confidences = new double[T];
+
 		double[] labelScores = new double[numLabels];
 		for (int t=0; t<T; t++) {
 			computeLabelScores(t, sentence, labelScores);
 			sentence.labels[t] = ArrayMath.argmax(labelScores);
 			if (t < T-1)
 				sentence.edgeFeatures[t+1] = sentence.labels[t];
+			if (storeConfidences) {
+				ArrayMath.expInPlace(labelScores);
+				double Z = ArrayMath.sum(labelScores);
+				ArrayMath.multiplyInPlace(labelScores, 1.0/Z);
+				sentence.confidences[t] = labelScores[ sentence.labels[t] ];
+			}
 		}
 	}
 
@@ -181,7 +190,8 @@ public class Model {
 		}
 	}
 
-	/** CLOBBERS labelScores **/
+	/** Computes unnormalized log-potentials.
+	 * CLOBBERS labelScores **/
 	public void computeLabelScores(int t, ModelSentence sentence, double[] labelScores) {
 		Arrays.fill(labelScores, 0);
 		computeBiasScores(labelScores);
