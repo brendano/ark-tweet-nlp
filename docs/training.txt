@@ -1,0 +1,37 @@
+Training the tagger:
+where "myjava" is, say, "java -Xmx2g -cp ark-tweet-nlp-0.3.jar",
+
+  myjava cmu.arktweetnlp.Train $trainingdata $modelfile
+
+Evaluating the tagger
+
+  myjava cmu.arktweetnlp.RunTagger --input-format conll --model $modelfile $testfile
+
+For example, this replicates the Owoputi and O'Connor (2012) results:
+  myjava cmu.arktweetnlp.Train data/twpos-data-v0.3/oct27.conll mymodel
+  myjava cmu.arktweetnlp.RunTagger cmu.arktweetnlp.RunTagger --input-format conll --model mymodel data/twpos-data-v0.3/daily547.conll > pred
+
+If you run this it should look like
+
+== Training ==
+
+$ myjava cmu.arktweetnlp.Train data/twpos-data-v0.3/oct27.conll mymodel
+Extracting features
+Optimizing function of 3480325 variables with OWL-QN parameters:
+[... takes 5-10 minutes. decrease convergence tolerance to finish faster ...]
+Iter  292:  4.8015e+03  58547     (9.5843e-08)  TokLL -0.080573 
+Finished with optimization.  58547/3480325 non-zero weights.
+
+== You can look at the model ==
+
+$ wc -l mymodel
+$ less mymodel
+$ grep -i nigga mymodel
+$ awk '$2=="V"' < mymodel | grep Suff | sort -gk3
+  (strongest suffix indicators of being a verb)
+
+== Testing ==
+
+$ myjava cmu.arktweetnlp.RunTagger cmu.arktweetnlp.RunTagger --input-format conll --model mymodel data/twpos-data-v0.3/daily547.conll > pred
+7184 / 7707 correct = 0.9321 acc, 0.0679 err
+547 tweets in 3.3 seconds, 163.5 tweets/sec

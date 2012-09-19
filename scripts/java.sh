@@ -37,4 +37,4 @@ cygwin*|msys)
 esac
 
 # set -eux
-exec java -server -Xmx2g -cp "$cp" "$@"
+exec java -ea -Xmx2g -cp "$cp" "$@"

@@ -2,7 +2,8 @@ Annotation Guidelines for Twitter Part-of-Speech Tagging
 ========================================================
 
 Authors: Kevin Gimpel, Nathan Schneider, Brendan O'Connor
-2012-09-14
+
+2012-09-14, for the 0.3 data release (http://www.ark.cs.cmu.edu/TweetNLP/)
 
 
 Introduction

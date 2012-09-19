@@ -16,6 +16,7 @@ cp ark-tweet-nlp/target/bin/ark-tweet-nlp-${VERSION}.jar $DIR
 cp -r examples $DIR
 cp -r scripts $DIR
 cp -r docs $DIR
+cp -r data $DIR
 rm $DIR/scripts/prepare_release.sh
 rm $DIR/scripts/java.sh
 rm -f $DIR/**/.*un~
