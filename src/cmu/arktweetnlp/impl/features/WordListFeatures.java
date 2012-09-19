@@ -1,6 +1,7 @@
 package cmu.arktweetnlp.impl.features;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -58,7 +59,7 @@ public class WordListFeatures {
 	public static class Listofnames implements FeatureExtractorInterface {
 		String Listname="";
 		HashSet<String> members;
-		public Listofnames(String str) {
+		public Listofnames(String str) throws IOException {
 			Listname=str;
 			this.members = initDict(Listname);
 		}
@@ -92,7 +93,7 @@ public class WordListFeatures {
 		}
 	}
 
-	private static HashSet<String> initDict(String dict) {
+	private static HashSet<String> initDict(String dict) throws IOException {
 		BufferedReader bReader = BasicFileIO.getResourceReader("/cmu/arktweetnlp/" + dict);
 		HashSet<String> dictset = new HashSet<String>();
 		String line=BasicFileIO.getLine(bReader);

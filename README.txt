@@ -1,4 +1,4 @@
-CMU ARK Twitter Part-of-Speech Tagger v0.3-pre 
+CMU ARK Twitter Part-of-Speech Tagger v0.3
 http://www.ark.cs.cmu.edu/TweetNLP/
 
 Basic usage
@@ -6,38 +6,23 @@ Basic usage
 
 Requires Java 6.  To run the tagger from unix shell:
 
-    ./runTagger.sh example_tweets.txt modelfile > tagged_tweets.txt
+    ./runTagger.sh examples/example_tweets.txt
 
-Another example:
+The tagger outputs tokens, predicted part-of-speech tags, and confidences.
+For more information:
 
-    ./runTagger.sh --input-format json barackobama.jsonlines.txt -output tagged_barackobama.txt
+    ./runTagger.sh --help
 
-The outputs should match tagged_tweets_expected.txt and barackobamaexpected.txt respectively.
+We also include a script that invokes just the tokenizer:
 
-
-
-Advanced usage
---------------
-
-We include a pre-compiled .jar of the tagger so you hopefully don't need to
-compile it.  But if you need to recompile, do:
-  mvn install
-NOTE: requires Maven 3.0.3+
-
-To train and evalute the tagger, see:
-  ark-tweet-nlp/src/main/java/edu/cmu/cs/lti/ark/ssl/pos/SemiSupervisedPOSTagger.java
-  scripts/train.sh and scripts/test.sh
-
-Contents
---------
- * runTagger.sh       is the script you probably want
- * lib/               dependencies
- * ark-tweet-nlp/src  the project code itself (all java)
+    ./twokenize.sh examples/example_tweets.txt
 
 Information
------------
-This tagger is described in the following paper.  Please cite it if you write a
-research paper using this software.
+===========
+
+Version 0.3 of the tagger is 40 times faster and more accurate.  Please see the tech report on the website for details.
+
+This tagger is described in the following two papers, available at the website.  Please cite this if you write a research paper using this software.
 
   Part-of-Speech Tagging for Twitter: Annotation, Features, and Experiments
   Kevin Gimpel, Nathan Schneider, Brendan O'Connor, Dipanjan Das, Daniel Mills,
@@ -46,23 +31,7 @@ research paper using this software.
   Linguistics, companion volume, Portland, OR, June 2011.
   http://www.ark.cs.cmu.edu/TweetNLP/gimpel+etal.acl11.pdf
 
-The software is licensed under Apache 2.0 (see LICENSE file).
-
-Version 0.2 of the tagger differs from version 0.1 in the following ways:
-
-* The tokenizer has been improved and integrated with the tagger in a single Java program.
-
-* The new tokenizer was run on the 1,827 tweets used for the annotation effort and the
-annotations were adapted for tweets with differing tokenizations. The revised annotations
-are contained in a companion v0.2 release of the data (twpos-data-v0.2).
-
-* The tagging model is trained on ALL of the available annotated data in twpos-data-v0.2.
-The model in v0.1 was only trained on the training set.
-
-* The tokenizer/tagger is integrated with Twitter's text commons annotations API.
-
 Contact
--------
-Please contact Brendan O'Connor (brenocon@cmu.edu) and Kevin Gimpel (kgimpel@cs.cmu.edu)
-if you encounter any problems.
+=======
 
+Please contact Brendan O'Connor (brenocon@cmu.edu) and Kevin Gimpel (kgimpel@cs.cmu.edu) if you encounter any problems.

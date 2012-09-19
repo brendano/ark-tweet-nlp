@@ -28,18 +28,19 @@ public class RunTagger {
 	Tagger tagger;
 	
 	// Commandline I/O-ish options
-	String inputFormat = "json";
+	String inputFormat = "auto";
 	String outputFormat = "auto";
 	int inputField = 1;
 	
 	String inputFilename;
-	String modelFilename;
+	/** Can be either filename or resource name **/
+	String modelFilename = "/cmu/arktweetnlp/model.20120919";
 
 	public boolean noOutput = false;
 	public boolean justTokenize = false;
 	
 	public static enum Decoder { GREEDY, VITERBI };
-	public Decoder decoder = Decoder.VITERBI; 
+	public Decoder decoder = Decoder.GREEDY; 
 	public boolean showConfidence = true;
 
 	PrintStream outputStream;
@@ -64,6 +65,17 @@ public class RunTagger {
 		// force UTF-8 here, so don't need -Dfile.encoding
 		this.outputStream = new PrintStream(System.out, true, "UTF-8");
 	}
+	public void detectAndSetInputFormat(String tweetData) throws IOException {
+		JsonTweetReader jsonTweetReader = new JsonTweetReader();
+		if (jsonTweetReader.isJson(tweetData)) {
+			System.err.println("Detected JSON input format");
+			inputFormat = "json";
+		} else {
+			System.err.println("Detected text input format");
+			inputFormat = "text";
+		}
+	}
+	
 	public void runTagger() throws IOException, ClassNotFoundException {
 		
 		tagger = new Tagger();
@@ -86,9 +98,20 @@ public class RunTagger {
 		while ( (line = reader.readLine()) != null) {
 			String[] parts = line.split("\t");
 			String tweetData = parts[inputField-1];
+			
+			if (reader.getLineNumber()==1) {
+				if (inputFormat.equals("auto")) {
+					detectAndSetInputFormat(tweetData);
+				}
+			}
+			
 			String text;
 			if (inputFormat.equals("json")) {
-				text = jsonTweetReader.getText(tweetData); 
+				text = jsonTweetReader.getText(tweetData);
+				if (text==null) {
+					System.err.println("Warning, null text (JSON parse error?), using blank string instead");
+					text = "";
+				}
 			} else {
 				text = tweetData;
 			}
@@ -107,7 +130,7 @@ public class RunTagger {
 			if (outputFormat.equals("conll")) {
 				outputJustTagging(sentence, modelSentence);
 			} else {
-				outputPrependedTagging(sentence, modelSentence, justTokenize, tweetData);				
+				outputPrependedTagging(sentence, modelSentence, justTokenize, line);				
 			}
 			numtoks += sentence.T();
 		}
@@ -209,7 +232,7 @@ public class RunTagger {
 	
 	private String formatConfidence(double confidence) {
 		// too many decimal places wastes space
-		return String.format("%.3f", confidence);
+		return String.format("%.4f", confidence);
 	}
 
 	/**
@@ -329,23 +352,29 @@ public class RunTagger {
 		if (!tagger.justTokenize && tagger.modelFilename == null) {
 			usage("Need to specify model");
 		}
-		
-		tagger.finalizeOutputFormat();
 
 		if (args.length - i > 1) usage();
+		if (args.length <= i) usage();
 		tagger.inputFilename = args[i];
+		tagger.finalizeOptions();
 		
-		tagger.runTagger();
-		
+		tagger.runTagger();		
 	}
 	
-	public void finalizeOutputFormat() {
+	public void finalizeOptions() throws IOException {
 		if (outputFormat.equals("auto")) {
 			if (inputFormat.equals("conll")) {
 				outputFormat = "conll";
 			} else {
 				outputFormat = "pretsv";
 			}
+		}
+		if (showConfidence && decoder==Decoder.VITERBI) {
+			System.err.println("Confidence output is unimplemented in Viterbi, turning it off.");
+			showConfidence = false;
+		}
+		if (justTokenize) {
+			showConfidence = false;
 		}
 	}
 	
@@ -359,11 +388,10 @@ public class RunTagger {
 "\n  runs the CMU ARK Twitter tagger on tweets from ExamplesFilename, " +
 "\n  writing taggings to standard output." +
 "\n\nOptions:" +
-"\n  --model <Filename>        Specify model filename." +
-"\n                            [TODO should this default to something?]" +
+"\n  --model <Filename>        Specify model filename. (Else use built-in.)" +
 "\n  --just-tokenize           Only run the tokenizer; no POS tags." +
 "\n  --quiet                   Quiet: no output" +
-"\n  --input-format <Format>   Default: json." +
+"\n  --input-format <Format>   Default: auto" +
 "\n                            Options: json, text, conll" +
 "\n  --output-format <Format>  Default: automatically decide from input format." +
 "\n                            Options: pretsv, conll" +
@@ -373,31 +401,23 @@ public class RunTagger {
 "\n                            Only for {json, text} input formats." +
 "\n  --word-clusters <File>    Alternate word clusters file (see FeatureExtractor)" +
 "\n  --no-confidence           Don't output confidence probabilities" +
+"\n  --decoder <Decoder>       Change the decoding algorithm (default: greedy)" +
 "\n" +
-"\nThere are two types of input-output formats: " +
-"\n(1) tweet-per-line, and (2) token-per-line." +
 "\nTweet-per-line input formats:" +
 "\n   json: Every input line has a JSON object containing the tweet," +
-"\n         as per the Streaming API. (The 'text' field gets used.)" +
+"\n         as per the Streaming API. (The 'text' field is used.)" +
 "\n   text: Every input line has the text for one tweet." +
-"\nFor both cases, we the lines in the input are actually TSV," +
-"\nand the tweets (text or json) are one particular field." +
+"\nWe actually assume input lines are TSV and the tweet data is one field."+
 "\n(Therefore tab characters are not allowed in tweets." +
 "\nTwitter's own JSON formats guarantee this;" +
 "\nif you extract the text yourself, you must remove tabs and newlines.)" +
-"\nThis allows metadata to be passed through." +
-"\nBy default, the first field is used; change with --input-field." +
 "\nTweet-per-line output format is" +
-"\n   pretsv: Prepend the tokenization and tagging as two new TSV fields, " +
+"\n   pretsv: Prepend the tokenization and tagging as new TSV fields, " +
 "\n           so the output includes a complete copy of the input." +
-"\n           (Control where the fields are inserted with --output-field.)" +
-"\nBy default, two TSV fields are prepended:" +
-"\n          Tokenization \\t POSTags \\t (original data...)" +
+"\nBy default, three TSV fields are prepended:" +
+"\n   Tokenization \\t POSTags \\t Confidences \\t (original data...)" +
 "\nThe tokenization and tags are parallel space-separated lists." +
-"\nWrite your own Java wrapper to Tagger.java for a different format." +
-"\n" +
-"\nThere is only one token-per-line format:" +
-"\n   conll: Each line is: Token \\t Tag, and blank line separating tweets." +
+"\nThe 'conll' format is token-per-line, blank spaces separating tweets."+
 "\n");
 		
 		if (extra != null) {

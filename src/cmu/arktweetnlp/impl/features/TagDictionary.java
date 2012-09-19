@@ -7,17 +7,26 @@ import org.apache.commons.codec.language.Metaphone;
 import cmu.arktweetnlp.util.BasicFileIO;
 
 public class TagDictionary {
-	public final static Map<String, List<String>> WORD_TO_POS;
+	public static Map<String, List<String>> WORD_TO_POS;
 
 	static {
-        WORD_TO_POS = loadData();
+		WORD_TO_POS = null;
+		
+        try {
+			WORD_TO_POS = loadData();
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     public static TagDictionary instance() {
         return new TagDictionary();
 	}
 
-	static Map<String, List<String>> loadData() {
+	static Map<String, List<String>> loadData() throws IOException {
 //		log.info("loading POS tag dictionary...");
 		Metaphone _metaphone = new Metaphone();
 		_metaphone.setMaxCodeLen(100);

@@ -224,15 +224,30 @@ public class BasicFileIO {
 	 * e.g. http://stackoverflow.com/questions/1464291/how-to-really-read-text-file-from-classpath-in-java
 	 * 
 	 * (added by Brendan 2012-08-14)
+	 * @throws IOException 
 	 */
-	public static BufferedReader getResourceReader(String resourceName) {
+	public static BufferedReader getResourceReader(String resourceName) throws IOException {
 		assert resourceName.startsWith("/") : "Absolute path needed for resource";
 		
 		InputStream stream = BasicFileIO.class.getResourceAsStream(resourceName);
-		if (stream == null) throw new RuntimeException("failed to find resource " + resourceName);
+		if (stream == null) throw new IOException("failed to find resource " + resourceName);
 		//read in paths file
 		BufferedReader bReader = new BufferedReader(new InputStreamReader(
 			stream, Charset.forName("UTF-8")));
 		return bReader;
+	}
+	
+	/** Try to get a file, if it doesn't exist, backoff to a resource. 
+	 * @throws IOException **/
+	public static BufferedReader openFileOrResource(String fileOrResource) throws IOException {
+		try {
+			if (new File(fileOrResource).exists()) {
+				return openFileToReadUTF8(fileOrResource);
+			} else {
+				return getResourceReader(fileOrResource);
+			}			
+		} catch (IOException e) {
+			throw new IOException("Neither file nor resource found for: " + fileOrResource);
+		}
 	}
 }

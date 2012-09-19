@@ -1,6 +1,7 @@
 package cmu.arktweetnlp.impl.features;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -21,7 +22,7 @@ public class WordClusterPaths implements FeatureExtractorInterface {
 	
 	public static HashMap<String,String> wordToPath;
 
-	public WordClusterPaths() {
+	public WordClusterPaths() throws IOException {
 //		log.info("Loading clusters");
 		
 		//read in paths file

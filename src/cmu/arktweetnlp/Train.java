@@ -75,7 +75,7 @@ public class Train {
 		model.numLabels = model.labelVocab.size();
 	}
 
-	public void dumpFeatures() {
+	public void dumpFeatures() throws IOException {
 		FeatureExtractor fe = new FeatureExtractor(model, true);
 		fe.dumpMode = true;
 		for (Sentence lSent : lSentences) {
@@ -84,7 +84,7 @@ public class Train {
 		}
 	}
 
-	public void extractFeatures() {
+	public void extractFeatures() throws IOException {
 		System.out.println("Extracting features");
 		FeatureExtractor fe = new FeatureExtractor(model, true);
 		for (Sentence lSent : lSentences) {

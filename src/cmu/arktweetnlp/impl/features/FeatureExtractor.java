@@ -1,5 +1,6 @@
 package cmu.arktweetnlp.impl.features;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -22,7 +23,7 @@ public class FeatureExtractor {
 	private ArrayList<FeatureExtractorInterface> allFeatureExtractors;
 	public boolean isTrainingTime;
 	public boolean dumpMode = false;
-	public FeatureExtractor(Model model, boolean isTrainingTime){
+	public FeatureExtractor(Model model, boolean isTrainingTime) throws IOException{
 		this.model = model;
 		this.isTrainingTime = isTrainingTime;
 		assert model.labelVocab.isLocked();
@@ -139,7 +140,7 @@ public class FeatureExtractor {
 
 
 
-	private void initializeFeatureExtractors() {
+	private void initializeFeatureExtractors() throws IOException {
 		allFeatureExtractors = new ArrayList<FeatureExtractorInterface>();
 		
 		allFeatureExtractors.add(new WordClusterPaths());

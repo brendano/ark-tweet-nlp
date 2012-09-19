@@ -406,7 +406,7 @@ public class Model {
 
 	public static Model loadModelFromText(String filename) throws IOException {
 		Model model = new Model();
-		BufferedReader reader = BasicFileIO.openFileToReadUTF8(filename);
+		BufferedReader reader = BasicFileIO.openFileOrResource(filename);
 		String line;
 
 		ArrayList<Double> biasCoefs = 

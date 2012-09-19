@@ -46,5 +46,23 @@ public class JsonTweetReader  {
 		
 		return textValue.asText();
 	}
+	
+	public boolean isJson(String isThisJson) {
+		JsonNode rootNode; 
+		
+		if (isThisJson.charAt(0) != '{')
+			return false;
+		
+		try {
+			rootNode = mapper.readValue(isThisJson, JsonNode.class);
+		} catch (JsonParseException e) {
+			return false;
+		} catch (IOException e) {
+			System.err.println("WTF -- got IOException in isJson()");
+			return false;
+		}
+		return true;
+		
+	}
 
 }
