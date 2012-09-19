@@ -18,7 +18,7 @@ public class Train {
 
 	public double l2penalty = 2;
 	public double l1penalty = 0.25;
-	public double tol = 1e-5;
+	public double tol = 1e-7;
 	public int maxIter = 500;
 	public String modelLoadFilename = null;
 	public String examplesFilename = null;
@@ -173,7 +173,7 @@ public class Train {
 			for (ModelSentence s : mSentences) {
 				loglik += model.computeLogLik(s);
 			}
-			System.out.printf("\tTokLL %.4f\t", loglik/numTokens);
+			System.out.printf("\tTokLL %.6f\t", loglik/numTokens);
 		}
 	}
 

@@ -149,10 +149,7 @@ public class FeatureExtractor {
 		allFeatureExtractors.add(new MiscFeatures.NgramSuffix(140));
 		allFeatureExtractors.add(new MiscFeatures.NgramPrefix(140));
 		allFeatureExtractors.add(new MiscFeatures.PrevWord());
-		//allFeatureExtractors.add(new Prev2Words());
 		allFeatureExtractors.add(new MiscFeatures.NextWord());
-		//allFeatureExtractors.add(new Next2Words());
-		//allFeatureExtractors.add(new URLFeatures());
 		allFeatureExtractors.add(new MiscFeatures.WordformFeatures());
 
 		allFeatureExtractors.add(new MiscFeatures.CapitalizationFeatures());
@@ -168,6 +165,11 @@ public class FeatureExtractor {
 		allFeatureExtractors.add(new WordListFeatures.Listofnames("female"));
 		
 		allFeatureExtractors.add(new MiscFeatures.Positions());
+		
+		//allFeatureExtractors.add(new Prev2Words());
+		//allFeatureExtractors.add(new Next2Words());
+		//allFeatureExtractors.add(new MiscFeatures.URLFeatures());
+
 	}
 
 
