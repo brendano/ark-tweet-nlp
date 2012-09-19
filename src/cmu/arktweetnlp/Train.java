@@ -50,12 +50,12 @@ public class Train {
 		readTrainingSentences(examplesFilename);
 		constructLabelVocab();
 		extractFeatures();
+
 		model.lockdownAfterFeatureExtraction();
 		if (modelLoadFilename != null) {
 			readWarmStartModel();
 		}
 		optimizationLoop();
-		//      sgdLoop();
 		model.saveModelAsText(modelSaveFilename);
 	}
 
@@ -85,8 +85,10 @@ public class Train {
 	}
 
 	public void extractFeatures() {
+		System.out.println("Extracting features");
 		FeatureExtractor fe = new FeatureExtractor(model, true);
 		for (Sentence lSent : lSentences) {
+
 			ModelSentence mSent = new ModelSentence(lSent.T());
 			fe.computeFeatures(lSent, mSent);
 			mSentences.add(mSent);
@@ -154,7 +156,7 @@ public class Train {
 	}
 
 	/**
-	 * lambda_2 + (1/2) sum (beta_j)^2  +  lambda_1 + sum |beta_j|
+	 * lambda_2 * (1/2) sum (beta_j)^2  +  lambda_1 * sum |beta_j|
 	 * our OWLQN seems to only want the first term
 	 */
 	 private double regularizerValue(double[] flatCoefs) {
