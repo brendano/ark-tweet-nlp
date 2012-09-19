@@ -146,8 +146,8 @@ public class FeatureExtractor {
 		allFeatureExtractors.add(new WordListFeatures.POSTagDict());
 		allFeatureExtractors.add(new WordListFeatures.MetaphonePOSDict());
 
-		allFeatureExtractors.add(new MiscFeatures.NgramSuffix(140));
-		allFeatureExtractors.add(new MiscFeatures.NgramPrefix(140));
+		allFeatureExtractors.add(new MiscFeatures.NgramSuffix(20));
+		allFeatureExtractors.add(new MiscFeatures.NgramPrefix(20));
 		allFeatureExtractors.add(new MiscFeatures.PrevWord());
 		allFeatureExtractors.add(new MiscFeatures.NextWord());
 		allFeatureExtractors.add(new MiscFeatures.WordformFeatures());
