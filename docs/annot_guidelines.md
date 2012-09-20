@@ -48,7 +48,7 @@ single ASCII symbol. In brief:
   `,` punctuation  
   `G` other abbreviations, foreign words, possessive endings, symbols, garbage
 * __Other Compounds__  
-  `L` nominal + verbal  
+  `L` nominal + verbal (e.g. _i'm_), verbal + nominal (_let's_, _lemme_)  
   `M` proper noun + verbal  
   `Y` `X` + verbal  
 
@@ -71,7 +71,7 @@ following examples:
 * It's Been Coldd :/ __iGuess__ It's Better Than Beingg Hot Tho . Where Do Yuhh Live At ? @iKnow\_YouWantMe
 * This yearâs almond crop is a great one . And the crop is being shipped fresh to __youâŠNow__ !
 * RT @Mz\_GoHAM Um ..... #TeamHeat ........ wut Happend ?? Haha &lt;== #TeamCeltics showin that ass what's __good...That's__ wat happened !!! LMAO
-* #uWasCoolUntil you unfollowed me ! __R E T W E E T__ if you Hate when people do that for no reason .
+* \#uWasCoolUntil you unfollowed me ! __R E T W E E T__ if you Hate when people do that for no reason .
 
 <!--
 28873458992   L V A E G L A P V A R , R V O V P ,
@@ -182,34 +182,40 @@ Verb particle examples
 TODO talk about adverb test for verb particles
 
 
-that/this: O, D, P, and relativizers
+_this_ and _that_: `O`, `D`, `P`, and relativizers
 ------------------------------------
 
-PTB almost always tags `this`/`that` as a determiner, but in cases where it is used nominally, it immediately surrounds with a singleton NP, e.g.
+PTB almost always tags _this_/_that_ as a determiner, but in cases where it is used pronominally, it is immediately dominated by a singleton NP, e.g.
+
 * (NP (DT This)) is Japan
 
-For our purposes, since we do not have parse trees and want to straightforwardly use the tags in POS patterns, it is better to tag it nominally, so we use __This/O__ here.  E.g. 
+For our purposes, since we do not have parse trees and want to straightforwardly use the tags in POS patterns, we tag such cases as pronouns:
+
 * i just orgasmed over __this/O__
 
 <!-- 28139103509815297 -->
 
-__this/D__ is reserved for modifier usage. E.g. 
+as opposed to
+
 * __this/D__ wind is serious
 
 <!-- 194552682147610625 -->
 
-Words where we were careful about the D/O distinction include, but are not limited to: _that, this, these, those, dat, daht, dis, tht_.  Also a few cases of _some_ (`get some/O`) though we use `some/D of`, `any/D of`.
+Words where we were careful about the `D`/`O` distinction include, but are not limited to: _that, this, these, those, dat, daht, dis, tht_. Also a few cases of _some_ (_get some/O_) though we use _some/D of_, _any/D of_.
 
-When `this`/`that` is used as a relativizer, we use __this/P__, and never this/O.  (Some relativizer instances could plausibly be nominal, but some clearly are not.)  E.g. 
+When _this_ or _that_ is used as a relativizer, we tag it as `P` (never `O`):
+
 * You should know , __that/P__ if you come any closer ...
 * Never cheat on a woman __that/P__ holds you down
 
 <!-- 87519526148780032 115821393559552000 -->
 
-Version 0.2 of the ACL-2011 data often used this/D for nominal usage, but was somewhat inconsistent.
-For the 0.3 release, we changed the tags on the ACL-2011 tweets to conform to the new style; all Daily547 tags conform as well.
+(Version 0.2 of the ACL-2011 data often used this/D for nominal usage, but was somewhat inconsistent.
+For the 0.3 release, we changed the tags on the ACL-2011 tweets to conform to the new style; all Daily547 tags conform as well.)
 
-WH-word relativizers are treated differently than the above: they are sometimes tagged as O, sometimes as D, but never P.  [TODO: should we normalize them somehow? or another can of worms?]
+WH-word relativizers are treated differently than the above: they are sometimes tagged as `O`, sometimes as `D`, but never as `P`.
+
+<!--  [TODO: should we normalize them somehow? or another can of worms?] -->
 
 
 Hashtags and At-mentions
@@ -237,6 +243,15 @@ Miscellaneous kinds of abbreviations are tagged with `G`:
 * _let's_ (let us), _buy'em_ (buy them)
 * _mfw_ (my face when)
 
+
+Metalinguistic Mentions
+-----------------------
+
+Mentions of a word (typically in quotes) are tagged as if the word had been used normally:
+
+* RT @HeyKikO Every girl lives for the " unexpected hugs from behind " moments &lt; I wouldn't say " __live__ "... but they r nice
+
+  > Here _live_ is tagged as a verb.
 
 Clipping
 --------
