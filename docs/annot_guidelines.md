@@ -48,7 +48,7 @@ single ASCII symbol. In brief:
   `,` punctuation  
   `G` other abbreviations, foreign words, possessive endings, symbols, garbage
 * __Other Compounds__  
-  `L` nominal + verbal  
+  `L` nominal + verbal (e.g. _i'm_), verbal + nominal (_let's_, _lemme_)  
   `M` proper noun + verbal  
   `Y` `X` + verbal  
 
@@ -60,7 +60,7 @@ Tokenization
 ------------
 
 The __twokenize__ tool included with the ARK TweetNLP package handles tokenization. 
-It seeks to identify word-external punctuation tokens and emoticons -— not an easy task given 
+It seeks to identify word-external punctuation tokens and emoticons — not an easy task given 
 Twitter’s lack of orthographic orthodoxy!
 
 When multiple words are written together without spaces, or when there are spaces 
@@ -71,7 +71,7 @@ following examples:
 * It's Been Coldd :/ __iGuess__ It's Better Than Beingg Hot Tho . Where Do Yuhh Live At ? @iKnow\_YouWantMe
 * This yearâs almond crop is a great one . And the crop is being shipped fresh to __youâŠNow__ !
 * RT @Mz\_GoHAM Um ..... #TeamHeat ........ wut Happend ?? Haha &lt;== #TeamCeltics showin that ass what's __good...That's__ wat happened !!! LMAO
-* #uWasCoolUntil you unfollowed me ! __R E T W E E T__ if you Hate when people do that for no reason .
+* \#uWasCoolUntil you unfollowed me ! __R E T W E E T__ if you Hate when people do that for no reason .
 
 <!--
 28873458992   L V A E G L A P V A R , R V O V P ,
@@ -79,10 +79,17 @@ following examples:
 28847830495   # O V O , G G G G G G G P O V R N V D P D N ,
 -->
 
+We decided not to manually fix tokenization errors (like in the third example above) 
+before POS annotation. We made this decision because we want to be able to run our 
+tagger on new text that is tokenized automatically, so we need to _train_ the tagger on annotated 
+data that is tokenized in the same way.
+
 Penn Treebank Conventions
 -------------------------
 
 Generally, we followed the Penn Treebank (PTB) WSJ conventions in determining parts of speech.
+However, there are many inconsistencies in the PTB annotations. We attempted to follow 
+the majority convention for a particular use of a word, but in some cases we did not. 
 Specific cases which caused difficulty for annotators or necessitated a departure from the PTB 
 approach are discussed below.
 
@@ -111,18 +118,23 @@ _28th October_, in which _28th_ is tagged as `$`.
   in the address as proper nouns. Consider the following PTB example:
   - 153/CD East/NNP 53rd/CD St./NNP
   
-  However, certain street numbers in the PTB are tagged as proper nouns:
+  However, this is not entirely consistent in the PTB. Certain street numbers in the PTB are tagged as proper nouns:
   - Fifth/NNP Ave/NNP
   
   Annotators are to use their best judgment in tagging street numbers.
-* __Cardinal directions__ (_east_, _NNW_) are common nouns [TODO: in all cases?]
+* __Cardinal directions__ (_east_, _NNW_) referred to in isolation (not as a modifier or part of a name) are common nouns
 * __Units of measurement__ are common nouns, even if they come from a person’s name (like _Celsius_)
+
+<!-- TODO: inconsistency in the data: °C/N in 95974936845352960 but °F/^ in 28883465935 -->
 
 Time and location nouns modifying verbs
 ---------------------------------------
 
-Words like _yesterday_/_today_/_tomorrow_, _home_/_outside_, etc. should be treated as 
-nouns even when modifying verbs: [TODO: examples] [actually, I see at least one PTB example 
+In the PTB, words like _yesterday_/_today_/_tomorrow_, _home_/_outside_, etc. are frequently labeled 
+as nouns, even when modifying verbs, but they are also often labeled as adverbs in such cases. The 
+PTB annotators are inconsistent in this regard. Annotators should use 
+their best judgment, referring to the PTB and to previously-annotated data to improve consistency. 
+[TODO: examples] [actually, I see at least one PTB example 
 that is _go home/RB_. Another possibility is to treat these as intransitive prepositions: 
 _go home/P_, _go outside/P_.]
 
@@ -162,13 +174,6 @@ if they are not behaving in a normal syntactic fashion, e.g. _Ace/^ of/^ Base/^_
 <!--Friday Night Lights = ^^^ ?-->
 <!--Justin Bieber's " My World " -- 28867570795-->
 
-
-Pronouns
---------
-
-[demonstrative pronouns, _one_/_something_, etc.—are we sticking to PTB on these?]
-
-
 Prepositions, Particles, and Adverbs
 ------------------------------------
 
@@ -182,35 +187,54 @@ Verb particle examples
 TODO talk about adverb test for verb particles
 
 
-that/this: O, D, P, and relativizers
+_this_ and _that_: Demonstratives and Relativizers
 ------------------------------------
 
-PTB almost always tags `this`/`that` as a determiner, but in cases where it is used nominally, it immediately surrounds with a singleton NP, e.g.
+PTB almost always tags demonstrative _this_/_that_ as a determiner, but in cases where it is used pronominally, it is immediately dominated by a singleton NP, e.g.
+
 * (NP (DT This)) is Japan
 
-For our purposes, since we do not have parse trees and want to straightforwardly use the tags in POS patterns, it is better to tag it nominally, so we use __This/O__ here.  E.g. 
+For our purposes, since we do not have parse trees and want to straightforwardly use the tags in POS patterns, we tag such cases as pronouns:
+
 * i just orgasmed over __this/O__
 
 <!-- 28139103509815297 -->
 
-__this/D__ is reserved for modifier usage. E.g. 
+as opposed to
+
 * __this/D__ wind is serious
 
 <!-- 194552682147610625 -->
 
-Words where we were careful about the D/O distinction include, but are not limited to: _that, this, these, those, dat, daht, dis, tht_.  Also a few cases of _some_ (`get some/O`) though we use `some/D of`, `any/D of`.
+Words where we were careful about the `D`/`O` distinction include, but are not limited to: _that, this, these, those, dat, daht, dis, tht_.
 
-When `this`/`that` is used as a relativizer, we use __this/P__, and never this/O.  (Some relativizer instances could plausibly be nominal, but some clearly are not.)  E.g. 
+When _this_ or _that_ is used as a relativizer, we tag it as `P` (never `O`):
+
 * You should know , __that/P__ if you come any closer ...
 * Never cheat on a woman __that/P__ holds you down
 
 <!-- 87519526148780032 115821393559552000 -->
 
-Version 0.2 of the ACL-2011 data often used this/D for nominal usage, but was somewhat inconsistent.
-For the 0.3 release, we changed the tags on the ACL-2011 tweets to conform to the new style; all Daily547 tags conform as well.
+(Version 0.2 of the ACL-2011 data often used this/D for nominal usage, but was somewhat inconsistent.
+For the 0.3 release, we changed the tags on the ACL-2011 tweets to conform to the new style; all Daily547 tags conform as well.)
 
-WH-word relativizers are treated differently than the above: they are sometimes tagged as O, sometimes as D, but never P.  [TODO: should we normalize them somehow? or another can of worms?]
+WH-word relativizers are treated differently than the above: they are sometimes tagged as `O`, sometimes as `D`, but never as `P`.
 
+<!--  [TODO: should we normalize them somehow? or another can of worms?] -->
+
+Quantifiers and Referentiality
+------------------------------
+
+* A few non-prenominal cases of _some_ are tagged as pronouns (_get some/O_). However, we use _some/D of_, _any/D of_, _all/D of_.
+* _someone_, _everyone_, _anyone_, _somebody_, _everybody_, _anybody_, _nobody_, _something_, _everything_, _anything_, and _nothing_ are almost always tagged as nouns
+* _one_ is usually tagged as a number, but occasionally as a noun or pronoun when it is referential (inconsistent)
+* _none_ is tagged as a noun
+* _all_, _any_ are almost always tagged as a (pre)determiner or adverb
+* _few_, _several_ are tagged as an adjective when used as a modifier, and as a noun elsewhere
+* _many_ is tagged as an adjective
+* _lot_, _lots_ (meaning a large amount/degree of something) are tagged as nouns
+
+<!-- TODO: some apparent inconsistencies in the data: someone/O, anyone/O, any1/O, all/O, Everybody/O. many/A in 28914826190, 28897684962 are not prenominal and thus might be reconsidered in light of 'few', 'several', and 'many'. Also, I think most/A in 28905710274 ought to be an adverb. -->
 
 Hashtags and At-mentions
 ------------------------
@@ -237,6 +261,15 @@ Miscellaneous kinds of abbreviations are tagged with `G`:
 * _let's_ (let us), _buy'em_ (buy them)
 * _mfw_ (my face when)
 
+
+Metalinguistic Mentions
+-----------------------
+
+Mentions of a word (typically in quotes) are tagged as if the word had been used normally:
+
+* RT @HeyKikO Every girl lives for the " unexpected hugs from behind " moments &lt; I wouldn't say " __live__ "... but they r nice
+
+  > Here _live_ is tagged as a verb.
 
 Clipping
 --------
