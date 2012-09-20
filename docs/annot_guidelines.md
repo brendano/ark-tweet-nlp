@@ -3,7 +3,7 @@ Annotation Guidelines for Twitter Part-of-Speech Tagging
 
 Authors: Kevin Gimpel, Nathan Schneider, Brendan O'Connor
 
-2012-09-14, for the 0.3 data release (http://www.ark.cs.cmu.edu/TweetNLP/)
+2012-09-20, for the 0.3 data release (http://www.ark.cs.cmu.edu/TweetNLP/)
 
 
 Introduction
@@ -156,8 +156,8 @@ sole child under a _DIR_ (direction) nonterminal, it is annotated as
   - (NP-DIR (RB home) ) 1 time
 
 Manual inspection of the 24 occurrences revealed no discernible difference in usage that would 
-warrant these differences in annotation. As a result of these inconsistencies, we initially 
-decided to let annotators use their best judgment when annotating these types of words in tweets, 
+warrant these differences in annotation. As a result of these inconsistencies, we decided to let 
+annotators use their best judgment when annotating these types of words in tweets, 
 asking them to refer to the PTB and to previously-annotated data to improve consistency. 
 
 <!-- [TODO: examples] [actually, I see at least one PTB example 
@@ -200,18 +200,20 @@ if they are not behaving in a normal syntactic fashion, e.g. _Ace/^ of/^ Base/^_
 <!--Friday Night Lights = ^^^ ?-->
 <!--Justin Bieber's " My World " -- 28867570795-->
 
-Prepositions, Particles, and Adverbs
-------------------------------------
+Prepositions and Particles
+--------------------------
 
-Verb particle examples
+To differentiate between prepositions and verb particles (e.g., _out_ in _take out_), we asked annotators to 
+use the following test: 
+
+ - if you can insert an adverb within the phrasal verb, it's probably a preposition rather than a particle:
+  - turn slowly into/P a monster
+  - *take slowly out/T the trash
+
+Some other verb particle examples:
 * what's going on/T
 * check it out/T
-* shoutout:
- * `s/o` and `SO` are V
- * shout/V out/T
-
-TODO talk about adverb test for verb particles
-
+* shout out/T (abbreviations like `s/o` and `SO` are tagged as V) 
 
 _this_ and _that_: Demonstratives and Relativizers
 ------------------------------------
