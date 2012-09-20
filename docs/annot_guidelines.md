@@ -115,8 +115,10 @@ _28th October_, in which _28th_ is tagged as `$`.
   - Fifth/NNP Ave/NNP
   
   Annotators are to use their best judgment in tagging street numbers.
-* __Cardinal directions__ (_east_, _NNW_) are common nouns [TODO: in all cases?]
+* __Cardinal directions__ (_east_, _NNW_) referred to in isolation (not as a modifier or part of a name) are common nouns
 * __Units of measurement__ are common nouns, even if they come from a person’s name (like _Celsius_)
+
+<!-- TODO: inconsistency in the data: °C/N in 95974936845352960 but °F/^ in 28883465935 -->
 
 Time and location nouns modifying verbs
 ---------------------------------------
