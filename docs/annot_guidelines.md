@@ -60,7 +60,7 @@ Tokenization
 ------------
 
 The __twokenize__ tool included with the ARK TweetNLP package handles tokenization. 
-It seeks to identify word-external punctuation tokens and emoticons -— not an easy task given 
+It seeks to identify word-external punctuation tokens and emoticons — not an easy task given 
 Twitter’s lack of orthographic orthodoxy!
 
 When multiple words are written together without spaces, or when there are spaces 
@@ -79,10 +79,17 @@ following examples:
 28847830495   # O V O , G G G G G G G P O V R N V D P D N ,
 -->
 
+We decided not to manually fix tokenization errors (like in the third example above) 
+before POS annotation. We made this decision because we want to be able to run our 
+tagger on new text that is tokenized automatically, so we need to _train_ the tagger on annotated 
+data that is tokenized in the same way.
+
 Penn Treebank Conventions
 -------------------------
 
 Generally, we followed the Penn Treebank (PTB) WSJ conventions in determining parts of speech.
+However, there are many inconsistencies in the PTB annotations. We attempted to follow 
+the majority convention for a particular use of a word, but in some cases we did not. 
 Specific cases which caused difficulty for annotators or necessitated a departure from the PTB 
 approach are discussed below.
 
@@ -111,7 +118,7 @@ _28th October_, in which _28th_ is tagged as `$`.
   in the address as proper nouns. Consider the following PTB example:
   - 153/CD East/NNP 53rd/CD St./NNP
   
-  However, certain street numbers in the PTB are tagged as proper nouns:
+  However, this is not entirely consistent in the PTB. Certain street numbers in the PTB are tagged as proper nouns:
   - Fifth/NNP Ave/NNP
   
   Annotators are to use their best judgment in tagging street numbers.
@@ -123,8 +130,11 @@ _28th October_, in which _28th_ is tagged as `$`.
 Time and location nouns modifying verbs
 ---------------------------------------
 
-Words like _yesterday_/_today_/_tomorrow_, _home_/_outside_, etc. should be treated as 
-nouns even when modifying verbs: [TODO: examples] [actually, I see at least one PTB example 
+In the PTB, words like _yesterday_/_today_/_tomorrow_, _home_/_outside_, etc. are frequently labeled 
+as nouns, even when modifying verbs, but they are also often labeled as adverbs in such cases. The 
+PTB annotators are inconsistent in this regard. Annotators should use 
+their best judgment, referring to the PTB and to previously-annotated data to improve consistency. 
+[TODO: examples] [actually, I see at least one PTB example 
 that is _go home/RB_. Another possibility is to treat these as intransitive prepositions: 
 _go home/P_, _go outside/P_.]
 
