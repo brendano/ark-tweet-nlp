@@ -162,13 +162,6 @@ if they are not behaving in a normal syntactic fashion, e.g. _Ace/^ of/^ Base/^_
 <!--Friday Night Lights = ^^^ ?-->
 <!--Justin Bieber's " My World " -- 28867570795-->
 
-
-Pronouns
---------
-
-[demonstrative pronouns, _one_/_something_, etc.—are we sticking to PTB on these?]
-
-
 Prepositions, Particles, and Adverbs
 ------------------------------------
 
@@ -182,10 +175,10 @@ Verb particle examples
 TODO talk about adverb test for verb particles
 
 
-_this_ and _that_: `O`, `D`, `P`, and relativizers
+_this_ and _that_: Demonstratives and Relativizers
 ------------------------------------
 
-PTB almost always tags _this_/_that_ as a determiner, but in cases where it is used pronominally, it is immediately dominated by a singleton NP, e.g.
+PTB almost always tags demonstrative _this_/_that_ as a determiner, but in cases where it is used pronominally, it is immediately dominated by a singleton NP, e.g.
 
 * (NP (DT This)) is Japan
 
@@ -201,7 +194,7 @@ as opposed to
 
 <!-- 194552682147610625 -->
 
-Words where we were careful about the `D`/`O` distinction include, but are not limited to: _that, this, these, those, dat, daht, dis, tht_. Also a few cases of _some_ (_get some/O_) though we use _some/D of_, _any/D of_.
+Words where we were careful about the `D`/`O` distinction include, but are not limited to: _that, this, these, those, dat, daht, dis, tht_.
 
 When _this_ or _that_ is used as a relativizer, we tag it as `P` (never `O`):
 
@@ -217,6 +210,19 @@ WH-word relativizers are treated differently than the above: they are sometimes 
 
 <!--  [TODO: should we normalize them somehow? or another can of worms?] -->
 
+Quantifiers and Referentiality
+------------------------------
+
+* A few non-prenominal cases of _some_ are tagged as pronouns (_get some/O_). However, we use _some/D of_, _any/D of_, _all/D of_.
+* _someone_, _everyone_, _anyone_, _somebody_, _everybody_, _anybody_, _nobody_, _something_, _everything_, _anything_, and _nothing_ are almost always tagged as nouns
+* _one_ is usually tagged as a number, but occasionally as a noun or pronoun when it is referential (inconsistent)
+* _none_ is tagged as a noun
+* _all_, _any_ are almost always tagged as a (pre)determiner or adverb
+* _few_, _several_ are tagged as an adjective when used as a modifier, and as a noun elsewhere
+* _many_ is tagged as an adjective
+* _lot_, _lots_ (meaning a large amount/degree of something) are tagged as nouns
+
+<!-- TODO: some apparent inconsistencies in the data: someone/O, anyone/O, any1/O, all/O, Everybody/O. many/A in 28914826190, 28897684962 are not prenominal and thus might be reconsidered in light of 'few', 'several', and 'many'. Also, I think most/A in 28905710274 ought to be an adverb. -->
 
 Hashtags and At-mentions
 ------------------------
