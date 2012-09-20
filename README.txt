@@ -4,12 +4,12 @@ http://www.ark.cs.cmu.edu/TweetNLP/
 Basic usage
 ===========
 
-Requires Java 6.  To run the tagger from unix shell:
+Requires Java 6.  To run the tagger from a unix shell:
 
     ./runTagger.sh examples/example_tweets.txt
 
 The tagger outputs tokens, predicted part-of-speech tags, and confidences.
-For more information:
+See:
 
     ./runTagger.sh --help
 
@@ -22,11 +22,13 @@ You may have to adjust the parameters to "java" depending on your system.
 Information
 ===========
 
-Version 0.3 of the tagger is 40 times faster and more accurate.  Please see the
+Version 0.3 of the tagger is much faster and more accurate.  Please see the
 tech report on the website for details.
 
+For the Java API, see src/cmu/arktweetnlp; especially Tagger.java.
+
 This tagger is described in the following two papers, available at the website.
-Please cite this if you write a research paper using this software.
+Please cite these if you write a research paper using this software.
 
 Part-of-Speech Tagging for Twitter: Annotation, Features, and Experiments
 Kevin Gimpel, Nathan Schneider, Brendan O'Connor, Dipanjan Das, Daniel Mills,
@@ -37,8 +39,9 @@ In Proceedings of the Annual Meeting of the Association
 http://www.ark.cs.cmu.edu/TweetNLP/gimpel+etal.acl11.pdf
 
 Part-of-Speech Tagging for Twitter: Word Clusters and Other Advances
-Olutobi Owoputi and Brendan O'Connor.
-Machine Learning Department Technical Report CMU-ML-12-107, Sept. 2012.
+Olutobi Owoputi, Brendan O'Connor, Chris Dyer, Kevin Gimpel, and
+  Nathan Schneider.
+Technical Report, Machine Learning Department. CMU-ML-12-107. September 2012.
 
 Contact
 =======

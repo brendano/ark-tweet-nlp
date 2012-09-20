@@ -32,7 +32,8 @@
   Contact:
 
     Please contact Brendan O'Connor (brenocon@cs.cmu.edu, http://brenocon.com)
-    with any questions about this release.
+    and Kevin Gimpel (kgimpel@cs.cmu.edu) with any questions about this
+    release.
 
   Changes:
 
@@ -52,9 +53,10 @@
     The following papers describe this dataset.  If you use this data in a
     research publication, we ask that you cite this (the original paper):
 
-    Kevin Gimpel, Nathan Schneider, Brendan O'Connor, Dipanjan Das, Daniel
-      Mills, Jacob Eisenstein, Michael Heilman, Dani Yogatama, Jeffrey Flanigan,
-      and Noah A. Smith.
+    Kevin Gimpel, Nathan Schneider, Brendan O'Connor, Dipanjan Das,
+      Daniel Mills, Jacob Eisenstein, Michael Heilman, Dani Yogatama, Jeffrey
+      Flanigan, and Noah A. Smith.
+
     Part-of-Speech Tagging for Twitter: Annotation, Features, and Experiments.
     In Proceedings of the Annual Meeting of the Association for Computational
       Linguistics, companion volume, Portland, OR, June 2011.
@@ -62,8 +64,11 @@
     Changes to the 0.3 version are described in
 
     Part-of-Speech Tagging for Twitter: Word Clusters and Other Advances
-    Olutobi Owoputi and Brendan O'Connor.
-    Machine Learning Department Technical Report CMU-ML-12-107, Sept. 2012.
+    Olutobi Owoputi, Brendan O'Connor, Chris Dyer, Kevin Gimpel, and
+      Nathan Schneider.
+    Technical Report, Machine Learning Department. CMU-ML-12-107.
+    September 2012.
+
 
     
 
