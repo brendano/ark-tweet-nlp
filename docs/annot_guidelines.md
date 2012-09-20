@@ -130,13 +130,39 @@ _28th October_, in which _28th_ is tagged as `$`.
 Time and location nouns modifying verbs
 ---------------------------------------
 
-In the PTB, words like _yesterday_/_today_/_tomorrow_, _home_/_outside_, etc. are frequently labeled 
-as nouns, even when modifying verbs, but they are also often labeled as adverbs in such cases. The 
-PTB annotators are inconsistent in this regard. Annotators should use 
-their best judgment, referring to the PTB and to previously-annotated data to improve consistency. 
-[TODO: examples] [actually, I see at least one PTB example 
+In the PTB, time and location nouns (words like _yesterday_/_today_/_tomorrow_, _home_/_outside_, etc.) 
+that modify verbs are inconsistently labeled. 
+The words _yesterday_/_today_/_tomorrow_ are nearly always tagged as nouns, even when modifying verbs.
+For example, in the PTB _today_ is tagged as NN 336 times and RB once. We note, however, that sometimes 
+the parse structure can be used to disambiguate the NN tags. When used as an adverb, _today_ is often 
+the sole child of an NP-TMP, e.g.,
+  - (NP-SBJ (DT These) (JJ high) (NNS rollers) )
+      (VP (VBD took) 
+        (NP (DT a) (JJ big) (NN bath) )
+        (NP-TMP (NN today) )))
+
+When used as a noun, it is often the sole child of an NP, e.g.,
+
+  - (PP-TMP (IN until) (NP (NN today) ))
+
+Since we are not annotating parse structure, it is less clear what to do with our data. In attempting 
+to be consistent with the PTB, we typically tagged _today_ as a noun. 
+
+The PTB annotations are less clear for words like _home_. Of the 24 times that _home_ appears as the 
+sole child under a _DIR_ (direction) nonterminal, it is annotated as
+  - (ADVP-DIR (NN home) ) 14 times
+  - (ADVP-DIR (RB home) ) 6 times
+  - (NP-DIR (NN home) ) 3 times
+  - (NP-DIR (RB home) ) 1 time
+
+Manual inspection of the 24 occurrences revealed no discernible difference in usage that would 
+warrant these differences in annotation. As a result of these inconsistencies, we initially 
+decided to let annotators use their best judgment when annotating these types of words in tweets, 
+asking them to refer to the PTB and to previously-annotated data to improve consistency. 
+
+<!-- [TODO: examples] [actually, I see at least one PTB example 
 that is _go home/RB_. Another possibility is to treat these as intransitive prepositions: 
-_go home/P_, _go outside/P_.]
+_go home/P_, _go outside/P_.] -->
 
 
 Names
@@ -190,11 +216,13 @@ TODO talk about adverb test for verb particles
 _this_ and _that_: Demonstratives and Relativizers
 ------------------------------------
 
-PTB almost always tags demonstrative _this_/_that_ as a determiner, but in cases where it is used pronominally, it is immediately dominated by a singleton NP, e.g.
+PTB almost always tags demonstrative _this_/_that_ as a determiner, but in cases where it is 
+used pronominally, it is immediately dominated by a singleton NP, e.g.
 
 * (NP (DT This)) is Japan
 
-For our purposes, since we do not have parse trees and want to straightforwardly use the tags in POS patterns, we tag such cases as pronouns:
+For our purposes, since we do not have parse trees and want to straightforwardly use the tags 
+in POS patterns, we tag such cases as pronouns:
 
 * i just orgasmed over __this/O__
 
@@ -206,7 +234,8 @@ as opposed to
 
 <!-- 194552682147610625 -->
 
-Words where we were careful about the `D`/`O` distinction include, but are not limited to: _that, this, these, those, dat, daht, dis, tht_.
+Words where we were careful about the `D`/`O` distinction include, but are not limited 
+to: _that, this, these, those, dat, daht, dis, tht_.
 
 When _this_ or _that_ is used as a relativizer, we tag it as `P` (never `O`):
 
@@ -258,9 +287,10 @@ an exclamation, tagged as `!`; _idk_ or _iono_ (I don’t know) can be tagged as
 Miscellaneous kinds of abbreviations are tagged with `G`:
 * _ily_ (I love you)
 * _wby_ (what about you)
-* _let's_ (let us), _buy'em_ (buy them)
+* _buy'em_ (buy them)
 * _mfw_ (my face when)
 
+<!-- removed let's from list above since we tag it as L. was: _let's_ (let us) -->
 
 Metalinguistic Mentions
 -----------------------
