@@ -1,0 +1,1321 @@
+Index: changes.diff
+===================================================================
+--- changes.diff	(revision 0)
++++ changes.diff	(revision 23586)
+@@ -0,0 +1,2 @@
++Index: changes.diff
++===================================================================
+Index: record_diff.sh
+===================================================================
+--- record_diff.sh	(revision 0)
++++ record_diff.sh	(revision 23586)
+@@ -0,0 +1,3 @@
++set -eux
++svn diff -r 23584 -x -U0 |grep @@ > changes.lines
++svn diff -r 23584 -x -U4 > changes.diff
+
+Property changes on: record_diff.sh
+___________________________________________________________________
+Added: svn:executable
+   + *
+
+Index: changes.lines
+===================================================================
+--- changes.lines	(revision 0)
++++ changes.lines	(revision 23586)
+@@ -0,0 +1,203 @@
++@@ -0,0 +1,1125 @@
+++@@ -199,9 +199,9 @@
+++@@ -306,9 +306,9 @@
+++@@ -530,9 +530,9 @@
+++@@ -760,9 +760,9 @@
+++@@ -1536,9 +1536,9 @@
+++@@ -2172,9 +2172,9 @@
+++@@ -2183,16 +2183,16 @@
+++@@ -2511,9 +2511,9 @@
+++@@ -2789,9 +2789,9 @@
+++@@ -3044,9 +3044,9 @@
+++@@ -3396,9 +3396,9 @@
+++@@ -3419,9 +3419,9 @@
+++@@ -3601,9 +3601,9 @@
+++@@ -4384,9 +4384,9 @@
+++@@ -5157,9 +5157,9 @@
+++@@ -5629,9 +5629,9 @@
+++@@ -6040,9 +6040,9 @@
+++@@ -6406,9 +6406,9 @@
+++@@ -6488,9 +6488,9 @@
+++@@ -7108,9 +7108,9 @@
+++@@ -7815,9 +7815,9 @@
+++@@ -9026,9 +9026,9 @@
+++@@ -9173,9 +9173,9 @@
+++@@ -9188,9 +9188,9 @@
+++@@ -9277,9 +9277,9 @@
+++@@ -9668,9 +9668,9 @@
+++@@ -9930,9 +9930,9 @@
+++@@ -10063,9 +10063,9 @@
+++@@ -10087,9 +10087,9 @@
+++@@ -10543,9 +10543,9 @@
+++@@ -12321,9 +12321,9 @@
+++@@ -12703,9 +12703,9 @@
+++@@ -12953,9 +12953,9 @@
+++@@ -13324,9 +13324,9 @@
+++@@ -13608,9 +13608,9 @@
+++@@ -14481,9 +14481,9 @@
+++@@ -15111,9 +15111,9 @@
+++@@ -15608,9 +15608,9 @@
+++@@ -15651,9 +15651,9 @@
+++@@ -16756,9 +16756,9 @@
+++@@ -16965,9 +16965,9 @@
+++@@ -17099,9 +17099,9 @@
+++@@ -17190,9 +17190,9 @@
+++@@ -17453,9 +17453,9 @@
+++@@ -17472,9 +17472,9 @@
+++@@ -17515,9 +17515,9 @@
+++@@ -17932,9 +17932,9 @@
+++@@ -18620,9 +18620,9 @@
+++@@ -18705,9 +18705,9 @@
+++@@ -18826,9 +18826,9 @@
+++@@ -18843,9 +18843,9 @@
+++@@ -18909,9 +18909,9 @@
+++@@ -19070,9 +19070,9 @@
+++@@ -19424,9 +19424,9 @@
+++@@ -19436,9 +19436,9 @@
+++@@ -19470,9 +19470,9 @@
+++@@ -19575,9 +19575,9 @@
+++@@ -19968,9 +19968,9 @@
+++@@ -20035,9 +20035,9 @@
+++@@ -20490,9 +20490,9 @@
+++@@ -20570,9 +20570,9 @@
+++@@ -20663,9 +20663,9 @@
+++@@ -20681,9 +20681,9 @@
+++@@ -22974,9 +22974,9 @@
+++@@ -23776,9 +23776,9 @@
+++@@ -23892,9 +23892,9 @@
+++@@ -24008,9 +24008,9 @@
+++@@ -24507,9 +24507,9 @@
+++@@ -24685,9 +24685,9 @@
+++@@ -24699,9 +24699,9 @@
+++@@ -25089,9 +25089,9 @@
+++@@ -25131,9 +25131,9 @@
+++@@ -25412,9 +25412,9 @@
+++@@ -25608,9 +25608,9 @@
+++@@ -25824,9 +25824,9 @@
+++@@ -26277,9 +26277,9 @@
+++@@ -26393,10 +26393,10 @@
+++@@ -26474,9 +26474,9 @@
+++@@ -26578,9 +26578,9 @@
+++@@ -27032,9 +27032,9 @@
+++@@ -27207,9 +27207,9 @@
+++@@ -27234,9 +27234,9 @@
+++@@ -27910,9 +27910,9 @@
+++@@ -28042,9 +28042,9 @@
+++@@ -28062,9 +28062,9 @@
+++@@ -28223,9 +28223,9 @@
+++@@ -29058,9 +29058,9 @@
+++@@ -29143,9 +29143,9 @@
+++@@ -29389,9 +29389,9 @@
+++@@ -30092,9 +30092,9 @@
+++@@ -30126,9 +30126,9 @@
+++@@ -30323,9 +30323,9 @@
+++@@ -30918,9 +30918,9 @@
+++@@ -30991,9 +30991,9 @@
+++@@ -31324,9 +31324,9 @@
+++@@ -31341,9 +31341,9 @@
+++@@ -31470,9 +31470,9 @@
+++@@ -31590,9 +31590,9 @@
+++@@ -31645,9 +31645,9 @@
+++@@ -31922,9 +31922,9 @@
+++@@ -31962,9 +31962,9 @@
++@@ -0,0 +1,3 @@
+++svn diff -r 23584 -x -U0 |grep @@ > changes.lines
++@@ -203 +203 @@
++@@ -310 +310 @@
++@@ -534 +534 @@
++@@ -764 +764 @@
++@@ -1540 +1540 @@
++@@ -2176 +2176 @@
++@@ -2187 +2187 @@
++@@ -2194 +2194 @@
++@@ -2515 +2515 @@
++@@ -2793 +2793 @@
++@@ -3048 +3048 @@
++@@ -3423 +3423 @@
++@@ -3605 +3605 @@
++@@ -4388 +4388 @@
++@@ -5161 +5161 @@
++@@ -5633 +5633 @@
++@@ -6044 +6044 @@
++@@ -6410 +6410 @@
++@@ -6492 +6492 @@
++@@ -7112 +7112 @@
++@@ -7819 +7819 @@
++@@ -9030 +9030 @@
++@@ -9177 +9177 @@
++@@ -9192 +9192 @@
++@@ -9281 +9281 @@
++@@ -9672 +9672 @@
++@@ -9934 +9934 @@
++@@ -10067 +10067 @@
++@@ -10091 +10091 @@
++@@ -10547 +10547 @@
++@@ -12325 +12325 @@
++@@ -12707 +12707 @@
++@@ -12957 +12957 @@
++@@ -13328 +13328 @@
++@@ -13612 +13612 @@
++@@ -14485 +14485 @@
++@@ -15115 +15115 @@
++@@ -15612 +15612 @@
++@@ -15655 +15655 @@
++@@ -16760 +16760 @@
++@@ -16969 +16969 @@
++@@ -17103 +17103 @@
++@@ -17194 +17194 @@
++@@ -17457 +17457 @@
++@@ -17476 +17476 @@
++@@ -17519 +17519 @@
++@@ -17936 +17936 @@
++@@ -18624 +18624 @@
++@@ -18709 +18709 @@
++@@ -18830 +18830 @@
++@@ -18847 +18847 @@
++@@ -18913 +18913 @@
++@@ -19074 +19074 @@
++@@ -19428 +19428 @@
++@@ -19440 +19440 @@
++@@ -19474 +19474 @@
++@@ -19579 +19579 @@
++@@ -19972 +19972 @@
++@@ -20039 +20039 @@
++@@ -20494 +20494 @@
++@@ -20574 +20574 @@
++@@ -20667 +20667 @@
++@@ -20685 +20685 @@
++@@ -22978 +22978 @@
++@@ -23780 +23780 @@
++@@ -23896 +23896 @@
++@@ -24012 +24012 @@
++@@ -24511 +24511 @@
++@@ -24703 +24703 @@
++@@ -25093 +25093 @@
++@@ -25135 +25135 @@
++@@ -25416 +25416 @@
++@@ -25612 +25612 @@
++@@ -25828 +25828 @@
++@@ -26281 +26281 @@
++@@ -26397,2 +26397,2 @@
++@@ -26478 +26478 @@
++@@ -26582 +26582 @@
++@@ -27036 +27036 @@
++@@ -27211 +27211 @@
++@@ -27238 +27238 @@
++@@ -27914 +27914 @@
++@@ -28046 +28046 @@
++@@ -28066 +28066 @@
++@@ -28227 +28227 @@
++@@ -29062 +29062 @@
++@@ -29393 +29393 @@
++@@ -30096 +30096 @@
++@@ -30130 +30130 @@
++@@ -30327 +30327 @@
++@@ -30922 +30922 @@
++@@ -30995 +30995 @@
++@@ -31328 +31328 @@
++@@ -31345 +31345 @@
++@@ -31474 +31474 @@
++@@ -31594 +31594 @@
++@@ -31649 +31649 @@
++@@ -31926 +31926 @@
++@@ -31966 +31966 @@
+Index: all.supertsv
+===================================================================
+--- all.supertsv	(revision 23584)
++++ all.supertsv	(working copy)
+@@ -199,9 +199,9 @@
+ ^	South
+ ^	park
+ ,	,
+ &	but
+-D	that
++O	that
+ V	was
+ A	hilarious
+ ,	!!!!!!!
+ 
+@@ -306,9 +306,9 @@
+ 
+ TWEET	28841445644	2010-10-27T00:27:06
+ TOKENS
+ @	@BettyMcSweets
+-D	that
++O	that
+ V	hurts
+ ,	!
+ 
+ TWEET	28928495933	2010-10-27T22:02:18
+@@ -530,9 +530,9 @@
+ A	off
+ ^	Thursday
+ ,	.
+ V	Is
+-D	that
++O	that
+ A	good
+ P	for
+ O	you
+ ,	?
+@@ -760,9 +760,9 @@
+ P	bout
+ X	all
+ D	the
+ N	things
+-D	that
++P	that
+ O	i
+ V	can
+ V	do
+ N	baby
+@@ -1536,9 +1536,9 @@
+ ,	.
+ O	I
+ R	just
+ V	made
+-D	this
++O	this
+ T	up
+ P	to
+ R	not
+ V	be
+@@ -2172,9 +2172,9 @@
+ 
+ TWEET	28868437117	2010-10-27T07:27:21
+ TOKENS
+ @	@topshelfcuzo
+-P	that
++D	that
+ ^	good
+ ^	times
+ N	episode
+ V	was
+@@ -2183,16 +2183,16 @@
+ 
+ TWEET	28867038098	2010-10-27T06:54:34
+ TOKENS
+ !	damm
+-D	that
++O	that
+ V	cutt
+ R	deep
+ ,	,
+ O	i
+ R	justt
+ V	noticedd
+-D	daht
++O	daht
+ ,	.....
+ 
+ TWEET	28841541917	2010-10-27T00:28:10
+ TOKENS
+@@ -2511,9 +2511,9 @@
+ 
+ TWEET	28861482692	2010-10-27T04:57:50
+ TOKENS
+ L	Wats
+-D	that
++O	that
+ ~	RT
+ @	@flacodf
+ ~	:
+ @	@JasminCalle
+@@ -2789,9 +2789,9 @@
+ ,	'
+ ^	Kool-Aid
+ ,	...
+ V	is
+-D	that
++O	that
+ N	Fruit
+ N	Punch
+ ,	?
+ ~	<
+@@ -3044,9 +3044,9 @@
+ !	yea
+ O	he
+ D	the
+ $	one
+-D	that
++P	that
+ V	came
+ P	to
+ D	the
+ N	car
+@@ -3419,9 +3419,9 @@
+ 
+ TWEET	28856287556	2010-10-27T03:31:54
+ TOKENS
+ !	Bwaahaha
+-D	that
++O	that
+ V	is
+ A	classic
+ ,	.
+ N	Scoreboard
+@@ -3601,9 +3601,9 @@
+ @	@PerezHilton
+ ~	:
+ @	@kylieminogue
+ V	Forget
+-D	that
++O	that
+ ,	!
+ L	I'm
+ A	ready
+ P	for
+@@ -4384,9 +4384,9 @@
+ N	day
+ 
+ TWEET	28859247371	2010-10-27T04:17:45
+ TOKENS
+-O	These
++D	These
+ N	refs
+ V	are
+ V	being
+ V	paid
+@@ -5157,9 +5157,9 @@
+ V	Hate
+ R	when
+ N	people
+ V	do
+-D	that
++O	that
+ P	for
+ D	no
+ N	reason
+ ,	.
+@@ -5629,9 +5629,9 @@
+ O	you
+ V	know
+ O	what
+ ,	?
+-D	This
++O	This
+ V	is
+ A	more
+ P	than
+ R	just
+@@ -6040,9 +6040,9 @@
+ $	1-0
+ ^	Heat
+ $	0-1
+ R	now
+-D	tht
++O	tht
+ V	is
+ R	how
+ O	you
+ V	start
+@@ -6406,9 +6406,9 @@
+ !	hey
+ E	:D
+ V	please
+ V	read
+-D	this
++O	this
+ P	for
+ O	me
+ ,	!
+ U	http://twitition.com/tiexm/
+@@ -6488,9 +6488,9 @@
+ V	can
+ D	a
+ N	nigga
+ V	stab
+-D	that
++O	that
+ ,	??"
+ E	;-p
+ #	#nowplaying
+ 
+@@ -7108,9 +7108,9 @@
+ ,	.
+ R	Why
+ O	you
+ V	say
+-D	that
++O	that
+ R	tho
+ ,	?
+ !	Haha
+ ,	!!
+@@ -7815,9 +7815,9 @@
+ ~	RT
+ @	@TeamMinajBuffNY
+ ~	:
+ @	@NICKIMINAJ
+-D	This
++O	This
+ V	is
+ D	my
+ A	favorite
+ N	screen
+@@ -9026,9 +9026,9 @@
+ A	such
+ D	a
+ N	comfort
+ P	for
+-D	some
++O	some
+ P	that
+ D	the
+ N	truth
+ V	has
+@@ -9173,9 +9173,9 @@
+ 
+ TWEET	28914803849	2010-10-27T18:42:57
+ TOKENS
+ V	Check
+-D	this
++O	this
+ T	out
+ ,	:
+ N	Menthol
+ N	Madness%3A
+@@ -9188,9 +9188,9 @@
+ 
+ TWEET	28931593505	2010-10-27T22:42:07
+ TOKENS
+ V	wouldn't
+-D	that
++O	that
+ V	be
+ V	fucked
+ T	up
+ P	if
+@@ -9277,9 +9277,9 @@
+ ^	Aaron
+ ,	!
+ !	Lol
+ !	Naw
+-D	this
++O	this
+ V	is
+ A	serious
+ ,	!
+ &	and
+@@ -9668,9 +9668,9 @@
+ O	u
+ V	need
+ P	2
+ V	c
+-D	this
++O	this
+ U	meat.org
+ ~	RT
+ @	@RepUrBoroughMag
+ ~	:
+@@ -9930,9 +9930,9 @@
+ TOKENS
+ ~	RT
+ @	@K0VERGIRL
+ ~	:
+-D	That
++O	That
+ V	has
+ P	to
+ V	kill
+ D	your
+@@ -10063,9 +10063,9 @@
+ P	from
+ D	my
+ N	gate
+ ,	,
+-D	this
++O	this
+ V	is
+ D	my
+ N	tweet
+ ,	,
+@@ -10087,9 +10087,9 @@
+ V	missing
+ $	two
+ N	labs
+ P	before
+-D	that
++O	that
+ ,	!
+ 
+ TWEET	28915345203	2010-10-27T18:51:05
+ TOKENS
+@@ -10543,9 +10543,9 @@
+ V	Have
+ N	#PR
+ N	pros
+ V	noticed
+-D	this
++O	this
+ P	like
+ N	#HR
+ N	pros
+ V	have
+@@ -12321,9 +12321,9 @@
+ A	most
+ V	are
+ D	the
+ N	ones
+-D	that
++P	that
+ V	are
+ R	hardest
+ P	2
+ V	get
+@@ -12703,9 +12703,9 @@
+ X	all
+ V	got
+ V	excited
+ P	for
+-D	this
++O	this
+ ,	????
+ 
+ TWEET	28851236031	2010-10-27T02:23:57
+ TOKENS
+@@ -12953,9 +12953,9 @@
+ !	Uhm
+ ,	??
+ ~	>>
+ ,	"
+-D	this
++O	this
+ R	also
+ V	means
+ A	more
+ N	lettters
+@@ -13324,9 +13324,9 @@
+ V	have
+ P	to
+ V	crash
+ P	for
+-D	that
++O	that
+ ,	-
+ O	I
+ V	hate
+ V	paying
+@@ -13608,9 +13608,9 @@
+ ,	!!!!
+ 
+ TWEET	28906291192	2010-10-27T16:43:21
+ TOKENS
+-D	that
++O	that
+ V	was
+ A	supposed
+ P	to
+ V	say
+@@ -14481,9 +14481,9 @@
+ V	feel
+ G	like_________
+ ,	....
+ !	yea
+-D	that
++O	that
+ 
+ TWEET	28841538930	2010-10-27T00:28:08
+ TOKENS
+ ~	RT
+@@ -15111,9 +15111,9 @@
+ V	need
+ P	to
+ V	get
+ P	on
+-D	that
++O	that
+ ~	RT
+ @	@JeffTheSigma
+ ~	:
+ O	I
+@@ -15608,9 +15608,9 @@
+ @	@shakingallah
+ @	@livingproofe
+ @	@joyike
+ V	Check
+-D	this
++O	this
+ T	out
+ G	->
+ A	High
+ N	Impact
+@@ -15651,9 +15651,9 @@
+ O	it
+ ,	.
+ N	Stuff
+ P	like
+-D	this
++O	this
+ V	doesn't
+ V	happen
+ R	often
+ ,	.
+@@ -16756,9 +16756,9 @@
+ V	Win
+ &	or
+ V	lose
+ P	if
+-D	this
++O	this
+ V	doesn't
+ V	prove
+ R	how
+ A	good
+@@ -16965,9 +16965,9 @@
+ ,	!
+ ~	RT
+ @	@oh_so_coco
+ ~	:
+-D	This
++O	This
+ V	is
+ V	going
+ P	to
+ V	be
+@@ -17099,9 +17099,9 @@
+ R	so
+ A	many
+ V	think
+ P	like
+-D	that
++O	that
+ ,	.
+ V	Doesn't
+ V	matter
+ P	if
+@@ -17190,9 +17190,9 @@
+ @	@bianca7022
+ ~	:
+ L	#howcome
+ N	everything
+-D	that
++P	that
+ V	looks
+ A	good
+ P	on
+ D	the
+@@ -17453,9 +17453,9 @@
+ A	sad
+ P	to
+ V	say
+ ,	,
+-D	that
++O	that
+ V	isnt
+ D	his
+ N	team
+ R	anymore
+@@ -17472,9 +17472,9 @@
+ N	friend
+ P	for
+ ^	Botox
+ &	and
+-D	both
++O	both
+ V	get
+ $	20%
+ P	OFF
+ ,	!!!!!
+@@ -17515,9 +17515,9 @@
+ D	any
+ @	@MacysInc
+ ,	!
+ V	RT
+-D	THIS
++O	THIS
+ &	&
+ V	Follow
+ P	to
+ V	#win
+@@ -17932,9 +17932,9 @@
+ TOKENS
+ @	@gcouros
+ O	I
+ V	see
+-D	that
++P	that
+ ,	,
+ R	regretfully
+ O	I
+ V	was
+@@ -18620,9 +18620,9 @@
+ ^	Houston
+ 
+ TWEET	28847687242	2010-10-27T01:40:38
+ TOKENS
+-D	This
++O	This
+ V	is
+ V	startin
+ P	to
+ V	get
+@@ -18705,9 +18705,9 @@
+ TOKENS
+ @	@WilliefknUnique
+ !	hahah
+ !	well
+-D	that
++O	that
+ D	a
+ A	diff
+ N	story
+ R	then
+@@ -18826,9 +18826,9 @@
+ V	like
+ P	to
+ V	discuss
+ R	where
+-D	this
++O	this
+ V	is
+ V	going
+ ,	...
+ 
+@@ -18843,9 +18843,9 @@
+ &	and
+ V	make
+ N	nachos
+ P	with
+-D	this
++O	this
+ R	probably
+ A	bad
+ P	for
+ O	me
+@@ -18909,9 +18909,9 @@
+ 
+ TWEET	28930458881	2010-10-27T22:27:51
+ TOKENS
+ !	well
+-D	that
++O	that
+ V	was
+ A	strange
+ ,	!
+ !	hahahahhaa
+@@ -19070,9 +19070,9 @@
+ N	times
+ U	http://twitpic.com/317itr
+ ~	<
+ V	love
+-D	this
++O	this
+ !	haha
+ !	heelllooo
+ 
+ TWEET	28866062033	2010-10-27T06:31:34
+@@ -19424,9 +19424,9 @@
+ V	of
+ V	swore
+ O	u
+ V	said
+-D	that
++O	that
+ N	yesterday
+ E	:/
+ !	lol
+ 
+@@ -19436,9 +19436,9 @@
+ O	I
+ V	get
+ V	started
+ P	on
+-D	this
++O	this
+ N	post
+ V	let
+ O	me
+ V	make
+@@ -19470,9 +19470,9 @@
+ ~	:
+ V	Are
+ O	you
+ A	SURE
+-D	this
++O	this
+ V	was
+ A	Big
+ $	3
+ P	vs
+@@ -19575,9 +19575,9 @@
+ P	on
+ N	something
+ A	other
+ P	than
+-D	this
++O	this
+ ,	.
+ 
+ TWEET	28937402937	2010-10-27T23:52:16
+ TOKENS
+@@ -19968,9 +19968,9 @@
+ V	was
+ V	gonna
+ P	in
+ P	on
+-D	that
++O	that
+ #	#TT
+ #	#MyExGirlfriend
+ ,	.
+ !	Lol
+@@ -20035,9 +20035,9 @@
+ P	with
+ D	a
+ N	view
+ P	like
+-D	that
++O	that
+ ,	.
+ #	#potsandpans
+ 
+ TWEET	28903857957	2010-10-27T16:12:46
+@@ -20490,9 +20490,9 @@
+ ,	...
+ &	But
+ O	i
+ V	like
+-D	that
++O	that
+ 
+ TWEET	28854315937	2010-10-27T03:03:57
+ TOKENS
+ ^	xnevershoutbrianna
+@@ -20570,9 +20570,9 @@
+ L	that's
+ R	pretty
+ A	hawt
+ V	is
+-D	that
++O	that
+ D	all
+ P	of
+ D	the
+ N	outfit
+@@ -20663,9 +20663,9 @@
+ V	gotta
+ N	team
+ P	that
+ V	does
+-D	that
++O	that
+ ,	?!?
+ O	Who
+ ,	??
+ 
+@@ -20681,9 +20681,9 @@
+ ^	#GlareX2Mender
+ N	products
+ ,	!
+ D	All
+-D	this
++O	this
+ P	in
+ $	one
+ N	#contest
+ ,	!
+@@ -22974,9 +22974,9 @@
+ ,	..
+ &	and
+ R	why
+ R	not
+-D	that
++O	that
+ V	seems
+ P	like
+ D	a
+ A	fun
+@@ -23776,9 +23776,9 @@
+ ~	RT
+ @	@LiveSquadEnDee
+ ~	:
+ !	Nah
+-D	that
++O	that
+ ^	tyrone
+ ^	biggems
+ ~	RT
+ @	@PNUTDABOY
+@@ -23892,9 +23892,9 @@
+ L	I'm
+ V	going
+ P	to
+ V	put
+-D	this
++O	this
+ P	on
+ D	my
+ N	resume
+ ,	.
+@@ -24008,9 +24008,9 @@
+ TWEET	28911822101	2010-10-27T17:59:18
+ TOKENS
+ @	@yearoftherat
+ V	found
+-D	this
++O	this
+ U	http://www.youtube.com/user/topcent#p/a/u/2/0qqU7OVFdsw
+ O	he
+ V	looks
+ P	like
+@@ -24507,9 +24507,9 @@
+ O	WHAT
+ D	THE
+ N	FUCK
+ V	IS
+-D	THAT
++O	THAT
+ G	---
+ G	>
+ U	http://twitpic.com/30vx7s
+ 
+@@ -24699,9 +24699,9 @@
+ ,	,
+ L	it's
+ D	the
+ N	mint
+-D	that
++P	that
+ V	makes
+ O	it
+ A	great
+ ,	.
+@@ -25089,9 +25089,9 @@
+ TWEET	28889266242	2010-10-27T13:23:23
+ TOKENS
+ !	Ooh
+ ,	,
+-D	That
++O	That
+ V	Was
+ N	#champ
+ P	Of
+ O	Me
+@@ -25131,9 +25131,9 @@
+ @	@vicckiee
+ !	Yea
+ O	I
+ V	saw
+-D	that
++O	that
+ P	on
+ D	my
+ N	dashboard
+ &	&
+@@ -25412,9 +25412,9 @@
+ @	@OhAshleyMarieee
+ L	ima
+ V	jump
+ P	in
+-D	this
++O	this
+ E	:)
+ R	toooo
+ A	funny
+ ,	!
+@@ -25608,9 +25608,9 @@
+ P	if
+ O	they
+ A	worse
+ P	then
+-D	those
++O	those
+ R	then
+ !	yea
+ ,	..
+ N	trash
+@@ -25824,9 +25824,9 @@
+ TOKENS
+ L	It's
+ N	days
+ P	like
+-D	this
++O	this
+ R	where
+ O	I
+ R	literally
+ V	have
+@@ -26277,9 +26277,9 @@
+ N	back
+ V	hurts
+ ,	.
+ P	So
+-D	that
++O	that
+ V	means
+ ,	,
+ L	he's
+ V	gonna
+@@ -26393,10 +26393,10 @@
+ TOKENS
+ !	Oh
+ ,	..
+ P	For
+-D	those
+-D	that
++O	those
++P	that
+ V	are
+ A	confused
+ ,	..
+ D	The
+@@ -26474,9 +26474,9 @@
+ ,	?
+ O	You
+ V	can't
+ V	blame
+-D	that
++O	that
+ P	on
+ O	me
+ ,	...
+ O	I
+@@ -26578,9 +26578,9 @@
+ @	@angiemonsterboo
+ O	you
+ V	don't
+ V	question
+-D	that
++O	that
+ ,	.
+ R	ever
+ ,	.
+ 
+@@ -27032,9 +27032,9 @@
+ TOKENS
+ ^	Lamar
+ V	Gonna
+ V	get
+-D	some
++O	some
+ N	tonite
+ !	huh
+ ,	.
+ O	he
+@@ -27207,9 +27207,9 @@
+ &	but
+ O	I
+ V	don't
+ V	know
+-D	that
++O	that
+ R	firsthand
+ ,	.
+ U	http://ow.ly/302YZ
+ 
+@@ -27234,9 +27234,9 @@
+ D	the
+ N	weather
+ V	is
+ P	like
+-D	this
++O	this
+ P	b/c
+ ^	God
+ V	loves
+ O	me
+@@ -27910,9 +27910,9 @@
+ N	sciences
+ ,	.
+ O	You
+ V	got
+-D	this
++O	this
+ ,	.
+ V	Don't
+ V	stress
+ ,	.
+@@ -28042,9 +28042,9 @@
+ ,	!
+ N	nothing
+ A	wrong
+ P	with
+-D	that
++O	that
+ E	:)
+ 
+ TWEET	28917680059	2010-10-27T19:26:13
+ TOKENS
+@@ -28062,9 +28062,9 @@
+ ,	.
+ Z	Cincinnati's
+ V	charges
+ P	for
+-D	both
++O	both
+ ,	.
+ V	Surprised
+ O	they
+ V	don't
+@@ -28223,9 +28223,9 @@
+ ,	!
+ O	We
+ V	talk
+ P	about
+-D	this
++O	this
+ D	every
+ A	other
+ N	day
+ ,	!
+@@ -29058,9 +29058,9 @@
+ N	tonight
+ ,	?
+ L	I'd
+ V	like
+-D	that
++O	that
+ ,	.
+ ~	RT
+ @	@Togishi
+ ~	:
+@@ -29389,9 +29389,9 @@
+ TOKENS
+ A	good
+ N	luck
+ P	on
+-D	that
++O	that
+ 
+ TWEET	28867904175	2010-10-27T07:14:51
+ TOKENS
+ @	@JessicaNorthey
+@@ -30092,9 +30092,9 @@
+ P	to
+ V	watch
+ D	the
+ N	skank
+-D	that
++P	that
+ V	took
+ D	my
+ N	parking
+ N	spot
+@@ -30126,9 +30126,9 @@
+ N	girl
+ O	I
+ V	wouldn't
+ V	mind
+-D	tht
++O	tht
+ 
+ TWEET	28920275319	2010-10-27T20:05:30
+ TOKENS
+ @	@monykassem
+@@ -30323,9 +30323,9 @@
+ ,	!
+ R	Where
+ O	they
+ V	do
+-D	dat
++O	dat
+ P	at
+ ,	?
+ 
+ TWEET	28932520435	2010-10-27T22:53:35
+@@ -30918,9 +30918,9 @@
+ N	weight
+ N	loss
+ ,	,
+ V	try
+-D	this
++O	this
+ ,	.
+ U	http://bit.ly/cAx1Ff
+ 
+ TWEET	28858325177	2010-10-27T04:02:46
+@@ -30991,9 +30991,9 @@
+ D	the
+ N	game
+ V	looks
+ P	like
+-D	this
++O	this
+ ,	...
+ #	#womp
+ ,	..
+ L	im
+@@ -31324,9 +31324,9 @@
+ TOKENS
+ @	@GreenEyezzzzz
+ @	@bjr70
+ !	well
+-D	that
++O	that
+ V	sucks
+ ,	!!!
+ R	now
+ L	idk
+@@ -31341,9 +31341,9 @@
+ TOKENS
+ !	Lol
+ @	@latenitedame
+ V	was
+-D	that
++O	that
+ A	mean
+ ,	?
+ O	It
+ V	warm't
+@@ -31470,9 +31470,9 @@
+ !	Ok
+ ,	..
+ L	Let's
+ V	shut
+-D	this
++O	this
+ T	down
+ ,	!
+ ^	#celtics
+ ,	.
+@@ -31590,9 +31590,9 @@
+ O	I
+ V	will
+ R	never
+ V	get
+-D	this
++O	this
+ ,	.
+ 
+ TWEET	28856278637	2010-10-27T03:31:46
+ TOKENS
+@@ -31645,9 +31645,9 @@
+ A	younger
+ N	self
+ V	dancing
+ P	to
+-D	that
++O	that
+ 
+ TWEET	28932482136	2010-10-27T22:53:07
+ TOKENS
+ A	Fake
+@@ -31922,9 +31922,9 @@
+ TWEET	28930171932	2010-10-27T22:24:08
+ TOKENS
+ @	@Gallis_
+ V	was
+-D	that
++O	that
+ D	the
+ A	wrong
+ N	context
+ ,	?
+@@ -31962,9 +31962,9 @@
+ O	u
+ V	have
+ N	issues
+ P	with
+-D	that
++O	that
+ V	use
+ N	condom
+ ~	RT
+ @	@Nicolie_Ravioli
