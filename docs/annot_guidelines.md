@@ -213,7 +213,8 @@ use the following test:
 Some other verb particle examples:
 * what's going on/T
 * check it out/T
-* shout out/T (abbreviations like `s/o` and `SO` are tagged as V) 
+* shout out/T
+  - abbreviations like _s/o_ and _SO_ are tagged as `V`
 
 _this_ and _that_: Demonstratives and Relativizers
 ------------------------------------
@@ -289,10 +290,10 @@ an exclamation, tagged as `!`; _idk_ or _iono_ (I don’t know) can be tagged as
 Miscellaneous kinds of abbreviations are tagged with `G`:
 * _ily_ (I love you)
 * _wby_ (what about you)
-* _buy'em_ (buy them)
 * _mfw_ (my face when)
 
 <!-- removed let's from list above since we tag it as L. was: _let's_ (let us) -->
+<!-- TODO: buy'em should also be tagged as L, but in the data it is V. -->
 
 Metalinguistic Mentions
 -----------------------
