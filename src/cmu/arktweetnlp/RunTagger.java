@@ -238,9 +238,10 @@ public class RunTagger {
 	 * assume mSent's labels hold the tagging.
 	 */
 	public void outputJustTagging(Sentence lSent, ModelSentence mSent) {
+		// mSent might be null!
 
 		if (outputFormat.equals("conll")) {
-			for (int t=0; t < mSent.T; t++) {
+			for (int t=0; t < lSent.T(); t++) {
 				outputStream.printf("%s\t%s", 
 						lSent.tokens.get(t),  
 						tagger.model.labelVocab.name(mSent.labels[t]));
@@ -264,6 +265,7 @@ public class RunTagger {
 	 */
 	public void outputPrependedTagging(Sentence lSent, ModelSentence mSent, 
 			boolean suppressTags, String inputLine) {
+		// mSent might be null!
 		
 		int T = lSent.T();
 		String[] tokens = new String[T];
