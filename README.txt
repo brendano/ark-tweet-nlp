@@ -26,6 +26,7 @@ Version 0.3 of the tagger is much faster and more accurate.  Please see the
 tech report on the website for details.
 
 For the Java API, see src/cmu/arktweetnlp; especially Tagger.java.
+See also documentation in docs/.
 
 This tagger is described in the following two papers, available at the website.
 Please cite these if you write a research paper using this software.

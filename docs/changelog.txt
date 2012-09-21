@@ -1,7 +1,7 @@
 Changes for the tagger
 
 
-Version 0.3 (2012-09-19)
+Version 0.3 (2012-09-21)
 
 * 40 times faster: completely new implementation
 
