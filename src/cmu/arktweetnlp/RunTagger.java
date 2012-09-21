@@ -87,8 +87,7 @@ public class RunTagger {
 			runTaggerInEvalMode();
 			return;
 		} 
-		assert (inputFormat.equals("json") || inputFormat.equals("text"));
-		
+
 		JsonTweetReader jsonTweetReader = new JsonTweetReader();
 		
 		LineNumberReader reader = new LineNumberReader(BasicFileIO.openFileToReadUTF8(inputFilename));
@@ -301,7 +300,7 @@ public class RunTagger {
 
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException {        
-		if (args.length == 0 || args[0].equals("-h") || args[0].equals("--help")) {
+		if (args.length > 0 && (args[0].equals("-h") || args[0].equals("--help"))) {
 			usage();
 		}
 
@@ -349,13 +348,15 @@ public class RunTagger {
 				usage();                
 			}
 		}
-		if (!tagger.justTokenize && tagger.modelFilename == null) {
-			usage("Need to specify model");
-		}
-
+		
 		if (args.length - i > 1) usage();
-		if (args.length <= i) usage();
-		tagger.inputFilename = args[i];
+		if (args.length == i || args[i].equals("-")) {
+			System.err.println("Listening on stdin for input.  (-h for help)");
+			tagger.inputFilename = "/dev/stdin";
+		} else {
+			tagger.inputFilename = args[i];
+		}
+		
 		tagger.finalizeOptions();
 		
 		tagger.runTagger();		
@@ -384,9 +385,9 @@ public class RunTagger {
 
 	public static void usage(String extra) {
 		System.out.println(
-"RunTagger [options] <ExamplesFilename>" +
+"RunTagger [options] [ExamplesFilename]" +
 "\n  runs the CMU ARK Twitter tagger on tweets from ExamplesFilename, " +
-"\n  writing taggings to standard output." +
+"\n  writing taggings to standard output. Listens on stdin if no input filename." +
 "\n\nOptions:" +
 "\n  --model <Filename>        Specify model filename. (Else use built-in.)" +
 "\n  --just-tokenize           Only run the tokenizer; no POS tags." +
