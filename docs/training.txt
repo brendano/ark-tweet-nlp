@@ -7,7 +7,7 @@ Evaluating the tagger
 
   myjava cmu.arktweetnlp.RunTagger --input-format conll --model $modelfile $testfile
 
-For example, this replicates the Owoputi and O'Connor (2012) results:
+For example, this replicates the tech report (Owoputi et al 2012) results:
   myjava cmu.arktweetnlp.Train data/twpos-data-v0.3/oct27.conll mymodel
   myjava cmu.arktweetnlp.RunTagger cmu.arktweetnlp.RunTagger --input-format conll --model mymodel data/twpos-data-v0.3/daily547.conll > pred
 
