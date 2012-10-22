@@ -98,11 +98,12 @@ public class Twokenize {
     // @aliciakeys Put it in a love song :-))
     // @hellocalyclops =))=))=)) Oh well
 
-    static String s1 = "(♥|0|o|°|v|\\$|t|x|\\.|;|\\u0CA0|@|ʘ|•|・|◕|\\^|¬|\\*)";
-    static String s2 = "(?:[\\.]|[_-]+)\\2";
+    static String bfLeft = "(♥|0|o|°|v|\\$|t|x|\\.|;|\\u0CA0|@|ʘ|•|・|◕|\\^|¬|\\*)";
+    static String bfCenter = "(?:[\\.]|[_-]+)";
+    static String bfRight = "\\2";
     static String s3 = "(?:--['\"])";
     static String s4 = "(?:<|&lt;|>|&gt;)[\\._-]+(?:<|&lt;|>|&gt;)";
-    static String basicface = "(?:(?i)" +s1+s2+ ")|" +s3+ "|" + s4;
+    static String basicface = "(?:(?i)" +bfLeft+bfCenter+bfRight+ ")|" +s3+ "|" + s4;
 
     static String eeLeft = "[＼\\\\ƪԄ\\(（<>;ヽ\\-=~\\*]+";
     static String eeRight= "[\\-=\\);'\\u0022<>ʃ）/／ノﾉ丿╯σっµ~\\*]+";
