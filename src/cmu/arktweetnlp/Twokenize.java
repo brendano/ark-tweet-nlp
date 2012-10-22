@@ -98,9 +98,14 @@ public class Twokenize {
     // @aliciakeys Put it in a love song :-))
     // @hellocalyclops =))=))=)) Oh well
 
-    static String basicface = "(?:(?i)(♥|0|o|°|v|\\$|t|x|\\.|;|\\u0CA0|@|ʘ|•|・|◕|\\^|¬|\\*)(?:[\\.]|[_-]+)\\2)|(?:--['\"])"+
-    		"|(?:<|&lt;|>|&gt;)[\\._-]+(?:<|&lt;|>|&gt;)";
+    static String s1 = "(♥|0|o|°|v|\\$|t|x|\\.|;|\\u0CA0|@|ʘ|•|・|◕|\\^|¬|\\*)";
+    static String s2 = "(?:[\\.]|[_-]+)\\2";
+    static String s3 = "(?:--['\"])";
+    static String s4 = "(?:<|&lt;|>|&gt;)[\\._-]+(?:<|&lt;|>|&gt;)";
+    static String basicface = "(?:(?i)" +s1+s2+ ")|" +s3+ "|" + s4;
+
     static String eastEmote = "[＼\\\\ƪԄ\\(（<>;ヽ\\-=~\\*]+(?:"+basicface+"|[^A-Za-z0-9\\s\\(\\)\\*:=-])+[\\-=\\);'\\u0022<>ʃ）/／ノﾉ丿╯σっµ~\\*]+";
+    
     public static String emoticon = OR(
             // Standard version  :) :( :] :D :P
     		"(?:>|&gt;)?" + OR(normalEyes, wink) + OR(noseArea,"[Oo]") + 
