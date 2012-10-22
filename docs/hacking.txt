@@ -1,6 +1,10 @@
 This requires the source checkout from GitHub,
 e.g. https://github.com/brendano/ark-tweet-nlp
 
+The checkout should have all necessary resources EXCEPT a trained model.  One
+can be downloaded from http://www.ark.cs.cmu.edu/TweetNLP (it is packaged with
+the released version).
+
 Setting up Eclipse
 ==================
 
