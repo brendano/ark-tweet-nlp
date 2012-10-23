@@ -16,3 +16,4 @@ mod/
 target/
 bin/
 *.bak
+dependency-reduced-pom.xml

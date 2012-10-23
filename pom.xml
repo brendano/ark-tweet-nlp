@@ -1,14 +1,132 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>edu.cmu.cs.lti</groupId>
-    <artifactId>ark-tweet-nlp-with-deps</artifactId>
-    <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
-    <properties>
+    <groupId>edu.cmu.cs</groupId>
+    <artifactId>ark-tweet-nlp</artifactId>
+    <packaging>jar</packaging>
+    <version>0.3</version>
+    <name>CMU ARK TweetNLP: Twitter POS tagger</name>
+    <url>http://www.ark.cs.cmu.edu/TweetNLP/</url>
+    
+    <dependencies>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.4</version>
+        </dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.3</version>
+		</dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math</artifactId>
+            <version>2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.twitter</groupId>
+            <artifactId>twitter-text</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>3.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.twitter.common</groupId>
+            <artifactId>text</artifactId>
+            <version>0.1.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>10.0.1</version>
+        </dependency>
+        <dependency>
+		  <groupId>com.fasterxml.jackson.core</groupId>
+		  <artifactId>jackson-databind</artifactId>
+		  <version>2.0.0</version>
+		</dependency>
+		<!-- The gnu trove dependency is still managed through the lib folder 
+		<dependency>
+		<groupId>net.sf.trove4j</groupId>
+		<artifactId>trove4j</artifactId>
+		<version>3.0.3</version>
+		</dependency> -->
+		
+		<!-- local dependencies, install them through install_local_dependencies.sh -->		
+		<dependency>
+		<groupId>${project.groupId}</groupId>
+		<artifactId>edu.berkeley.nlp.posBerkeley</artifactId>
+		<version>custom</version>
+		</dependency>
+		<dependency>
+		<groupId>${project.groupId}</groupId>
+		<artifactId>edu.stanford.nlp.postagger</artifactId>
+		<version>2010-05-26</version>
+		</dependency>
+		<dependency>
+            <groupId>${project.groupId}</groupId>
+			<artifactId>gnu.trove</artifactId>
+			<version>3.0.0a5</version>
+		</dependency>
+    </dependencies>
+    <build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.0</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <archive>
+                        <index>true</index>
+                        <manifest>
+                            <mainClass>cmu.arktweetnlp.RunTagger</mainClass>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    
+	<repositories>
+		<repository>
+			<id>JBoss</id>
+			<name>jboss-public-repository</name>
+			<url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+		</repository>
+		<repository>
+			<id>twitter</id>
+			<url>http://maven.twttr.com/</url>
+		</repository>
+	</repositories>
+	
+	<properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    <modules>
-      <module>ark-tweet-nlp</module>
-    </modules>
 </project>
