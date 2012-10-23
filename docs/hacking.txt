@@ -1,9 +1,26 @@
 This requires the source checkout from GitHub,
 e.g. https://github.com/brendano/ark-tweet-nlp
 
+
+To compile
+==========
+
+Type "mvn package"
+
+
+Resources
+=========
+
 The checkout should have all necessary resources EXCEPT a trained model.  One
 can be downloaded from http://www.ark.cs.cmu.edu/TweetNLP (it is packaged with
 the released version).
+
+The resource files, including the model, word clusters, etc. go into
+ark-tweet-nlp/src/main/resources/cmu/arktweetnlp/
+
+Then the resource loader can find them.  "mvn package" puts them into jar file
+too.
+
 
 Setting up Eclipse
 ==================
@@ -28,11 +45,3 @@ files (and in fact this happens automatically), then switch to the terminal to
 run the tagger.
 
 
-Resources
-=========
-
-The resource files, including the model, word clusters, etc. go into
-ark-tweet-nlp/src/main/resources/cmu/arktweetnlp/
-
-Then the resource loader can find them.  "mvn package" puts them into jar file
-too.
