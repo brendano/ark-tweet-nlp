@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=0.3
+VERSION=0.3.1
 DIR=release/ark-tweet-nlp-$VERSION
 
 set -eux
