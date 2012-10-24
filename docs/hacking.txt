@@ -5,7 +5,8 @@ e.g. https://github.com/brendano/ark-tweet-nlp
 To compile
 ==========
 
-Type "mvn package"
+Type "mvn package".  It should produce a final packaged jar here:
+ark-tweet-nlp/target/bin/ark-tweet-nlp-0.3.jar
 
 
 Resources
@@ -13,13 +14,12 @@ Resources
 
 The checkout should have all necessary resources EXCEPT a trained model.  One
 can be downloaded from http://www.ark.cs.cmu.edu/TweetNLP (it is packaged with
-the released version).
-
-The resource files, including the model, word clusters, etc. go into
+the released version).  Put it into this directory:
 ark-tweet-nlp/src/main/resources/cmu/arktweetnlp/
 
-Then the resource loader can find them.  "mvn package" puts them into jar file
-too.
+... then when you type "mvn package", it will be put into the jar file as a
+loadable resource.  (All resources should go in this directory; the source
+checkout includes word clusters and others.)
 
 
 Setting up Eclipse
