@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=0.3.1
+VERSION=0.3.2
 DIR=release/ark-tweet-nlp-$VERSION
 
 set -eux
@@ -31,3 +31,4 @@ d=$(basename $DIR)
 # (cd $(dirname $DIR) && zip -r $d.zip $d)
 (cd $(dirname $DIR) && tar czf $d.tgz $d)
 
+cd $DIR && scripts/simple_tests.sh
