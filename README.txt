@@ -1,16 +1,19 @@
 CMU ARK Twitter Part-of-Speech Tagger v0.3
 http://www.ark.cs.cmu.edu/TweetNLP/
 
-Basic usage
-===========
+Basic usage for released version
+================================
 
-Requires Java 6.  To run the tagger from a unix shell:
+Requires Java 6.  To run the tagger on example data, try:
+
+    java -Xmx500m -jar ark-tweet-nlp-0.3.2.jar examples/example_tweets.txt
+
+where the jar file is the one included in the release download.
+The tagger outputs tokens, predicted part-of-speech tags, and confidences.
+Use the "--help" flag for more information.  On Unix systems, "./runTagger.sh"
+invokes the tagger; e.g.
 
     ./runTagger.sh examples/example_tweets.txt
-
-The tagger outputs tokens, predicted part-of-speech tags, and confidences.
-See:
-
     ./runTagger.sh --help
 
 We also include a script that invokes just the tokenizer:
@@ -18,6 +21,8 @@ We also include a script that invokes just the tokenizer:
     ./twokenize.sh examples/example_tweets.txt
 
 You may have to adjust the parameters to "java" depending on your system.
+
+If instead you are using a source checkout, see docs/hacking.txt for info.
 
 Information
 ===========
