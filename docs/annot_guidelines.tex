@@ -1,0 +1,417 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage{annot_guidelines}
+
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage{textcomp}
+
+\usepackage{covington}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{amsfonts,eucal,amsbsy,amsopn,amssymb,amsthm}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{color}
+
+%\usepackage{caption}
+%\renewcommand{\captionfont}{\small}
+%\setlength{\abovecaptionskip}{0em}
+%\setlength{\belowcaptionskip}{-1.5em}
+% Shay's environment for itemized lists
+\newenvironment{itemizesquish}{\begin{list}{\labelitemi}{\setlength{\itemsep}{0em}\setlength{\labelwidth}{0.5em}\setlength{\leftmargin}{\labelwidth}\addtolength{\leftmargin}{\labelsep}}}{\end{list}}
+
+\newcommand{\kpgcomment}[1]{\textcolor{green}{\bf \small [ #1 --KPG]}}
+\newcommand{\nascomment}[1]{\textcolor{blue}{\bf \small [ #1 --NAS]}}
+\newcommand{\finalversion}[1]{}
+\newcommand{\ignore}[1]{}
+
+\newcommand{\vect}[1]{\mbox{\boldmath $#1$}}
+
+\newcommand{\figsquish}{\opt{naacl}{\vspace{-1.1em}}}
+
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{argmin}
+
+\setlength{\doublerulesep}{\arrayrulewidth}
+
+\title{Annotation Guidelines for Part-of-Speech Tagging\\ of Online Conversational Text}
+
+\title{Annotation Guidelines for Twitter Part-of-Speech Tagging\\Version 0.3 (March 2013)}
+\author{Kevin Gimpel \ \ \ Nathan Schneider \ \ \ Brendan O'Connor \\
+Data and references are available at:
+\url{http://www.ark.cs.cmu.edu/TweetNLP/}
+ }
+
+% \\
+%CMU-LTI-10-008 \\
+% \\
+% \\
+% \\
+%Language Technologies Institute\\
+%School of Computer Science \\
+%Carnegie Mellon University \\
+%5000 Forbes Avenue, Pittsburgh, PA 15213 \\
+%{\tt www.lti.cs.cmu.edu} \\
+% \\
+% \\
+% \\
+%{\tt \{kgimpel,nasmith\}@cs.cmu.edu}
+%}
+
+%\date{March 2, 2013}
+
+\begin{document}
+\maketitle
+%\newpage
+
+\section{Introduction}
+
+Online conversational text differs markedly from traditional written genres like newswire, 
+including in ways that bear on linguistic analysis schemes. Here we describe part-of-speech (POS) annotation guidelines for online conversational text, using the Twitter POS tagset from \newcite{gimpel-11}.
+That paper introduced a tagset and presented experimental 
+results for a supervised tagger trained on manually-annotated tweets, but no explicit tagging guidelines were presented. 
+
+In this document we provide the set of annotation guidelines that were used for manually tagging the new \textsc{Daily547} Twitter data set (as discussed in section 5 of \newcite{owoputi2013})
+and for fixing inconsistencies Gimpel et al.'s original data set.
+The new dataset has been released as version 0.3 at: \\ \url{http://www.ark.cs.cmu.edu/TweetNLP/}
+
+%Table 1 of \newcite{gimpel-11} provides an overview of our 25 tags. Each is represented with a single ASCII symbol. In brief:
+The 25 tags are:
+
+%\newenvironment{itemizesquish}{\begin{list}{\labelitemi}{\setlength{\itemsep}{0em}\setlength{\labelwidth}{0.5em}\setlength{\leftmargin}{\labelwidth}\addtolength{\leftmargin}{\labelsep}}}{\end{list}}
+\newcommand{\tagname}[1]{\textbf{#1}}
+
+\hspace{-0.3in}
+\begin{tabular}{|p{0.5\textwidth}|p{0.5\textwidth}|}
+\hline\hline
+\begin{itemizesquish}
+\item Nominal
+\begin{itemizesquish}
+\item[] \tagname{N} \--- common noun  
+\item[] \tagname{O} \--- pronoun (personal/WH; not possessive)
+\item[] \verb|^| \--- proper noun  
+\item[] \tagname{S} \--- nominal + possessive  
+\item[] \tagname{Z} \--- proper noun + possessive  
+\end{itemizesquish}
+\item Other open-class words
+\begin{itemizesquish}
+\item[] \tagname{V} \--- verb incl. copula, auxiliaries  
+\item[] \tagname{A} \--- adjective  
+\item[] \tagname{R} \--- adverb  
+\item[] \tagname{!} \--- interjection  
+\end{itemizesquish}
+\item Other closed-class words
+\begin{itemizesquish}
+\item[] \tagname{D} \--- determiner  
+\item[] \tagname{P} \--- pre- or postposition, or subordinating conjunction 
+\item[] \tagname{\&} \--- coordinating conjunction  
+\item[] \tagname{T} \--- verb particle  
+\item[] \tagname{X} \--- existential \emph{there}, predeterminers  
+\end{itemizesquish}
+\end{itemizesquish} 
+& 
+\begin{itemizesquish}
+\item Twitter/online-specific
+\begin{itemizesquish}
+\item[] \tagname{\#} \--- hashtag (indicates topic/category for tweet)  
+\item[] \tagname{@} \--- at-mention (indicates another user as a recipient of a tweet)  
+\item[]  \tagname{\texttildelow} \ \ \--- discourse marker, indications of continuation of a message across multiple tweets
+\item[] \tagname{U} \--- URL or email address  
+\item[] \tagname{E} \--- emoticon  
+\end{itemizesquish}
+\item Miscellaneous
+\begin{itemizesquish}
+\item[] \tagname{\$} \--- numeral  
+\item[] \tagname{,} \--- punctuation  
+\item[] \tagname{G} \--- other abbreviations, foreign words, possessive endings, symbols, garbage
+\end{itemizesquish}
+\item Other compounds
+\begin{itemizesquish}
+\item[] \tagname{L} \--- nominal + verbal (e.g. \emph{i'm}), verbal + nominal (\emph{let's}, \emph{lemme})  
+\item[] \tagname{M} \--- proper noun + verbal  
+\item[] \tagname{Y} \--- X + verbal  
+\end{itemizesquish}
+\end{itemizesquish}
+\\ \hline\hline
+\end{tabular}
+
+
+\noindent
+Compound tags are used because tokenization is difficult and sometimes counterproductive for the nonstandard orthographic forms that are commonplace in online conversational text; see section 5.1 of \newcite{owoputi2013}.
+%Since our tokenization scheme avoids splitting most surface words, we opt for complex parts of speech where necessary; for instance, \emph{Noah’s} would receive the `Z` (proper noun + possessive) tag.
+We discuss challenges of dealing with tokenization in the next section and then continue our discussion of POS annotation in the remaining sections.
+
+\section{Tokenization}
+
+When multiple words are written together without spaces, or when there are spaces between all characters of a word, or when the tokenizer fails to split words, the resulting tokens are tagged as `G'. This is illustrated by the bold tokens in the following examples:
+
+\begin{itemize}
+\item[] It's Been Coldd :/ \textbf{iGuess} It's Better Than Beingg Hot Tho . Where Do Yuhh Live At ? @anonuser
+\item[] This year\^{a}s almond crop is a great one . And the crop is being shipped fresh to \textbf{you\^{a}\v{S}Now} !
+\item[] RT @anonuser Um ..... \#TeamHeat ........ wut Happend ?? Haha \textless == \#TeamCeltics showin that ass what's \textbf{good...That's} wat happened !!! LMAO
+\item[] \#uWasCoolUntil you unfollowed me ! \textbf{R E T W E E T} if you Hate when people do that for no reason .
+\end{itemize}
+
+%We decided not to manually fix tokenization errors before POS annotation. We made this decision because we want to be able to run our tagger on new text that is tokenized automatically, so we need to \emph{train} the tagger on annotated data that is tokenized in the same way.
+
+\section{Penn Treebank Conventions}
+
+Generally, we followed the Penn Treebank (PTB; Marcus et al., 1993)\nocite{marcus-93b} Wall Street Journal conventions in determining parts of speech. 
+However, there are many inconsistencies in the PTB annotations. We attempted to follow the majority convention for a particular use of a word, but in some cases we did not. 
+Specific cases which caused difficulty for annotators or necessitated a departure from the PTB 
+approach are discussed below.
+
+\subsection{Gerunds and Participles}
+
+Verb forms are nearly always given a verbal tag in the PTB (VBG for \emph{-ing} forms, VBD for \emph{-ed} forms), so we generally tag them as `V' in our dataset. 
+However, PTB sometimes tags as nouns or adjectives words such as \emph{upcoming}, \emph{annoying}, \emph{amazing}, \emph{scared}, \emph{related} (as in \emph{the related article}), and \emph{unexpected}. 
+We follow the PTB in tagging these as adjectives or nouns, appropriately.
+
+\subsection{Numbers and Values}
+
+\begin{itemize}
+\item \textbf{Cardinal numbers} are tagged as `\$'.
+\item \textbf{Ordinal numbers} are typically tagged as adjectives, following the PTB, except for cases like 
+\emph{28th October}, in which \emph{28th} is tagged as `\$'.
+\item \textbf{Times}: Following the Treebank, \emph{A.M.} and \emph{P.M.} are common nouns, while time zones (\emph{EST}, etc.) are proper nouns.
+\item \textbf{Days, months, and seasons}: Like the PTB, days of the week and months of the year are always tagged as proper nouns, while seasons are common nouns.
+\item \textbf{Street addresses}: We follow the PTB convention of tagging numbers (house numbers, street numbers, and zip codes) as `\$' and all other words in the address as proper nouns, like in the following PTB example: \emph{153/CD East/NNP 53rd/CD St./NNP}. 
+  
+However, this convention is not entirely consistent in the PTB. Certain street numbers in the PTB are tagged as proper nouns: \emph{Fifth/NNP Ave/NNP}
+
+Annotators are to use their best judgment in tagging street numbers.
+\item \textbf{Cardinal directions}: tokens such as \emph{east} and \emph{NNW} when referred to in isolation (not as a modifier or part of a name) are tagged as common nouns.
+\item \textbf{Units of measurement} are common nouns, even if they come from a person's name (like \emph{Celsius}).
+\end{itemize}
+
+\subsection{Time and Location Nouns Modifying Verbs}
+
+In the PTB, time and location nouns (words like \emph{yesterday}/\emph{today}/\emph{tomorrow}, \emph{home}/\emph{outside}, etc.) that modify verbs are inconsistently labeled. 
+The words \emph{yesterday}/\emph{today}/\emph{tomorrow} are nearly always tagged as nouns, even when modifying verbs.
+For example, in the PTB \emph{today} is tagged as NN 336 times and RB once. We note, however, that sometimes 
+the parse structure can be used to disambiguate the NN tags. When used as an adverb, \emph{today} is often 
+the sole child of an NP-TMP, e.g.,
+\begin{verbatim}
+(NP-SBJ (DT These) (JJ high) (NNS rollers) )
+(VP (VBD took) 
+    (NP (DT a) (JJ big) (NN bath) )
+    (NP-TMP (NN today) ))
+\end{verbatim}
+When used as a noun, it is often the sole child of an NP, e.g.,
+\begin{verbatim}
+(PP-TMP (IN until) (NP (NN today) ))
+\end{verbatim}
+Since we are not annotating parse structure, it is less clear what to do with our data. In attempting to be consistent with the PTB, we typically tagged \emph{today} as a noun. 
+
+The PTB annotations are less clear for words like \emph{home}. Of the 24 times that \emph{home} appears as the sole child under a \emph{DIR} (direction) nonterminal, it is annotated as:
+\begin{itemize}
+\item \texttt{(ADVP-DIR (NN home) )} 14 times
+\item \texttt{(ADVP-DIR (RB home) )} 6 times
+\item \texttt{(NP-DIR (NN home) )} 3 times
+\item \texttt{(NP-DIR (RB home) )} 1 time
+\end{itemize}
+
+Manual inspection of the 24 occurrences revealed no discernible difference in usage that would 
+warrant these differences in annotation. As a result of these inconsistencies, we decided to let 
+annotators use their best judgment when annotating these types of words in tweets, 
+asking them to refer to the PTB and to previously-annotated data to improve consistency. 
+
+\subsection{Names}
+
+In general, every noun within a proper name should be tagged as a proper noun (`\verb|^|'):
+\begin{itemize}
+\item Jesse/\textasciicircum\ and/\&\ the/D Rippers/\textasciicircum
+\item the/D California/\textasciicircum\ Chamber/\textasciicircum\ of/P Commerce/\textasciicircum
+\end{itemize}
+Company and web site names (\emph{Twitter}, \emph{Yahoo ! News}) are tagged as proper nouns.
+Function words are only ever tagged as proper nouns
+if they are not behaving in a normal syntactic fashion, e.g. \emph{Ace/\textasciicircum of/\textasciicircum Base/\textasciicircum}.
+
+\paragraph{Personal names:} Titles/forms of address with personal names should be tagged as proper nouns: 
+\emph{Mr.}, \emph{Mrs.}, \emph{Sir}, \emph{Aunt}, \emph{President}, \emph{Captain}. On their own\----not preceding someone's given name or surname\----they are common nouns, even in the official name of an office: \emph{President/\textasciicircum Obama/\textasciicircum said/V}, \emph{the/D president/N said/V}, \emph{he/O is/V president/N of/P the/D U.S./\textasciicircum}
+
+\paragraph{Titles of works:} In the PTB, simple titles like \emph{Star Wars} and \emph{Cheers} are tagged as proper nouns, but titles with more extensive phrasal structure are tagged as ordinary phrases, e.g., \emph{A/DT Fish/NN Called/VBN Wanda/NNP}. Note that \emph{Fish} is tagged as NN (common noun). Therefore, we adopt the following rule: titles containing only nouns should be tagged as proper nouns, and other titles as ordinary phrases.
+
+\subsection{Prepositions and Particles}
+
+To differentiate between prepositions and verb particles (e.g., \emph{out} in \emph{take out}), we asked annotators to use the following test: 
+
+If you can insert an adverb within the phrasal verb, it's probably a preposition rather than a particle:
+\begin{itemize}
+\item turn slowly into/P a monster
+\item *take slowly out/T the trash
+\end{itemize}
+
+\noindent Below are other examples of verb particles:
+\begin{itemize}
+\item what's going on/T
+\item check it out/T
+\item shout out/T
+\end{itemize}
+(Relatedly, abbreviations like \emph{s/o} and \emph{SO} are tagged as `V'.)
+
+
+\subsection{\emph{this} and \emph{that}: Demonstratives and Relativizers}
+
+The PTB almost always tags demonstrative \emph{this}/\emph{that} as a determiner, but in cases where it is 
+used pronominally, it is immediately dominated by a singleton NP, e.g.
+
+\begin{verbatim} (NP (DT This)) is Japan\end{verbatim}
+
+\noindent For our purposes, since we do not have parse trees and want to straightforwardly use the tags 
+in POS patterns, we tag such cases as pronouns:
+\emph{i just orgasmed over \textbf{this/O}}
+as opposed to
+\emph{\textbf{this/D} wind is serious}.
+Words where we were careful about the `D'/`O' distinction include, but are not limited 
+to: \emph{that, this, these, those, dat, daht, dis, tht}.
+
+When \emph{this} or \emph{that} is used as a relativizer, we tag it as `P' (never `O'):
+\begin{itemize}
+\item You should know , \textbf{that/P} if you come any closer ...
+\item Never cheat on a woman \textbf{that/P} holds you down
+\end{itemize}
+
+The original \newcite{gimpel-11} data often used \emph{this/D} for nominal usage, but was somewhat inconsistent. We changed the tags in their data to conform to the new style of these guidelines; all \textsc{Daily547} tags conform as well.
+
+WH-word relativizers are treated differently than the above: they are sometimes tagged as `O', sometimes as `D', but never as `P'.
+
+\subsection{Quantifiers and Referentiality}
+
+\begin{itemize}
+\item A few non-prenominal cases of \emph{some} are tagged as pronouns (\emph{get some/O}). However, we use \emph{some/D of}, \emph{any/D of}, and \emph{all/D of}.
+\item \emph{someone}, \emph{everyone}, \emph{anyone}, \emph{somebody}, \emph{everybody}, \emph{anybody}, \emph{nobody}, \emph{something}, \emph{everything}, \emph{anything}, and \emph{nothing} are almost always tagged as nouns.
+\item \emph{one} is usually tagged as a number, but occasionally as a noun or pronoun when it is referential, although this is inconsistent in the PTB and also in the annotated Twitter data.
+\item \emph{none} is tagged as a noun.
+\item \emph{all} and \emph{any} are almost always tagged as a (pre)determiner or adverb.
+\item \emph{few} and \emph{several} are tagged as an adjective when used as a modifier, and as a noun elsewhere.
+\item \emph{many} is tagged as an adjective.
+\item \emph{lot} and \emph{lots} (meaning a large amount/degree of something) are tagged as nouns.
+\end{itemize}
+
+\subsection{Metalinguistic Mentions}
+
+Mentions of a word (typically in quotes) are tagged as if the word had been used normally:
+\begin{itemize}
+\item RT @anonuser Every girl lives for the `` unexpected hugs from behind " moments \textless\ I wouldn't say `` \textbf{live} "... but they r nice
+\end{itemize}
+\noindent Here \emph{live} is tagged as a verb.
+
+\section{Phenomena in Twitter}
+
+There are many categories of phenomena that are frequent in Twitter and online conversational text that are not as frequent in the PTB. Below we describe how we treated them. 
+
+\subsection{Hashtags and At-mentions}
+
+As discussed by \newcite{gimpel-11}, \textbf{hashtags} used within a phrase or sentence are not distinguished from ordinary words. However, when the hashtag is external to the syntax and merely serves to categorize the tweet, it receives the `\#' tag. \textbf{At-mentions} \emph{always} receive the `@' tag, even though they occasionally double as words within a sentence.
+
+\subsection{Multiword Abbreviations}
+
+Some multiword abbreviations have natural tag correspondences: \emph{lol} (laughing out loud) is typically an exclamation, tagged as `!'; \emph{idk} or \emph{iono} (I don't know) can be tagged as `L' (nominal + verbal).
+
+Miscellaneous types of abbreviations are tagged with `G':
+\begin{itemize}
+\item \emph{ily} (I love you)
+\item \emph{wby} (what about you)
+\item \emph{mfw} (my face when)
+\end{itemize}
+
+\subsection{Clipping}
+
+Due to space constraints, words at the ends of tweets are sometimes cut off. We attempt to tag the partial word as if it had not been clipped. If the tag is unclear, 
+we fall back to `G':
+\begin{itemize}
+\item RT @anonuser : Tonight's memorial for Lucas Ransom starts at 8:00 p.m. and is being held at the open space at the corner of Del \textbf{Pla} ...  
+\end{itemize}
+\noindent We infer that \emph{Pla} is a clipped proper name, and accordingly tag it as `\textasciicircum'.
+
+\begin{itemize}
+\item RT @anonuser : Usually the people that need our help the most are the ones that are hardest 2 get through 2 . Be patient , love on \textbf{t} ...
+\end{itemize}
+\noindent The continuation is unclear, so we fall back to \emph{t/G}.
+
+\subsection{Symbols, Arrows, etc.}
+
+\begin{itemize}
+\item RT @anonuser : Helppp meeeee . I'mmm meltiiinngggg --\textgreater\ http://twitpic.com/316cjg
+\item http://bit.ly/cLRm23 \textless -- \#ICONLOUNGE 257 Trinity Ave , Downtown Atlanta ... Party This Wednesday ! RT
+\end{itemize}
+
+These arrows (\emph{--\textgreater} and \emph{\textless --}) are tagged as `G'. But see the next section for Twitter discourse uses of arrows, which receive the `\texttildelow' tag.
+
+\subsection{Twitter Discourse Tokens: Retweets, Continuation Markers, and Arrow Deixis}
+
+A common phenomenon in Twitter is the \textbf{retweet construction}, shown in the following example:
+\begin{itemize}
+\item RT @anonuser : Miami put a fork in it ...
+\end{itemize}
+
+The \emph{RT} indicates that what follows is a ``retweet'' of another tweet. Typically it is followed by a Twitter username in the form of an at-mention followed by a colon (:). In this construction, we tag both the \emph{RT} and \emph{:} as `\texttildelow'.
+
+It is often the case that, due to the presence of the retweet header information, there is not enough space for the entirety of the original tweet:
+
+\begin{itemize}
+\item RT @anonuser : Because of the crisis in Haiti , I must now turn down the volume . We are one people . Let us find a way to show our huma ...
+\end{itemize}
+
+Here, the final \emph{...} is also tagged as `\textasciicircum' because it is not 
+intentional punctuation but rather indicates that the tweet has been cut short due to space limitations (cf. ``Clipping" above). 
+
+Aside from retweets, a common phenomenon in tweets is posting a link to a news story or other 
+item of interest on the Internet. Typically the headline/title and beginning of the article 
+begins the tweet, followed by \emph{...} and the URL:
+
+\begin{itemize}
+\item New NC Highway Signs Welcome Motorists To `` Most Military Friendly State ": New signs going up on the major highways ... http://bit.ly/cPNH6e  
+\end{itemize}
+\noindent Since the ellipsis indicates that the text in the tweet is continued elsewhere (namely 
+at the subsequent URL), we tag it as `\texttildelow'. 
+
+Sometimes instead of \emph{...}, the token \emph{cont} (short for ``continued'') is used to indicate continuation:
+
+\begin{itemize}
+\item I predict I won't win a single game I bet on . Got Cliff Lee today , so if he loses its on me RT @anonuser : Texas ( cont ) http://tl.gd/6meogh
+\end{itemize}
+\noindent Here, \emph{cont} is tagged as `\texttildelow' and the surrounding parentheses are tagged as punctuation.
+
+Another use of `\texttildelow' is for tokens that indicate that one part of a tweet is a response to 
+another part, particularly when used in an RT construction. Consider:
+
+\begin{itemize}
+\item RT @anonuser : First time seeing Ye's film on VH1 $\ll$ -What do you think about it ?  
+\end{itemize}
+\noindent The \emph{$\ll$} indicates that the text after it is a response to the text before it \cite{collister-12}, and is therefore tagged with `\texttildelow'.
+
+
+\subsection{Nonstandard Spellings}
+
+We aim to choose tags that reflect what is \emph{meant} by a token, even in the face of typographic errors, spelling errors, or intentional nonstandard spellings.
+For instance, in
+
+\begin{itemize}
+\item I'm here are the game! But not with the tickets from your brother. Lol
+\end{itemize}
+
+\noindent it is assumed that \emph{at} was intended instead of \emph{are}, so \emph{are} is labeled as a preposition (`P'). Likewise, missing or extraneous apostrophes (e.g., \emph{your} clearly intended as ``you are'') should not influence the choice of tag.
+
+\subsection{Direct Address}
+
+Words such as \emph{girl}, \emph{miss}, \emph{man}, and \emph{dude} are often used vocatively in tweets directed to another person. They are tagged as nouns in such cases:
+\begin{itemize}
+\item RT @anonuser : Shout-out to @anonuser definition of lil webbies i-n-d-e-p-e-n-d-e-n-t --\textgreater\ do you know what means \textbf{man} ??? \textless\textless\ Ayyye !
+\item I need to go home \textbf{man} . Got some thangs I wanna try . Lol .
+\end{itemize}
+
+\noindent On the other hand, when such words do not refer to an individual but provide general emphasis, they are tagged as interjections (`!'):
+\begin{itemize}
+\item RT @anonuser : . \#walesaid dt @anonuser should go DOWNTOWN ! Lol !!.. \#jammy --\textgreater\texttildelow\ LMAO !! \textbf{Man} BIANCA !!!
+\item * Bbm yawn face * \textbf{Man} that \#napflow felt so refreshing .
+\item \textbf{Man} da \#Lakers have a fucking all-star squad fuck wit it !!
+\end{itemize}
+
+{ %\footnotesize
+\bibliography{nlp}
+\bibliographystyle{acl}
+}
+
+\end{document}
