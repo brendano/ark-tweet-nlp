@@ -236,7 +236,8 @@ public class MiscFeatures {
 				pairs.add(t, "t="+t);
 			}
 			for (int t=tokens.size()-1; t > Math.max(tokens.size()-4, -1); t--) {
-				pairs.add(t, "t=-"+t);
+//				pairs.add(t, "t=-"+t); // BROKEN version
+				pairs.add(t, "t=-"+ (tokens.size()-t)); // FIXED version
 			}
 		}
 	}
