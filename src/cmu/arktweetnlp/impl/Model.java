@@ -32,7 +32,7 @@ public class Model {
 	public double[] biasCoefs;
 
 	/** 
-	 * dim: (N_labels+1 x N_labels) 
+	 * dim: (N_labels x N_labels) 
 	 **/
 	public double[][] edgeCoefs;
 
@@ -48,11 +48,12 @@ public class Model {
 	}
 	
 	public int numLabels;	//initialized in loadModelFromText
-	public int startMarker() {
-		assert labelVocab.isLocked();
-		int lastLabel = labelVocab.size() - 1;
-		return lastLabel+1;
-	}
+
+	//	public int startMarker() {
+//		assert labelVocab.isLocked();
+//		int lastLabel = labelVocab.size() - 1;
+//		return lastLabel+1;
+//	}
 
 	public void lockdownAfterFeatureExtraction() {
 		labelVocab.lock();
@@ -62,7 +63,7 @@ public class Model {
 
 	public void allocateCoefs(int numLabels, int numObsFeats) {
 		observationFeatureCoefs = new double[numObsFeats][numLabels];
-		edgeCoefs = new double[numLabels+1][numLabels];
+		edgeCoefs = new double[numLabels][numLabels];
 		biasCoefs = new double[numLabels];
 	}
 
@@ -103,7 +104,6 @@ public class Model {
 	public void greedyDecode(ModelSentence sentence, boolean storeConfidences) {
 		int T = sentence.T;
 		sentence.labels = new int[T];
-		sentence.edgeFeatures[0] = startMarker();
 		
 		if (storeConfidences) {
 			sentence.confidences = new double[T];
@@ -142,44 +142,45 @@ public class Model {
 	 *  from 0 to t has token t labeled with tag k.   (0<=t<T)
 	 *  bptr[t][k] gives the max prob. tag of token t-1 (t=0->startMarker)
 	 */
-	public void viterbiDecode(ModelSentence sentence) {		
-		int T = sentence.T;
-		sentence.labels = new int[T];
-		int[][] bptr = new int[T][numLabels];
-		double[][] vit = new double[T][numLabels];
-		double[] labelScores = new double[numLabels];
-		computeVitLabelScores(0, startMarker(), sentence, labelScores);
-		ArrayUtil.logNormalize(labelScores);
-		//initialization
-		vit[0]=labelScores;
-		for (int k=0; k < numLabels; k++){
-			bptr[0][k]=startMarker();
-		}
-		for (int t=1; t < T; t++){
-			double[][] prevcurr = new double[numLabels][numLabels];
-			for (int s=0; s < numLabels; s++){
-				computeVitLabelScores(t, s, sentence, prevcurr[s]);
-				ArrayUtil.logNormalize(prevcurr[s]);
-				prevcurr[s] = ArrayUtil.add(prevcurr[s], labelScores[s]);
-			}
-			for (int s=0; s < numLabels; s++){
-				double[] sprobs = getColumn(prevcurr, s);
-				bptr[t][s] = ArrayUtil.argmax(sprobs);
-				vit[t][s] = sprobs[bptr[t][s]];	
-			}
-			labelScores=vit[t];
-		}
-		sentence.labels[T-1] = ArrayUtil.argmax(vit[T-1]);
-		//System.out.print(labelVocab.name(sentence.labels[T-1]));
-		//System.out.println(" with prob: "+Math.exp(vit[T-1][sentence.labels[T-1]]));
-		int backtrace = bptr[T-1][sentence.labels[T-1]];
-		for (int i=T-2; (i>=0)&&(backtrace != startMarker()); i--){ //termination
-			sentence.labels[i] = backtrace;
-			//System.err.println(labelVocab.name(backtrace)
-				//+" with prob: "+Math.exp(vit[i][backtrace]));
-			backtrace = bptr[i][backtrace];
-		}
-		assert (backtrace == startMarker());
+	public void viterbiDecode(ModelSentence sentence) {
+		assert false : "broken due to startmarker refactor";
+//		int T = sentence.T;
+//		sentence.labels = new int[T];
+//		int[][] bptr = new int[T][numLabels];
+//		double[][] vit = new double[T][numLabels];
+//		double[] labelScores = new double[numLabels];
+//		computeVitLabelScores(0, startMarker(), sentence, labelScores); BROKEN
+//		ArrayUtil.logNormalize(labelScores);
+//		//initialization
+//		vit[0]=labelScores;
+//		for (int k=0; k < numLabels; k++){
+//			bptr[0][k]=startMarker(); BROKEN
+//		}
+//		for (int t=1; t < T; t++){
+//			double[][] prevcurr = new double[numLabels][numLabels];
+//			for (int s=0; s < numLabels; s++){
+//				computeVitLabelScores(t, s, sentence, prevcurr[s]);
+//				ArrayUtil.logNormalize(prevcurr[s]);
+//				prevcurr[s] = ArrayUtil.add(prevcurr[s], labelScores[s]);
+//			}
+//			for (int s=0; s < numLabels; s++){
+//				double[] sprobs = getColumn(prevcurr, s);
+//				bptr[t][s] = ArrayUtil.argmax(sprobs);
+//				vit[t][s] = sprobs[bptr[t][s]];	
+//			}
+//			labelScores=vit[t];
+//		}
+//		sentence.labels[T-1] = ArrayUtil.argmax(vit[T-1]);
+//		//System.out.print(labelVocab.name(sentence.labels[T-1]));
+//		//System.out.println(" with prob: "+Math.exp(vit[T-1][sentence.labels[T-1]]));
+//		int backtrace = bptr[T-1][sentence.labels[T-1]];
+//		for (int i=T-2; (i>=0)&&(backtrace != startMarker()); i--){ //termination
+//			sentence.labels[i] = backtrace;
+//			//System.err.println(labelVocab.name(backtrace)
+//				//+" with prob: "+Math.exp(vit[i][backtrace]));
+//			backtrace = bptr[i][backtrace];
+//		}
+//		assert (backtrace == startMarker());
 	}
 
 	private double[] getColumn(double[][] matrix, int col){
@@ -222,6 +223,7 @@ public class Model {
 	public void computeEdgeScores(int t, ModelSentence sentence, double[] labelScores) {
 		//    	Util.p(sentence.edgeFeatures);
 		int prev = sentence.edgeFeatures[t];
+		if (prev==-1) return;
 		for (int k=0; k < numLabels; k++) {
 			labelScores[k] += edgeCoefs[prev][k];
 		}
@@ -271,7 +273,9 @@ public class Model {
 				double p = posterior[t][k];
 				int empir = y==k ? 1 : 0;
 				grad[biasFeature_to_flatID(k)]                      += empir - p;
-				grad[edgeFeature_to_flatID(prevLabel, k)]           += empir - p;
+				if (prevLabel != -1) {
+					grad[edgeFeature_to_flatID(prevLabel, k)]           += empir - p;	
+				}
 				for (Pair<Integer,Double> fv : sentence.observationFeatures.get(t)) {
 					grad[observationFeature_to_flatID(fv.first, k)] += (empir - p) * fv.second;
 				}
@@ -299,7 +303,7 @@ public class Model {
 		for (int k=0; k<numLabels; k++) {
 			biasCoefs[k] = flatCoefs[biasFeature_to_flatID(k)];
 		}
-		for (int prevLabel=0; prevLabel<numLabels+1; prevLabel++) {
+		for (int prevLabel=0; prevLabel<numLabels; prevLabel++) {
 			for (int k=0; k<numLabels; k++) {
 				edgeCoefs[prevLabel][k] = flatCoefs[edgeFeature_to_flatID(prevLabel, k)];
 			}
@@ -316,7 +320,7 @@ public class Model {
 		for (int k=0; k<numLabels; k++) {
 			flatCoefs[biasFeature_to_flatID(k)] = biasCoefs[k];
 		}
-		for (int prevLabel=0; prevLabel<numLabels+1; prevLabel++) {
+		for (int prevLabel=0; prevLabel<numLabels; prevLabel++) {
 			for (int k=0; k<numLabels; k++) {
 				flatCoefs[edgeFeature_to_flatID(prevLabel, k)] = edgeCoefs[prevLabel][k];
 			}
@@ -335,7 +339,7 @@ public class Model {
 		int K = labelVocab.size();
 		int J = featureVocab.size();
 		// bias terms + edge features + observation features
-		return K + (K+1)*K + J*K;
+		return K + K*K + J*K;
 	}
 	public int biasFeature_to_flatID(int label) {
 		return label;
@@ -346,30 +350,8 @@ public class Model {
 	}
 	public int observationFeature_to_flatID(int featID, int label) {
 		int K = labelVocab.size();
-		return K + (K+1)*K + featID*K + label;
+		return K + K*K + featID*K + label;
 	}
-
-	//    public boolean isUnregularized(int flatFeatID) {
-	//        int K = labelVocab.size();
-	//    	return flatFeatID < K + (K+1)*K;
-	//    }
-
-	// These appear to be unnecessary, and trickier to get correct anyway
-	//    private int flatID_to_biasFeature(int id) {
-	//        return id;
-	//    }
-	//    private int flatID_to_edgeFeatureBefore(int id) {
-	//        int K = labelVocab.size();
-	//        return (int)( (id - K) / (K+1) );
-	//    }
-	//    private int flatID_to_edgeFeatureAfter(int id) {
-	//        int K = labelVocab.size();
-	//        return (id - K) % (K+1);
-	//    }
-	//    private int flatID_to_observationFeature(int id) {
-	//        int K = labelVocab.size();
-	//        return id - K - (K+1)*K;
-	//    }
 
 	//////////////////////////////////////////////////
 
@@ -393,7 +375,7 @@ public class Model {
 		for (int k=0; k<numLabels; k++) {
 			out.printf("***BIAS***\t%s\t%g\n", labelVocab.name(k), biasCoefs[k]);
 		}
-		for (int prevLabel=0; prevLabel < numLabels+1; prevLabel++) {
+		for (int prevLabel=0; prevLabel < numLabels; prevLabel++) {
 			for (int curLabel=0; curLabel < numLabels; curLabel++) {
 				out.printf("***EDGE***\t%s %s\t%s\n", prevLabel, curLabel, edgeCoefs[prevLabel][curLabel]);
 			}

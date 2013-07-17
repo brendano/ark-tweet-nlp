@@ -58,7 +58,7 @@ public class FeatureExtractor {
 	 */
 	private void computeCheatingEdgeFeatures(Sentence sentence, ModelSentence modelSentence) {
 		assert isTrainingTime;
-		modelSentence.edgeFeatures[0] = model.startMarker();
+		modelSentence.edgeFeatures[0] = -1;
 		for (int t=1; t < sentence.T(); t++) {
 			modelSentence.edgeFeatures[t] = modelSentence.labels[t-1];
 		}
