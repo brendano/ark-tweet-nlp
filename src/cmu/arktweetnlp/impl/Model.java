@@ -7,6 +7,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import util.Arr;
+
 import cmu.arktweetnlp.util.BasicFileIO;
 import edu.berkeley.nlp.util.ArrayUtil;
 import edu.berkeley.nlp.util.Triple;
@@ -103,7 +105,10 @@ public class Model {
 		sentence.labels = new int[T];
 		sentence.edgeFeatures[0] = startMarker();
 		
-		if (storeConfidences) sentence.confidences = new double[T];
+		if (storeConfidences) {
+			sentence.confidences = new double[T];
+			sentence.labelPosteriors = new double[T][numLabels];
+		}
 
 		double[] labelScores = new double[numLabels];
 		for (int t=0; t<T; t++) {
@@ -116,6 +121,7 @@ public class Model {
 				double Z = ArrayMath.sum(labelScores);
 				ArrayMath.multiplyInPlace(labelScores, 1.0/Z);
 				sentence.confidences[t] = labelScores[ sentence.labels[t] ];
+				sentence.labelPosteriors[t] = Arr.copy(labelScores);
 			}
 		}
 	}
@@ -331,14 +337,14 @@ public class Model {
 		// bias terms + edge features + observation features
 		return K + (K+1)*K + J*K;
 	}
-	private int biasFeature_to_flatID(int label) {
+	public int biasFeature_to_flatID(int label) {
 		return label;
 	}
-	private int edgeFeature_to_flatID(int before, int current) {
+	public int edgeFeature_to_flatID(int before, int current) {
 		int K = labelVocab.size();
 		return K + before*K + current;
 	}
-	private int observationFeature_to_flatID(int featID, int label) {
+	public int observationFeature_to_flatID(int featID, int label) {
 		int K = labelVocab.size();
 		return K + (K+1)*K + featID*K + label;
 	}

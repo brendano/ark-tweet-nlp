@@ -17,7 +17,10 @@ public class ModelSentence {
 	 **/
 	public int labels[];
 	
+	/** posterior confidence only for the argmax labels */
 	public double confidences[];
+	/** posterior confidences for all labels .. should be marginals from a CRF, or a hackier thing from an MEMM */
+	public double labelPosteriors[][];
 	
 	/** Runtime observed, Trainingtime observed.
 	 * This is an array-of-arrays of (featID, featValue) pairs.

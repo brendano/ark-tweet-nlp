@@ -3,22 +3,24 @@ package cmu.arktweetnlp;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import util.Arr;
+import util.LBFGS;
+import util.LBFGS.Status;
+import util.U;
+
 import cmu.arktweetnlp.impl.Model;
 import cmu.arktweetnlp.impl.ModelSentence;
-import cmu.arktweetnlp.impl.OWLQN;
 import cmu.arktweetnlp.impl.Sentence;
-import cmu.arktweetnlp.impl.OWLQN.WeightsPrinter;
 import cmu.arktweetnlp.impl.features.FeatureExtractor;
 import cmu.arktweetnlp.io.CoNLLReader;
-import cmu.arktweetnlp.util.Util;
-import edu.stanford.nlp.math.ArrayMath;
-import edu.stanford.nlp.optimization.DiffFunction;
 
 public class Train {
 
-	public double l2penalty = 2;
-	public double l1penalty = 0.25;
-	public double tol = 1e-7;
+	public double penalty = 2;   // "lambda" in glmnet() terminology
+	public double l1mix = 0.05;  // "alpha" in glmnet() terminology
+	double l2penalty() { return penalty * (1-l1mix); }
+	double l1penalty() { return penalty * l1mix; } 
+	public double tol = 1e-5;
 	public int maxIter = 500;
 	public String modelLoadFilename = null;
 	public String examplesFilename = null;
@@ -102,84 +104,73 @@ public class Train {
 	}
 
 	public void optimizationLoop() {
-		OWLQN minimizer = new OWLQN();
-		minimizer.setMaxIters(maxIter);
-		minimizer.setQuiet(false);
-		minimizer.setWeightsPrinting(new MyWeightsPrinter());
-
-		double[] initialWeights = model.convertCoefsToFlat();
-
-		double[] finalWeights = minimizer.minimize(
-				new GradientCalculator(),
-				initialWeights, l1penalty, tol, 5);
-
-		model.setCoefsFromFlat(finalWeights);
+		double[] flatCoefs = model.convertCoefsToFlat();
+		LBFGS.Params params = new LBFGS.Params();
+		params.max_iterations = maxIter;
+		params.orthantwise_c = l1penalty();
+		params.delta = params.epsilon = tol;   // only 'delta' will matter
+		
+		LBFGS.Result r = LBFGS.lbfgs(flatCoefs, new GradientCalculator(),
+			new LBFGS.ProgressCallback() {
+				@Override
+				public int apply(double[] x, double[] g, double fx,
+						double xnorm, double gnorm, double step, int n, int iterNum,
+						Status ls) {
+					int numActive = 0;
+					for (double coef : x) numActive += (coef != 0) ? 1 : 0;
+					U.pf("iter %d: obj=%g active=%d gnorm=%g\n", iterNum, fx, numActive, gnorm);
+//					if (false && iterNum % 5 == 0) {
+//						try {
+//							model.setCoefsFromFlat(x);
+//							model.saveModelAsText(modelSaveFilename + ".iter" + k);
+//						} catch (IOException e) {
+//							e.printStackTrace();
+//						}
+//					}
+					return 0;
+				}
+		}, params);
+		System.out.println("Finished status=" + r.status);
+		model.setCoefsFromFlat(flatCoefs);
 	}
 
-
-
-	private class GradientCalculator implements DiffFunction {
-
+	private class GradientCalculator implements LBFGS.Function {
 		@Override
-		public int domainDimension() {
-			return model.flatIDsize();
-		}
-
-		@Override
-		public double valueAt(double[] flatCoefs) {
+		public double evaluate(double[] flatCoefs, double[] g, int n, double step) {
 			model.setCoefsFromFlat(flatCoefs);
+			Arr.fill(g,0);
 			double loglik = 0;
 			for (ModelSentence s : mSentences) {
+				model.computeGradient(s, g);
 				loglik += model.computeLogLik(s);
 			}
-			return -loglik + regularizerValue(flatCoefs);
-		}
-
-		@Override
-		public double[] derivativeAt(double[] flatCoefs) {
-			double[] g = new double[model.flatIDsize()];
-			model.setCoefsFromFlat(flatCoefs);
-			for (ModelSentence s : mSentences) {
-				model.computeGradient(s, g);
-			}
-			ArrayMath.multiplyInPlace(g, -1);
+			Arr.multiplyInPlace(g, -1);
 			addL2regularizerGradient(g, flatCoefs);
-			return g;
+			return -loglik + regularizerValue(flatCoefs);
 		}
 	}
 
 	private void addL2regularizerGradient(double[] grad, double[] flatCoefs) {
+		double l2pen = l2penalty();
 		assert grad.length == flatCoefs.length;
 		for (int f=0; f < flatCoefs.length; f++) {
-			grad[f] += l2penalty * flatCoefs[f]; 
+			grad[f] += l2pen * flatCoefs[f]; 
 		}
 	}
 
 	/**
 	 * lambda_2 * (1/2) sum (beta_j)^2  +  lambda_1 * sum |beta_j|
-	 * our OWLQN seems to only want the first term
+	 * the library only wants the first term
 	 */
 	 private double regularizerValue(double[] flatCoefs) {
 		double l2_term = 0;
 		for (int f=0; f < flatCoefs.length; f++) {
 			l2_term += Math.pow(flatCoefs[f], 2);
 		}
-		return 0.5*l2penalty*l2_term;
+		return 0.5*l2penalty()*l2_term;
 	}
 
-	public class MyWeightsPrinter implements WeightsPrinter {
-
-		@Override
-		public void printWeights() {
-			double loglik = 0;
-			for (ModelSentence s : mSentences) {
-				loglik += model.computeLogLik(s);
-			}
-			System.out.printf("\tTokLL %.6f\t", loglik/numTokens);
-		}
-	}
-
-	//////////////////////////////////////////////////////////////
+	 //////////////////////////////////////////////////////////////
 
 
 	public static void main(String[] args) throws IOException {
@@ -191,7 +182,6 @@ public class Train {
 
 		int i=0;
 		while (i < args.length) {
-			//        	Util.p(args[i]);
 			if (!args[i].startsWith("-")) {
 				break;
 			}
@@ -206,11 +196,11 @@ public class Train {
 			else if (args[i].equals("--dump-feat")) {
 				trainer.dumpFeatures = true;
 				i += 1;
-			} else if (args[i].equals("--l2")) {
-				trainer.l2penalty = Double.parseDouble(args[i+1]);
+			} else if (args[i].equals("--penalty")) {
+				trainer.penalty = Double.parseDouble(args[i+1]);
 				i += 2;
-			} else if (args[i].equals("--l1")) {
-				trainer.l1penalty = Double.parseDouble(args[i+1]);
+			} else if (args[i].equals("--l1mix")) {
+				trainer.l1mix = Double.parseDouble(args[i+1]);
 				i += 2;
 			}
 			else {
@@ -230,7 +220,6 @@ public class Train {
 		trainer.modelSaveFilename = args[i+1];
 		
 		trainer.doTraining();
-
 	}
 	public static void usage() {
 		System.out.println(
