@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import util.U;
+
 import cmu.arktweetnlp.Twokenize;
 import cmu.arktweetnlp.impl.features.FeatureExtractor.FeatureExtractorInterface;
 import cmu.arktweetnlp.impl.features.FeatureExtractor.PositionFeaturePairs;
@@ -53,20 +55,24 @@ public class WordClusterPaths implements FeatureExtractorInterface {
 		    		}
 		    	}
 		    }
-		    
 			if (bitstring != null){
 				int i;
-				bitstring = StringUtils.pad(bitstring, 16).replace(' ', '0');
-				for(i=2; i<=16; i+=2){
+				bitstring = StringUtils.pad(bitstring, 16).replace(' ', '-');
+				for(i=2; i<bitstring.length(); i+=4){
 					pairs.add(t, "BigCluster|" + bitstring.substring(0,i));
 				}
+				pairs.add(t, "BigCluster|" + bitstring);
 				if (t<tokens.size()-1){
-					for(i=4; i<=16; i+=2)
+					for(i=2; i<bitstring.length(); i+=4) {
 						pairs.add(t+1, "PrevBigCluster"+"|" + bitstring.substring(0,i));
+					}
+					pairs.add(t+1, "PrevBigCluster"+"|" + bitstring);
 				}
 				if (t>0){
-					for(i=4; i<=16; i+=2)
+					for(i=2; i<bitstring.length(); i+=4) {
 						pairs.add(t-1, "NextBigCluster"+"|" + bitstring.substring(0,i));
+					}
+					pairs.add(t-1, "NextBigCluster"+"|" + bitstring);
 				}
 			}
 /*				else{
