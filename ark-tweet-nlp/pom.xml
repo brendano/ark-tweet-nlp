@@ -4,7 +4,7 @@
     <groupId>edu.cmu.cs</groupId>
     <artifactId>ark-tweet-nlp</artifactId>
     <packaging>jar</packaging>
-    <version>0.3.2</version>
+    <version>1.0.0-PRE</version>
     <name>CMU ARK TweetNLP: Twitter POS tagger</name>
     <url>http://www.ark.cs.cmu.edu/TweetNLP/</url>
     <properties>
