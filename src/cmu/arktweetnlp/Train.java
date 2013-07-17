@@ -16,8 +16,8 @@ import cmu.arktweetnlp.io.CoNLLReader;
 
 public class Train {
 
-	public double penalty = 2;   // "lambda" in glmnet() terminology
-	public double l1mix = 0.05;  // "alpha" in glmnet() terminology
+	public double penalty = 2;   // "lambda" in glmnet terminology
+	public double l1mix = 0.1;  // "alpha" in glmnet terminology
 	double l2penalty() { return penalty * (1-l1mix); }
 	double l1penalty() { return penalty * l1mix; } 
 	public double tol = 1e-5;
@@ -58,6 +58,7 @@ public class Train {
 			readWarmStartModel();
 		}
 		optimizationLoop();
+		System.out.println("Saving model to " + modelSaveFilename);
 		model.saveModelAsText(modelSaveFilename);
 	}
 

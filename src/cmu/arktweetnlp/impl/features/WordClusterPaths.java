@@ -61,11 +61,11 @@ public class WordClusterPaths implements FeatureExtractorInterface {
 					pairs.add(t, "BigCluster|" + bitstring.substring(0,i));
 				}
 				if (t<tokens.size()-1){
-					for(i=4; i<=12; i+=4)
+					for(i=4; i<=16; i+=2)
 						pairs.add(t+1, "PrevBigCluster"+"|" + bitstring.substring(0,i));
 				}
 				if (t>0){
-					for(i=4; i<=12; i+=4)
+					for(i=4; i<=16; i+=2)
 						pairs.add(t-1, "NextBigCluster"+"|" + bitstring.substring(0,i));
 				}
 			}
