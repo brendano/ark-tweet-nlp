@@ -147,24 +147,24 @@ public class FeatureExtractor {
 		allFeatureExtractors.add(new WordListFeatures.POSTagDict());
 		allFeatureExtractors.add(new WordListFeatures.MetaphonePOSDict());
 
-//		allFeatureExtractors.add(new MiscFeatures.NgramSuffix(20));
-//		allFeatureExtractors.add(new MiscFeatures.NgramPrefix(20));
-//		allFeatureExtractors.add(new MiscFeatures.PrevWord());
-//		allFeatureExtractors.add(new MiscFeatures.NextWord());
-//		allFeatureExtractors.add(new MiscFeatures.WordformFeatures());
+		allFeatureExtractors.add(new MiscFeatures.NgramSuffix(20));
+		allFeatureExtractors.add(new MiscFeatures.NgramPrefix(20));
+		allFeatureExtractors.add(new MiscFeatures.PrevWord());
+		allFeatureExtractors.add(new MiscFeatures.NextWord());
+		allFeatureExtractors.add(new MiscFeatures.WordformFeatures());
 
 		allFeatureExtractors.add(new MiscFeatures.CapitalizationFeatures());
 		allFeatureExtractors.add(new MiscFeatures.SimpleOrthFeatures());
-//		allFeatureExtractors.add(new MiscFeatures.PrevNext());
+		allFeatureExtractors.add(new MiscFeatures.PrevNext());
 		
-//		allFeatureExtractors.add(new WordListFeatures.Listofnames("proper_names"));
-//		allFeatureExtractors.add(new WordListFeatures.Listofnames("celebs")); //2012-08-09 version of freebase celebrity list
-//		allFeatureExtractors.add(new WordListFeatures.Listofnames("videogame")); //june 22 version of freebase video game list
-//		allFeatureExtractors.add(new WordListFeatures.Listofnames("mobyplaces"));	//moby dictionary of US locations
-//		allFeatureExtractors.add(new WordListFeatures.Listofnames("family"));
-//		allFeatureExtractors.add(new WordListFeatures.Listofnames("male"));
-//		allFeatureExtractors.add(new WordListFeatures.Listofnames("female"));
-//		
+		allFeatureExtractors.add(new WordListFeatures.Listofnames("proper_names"));
+		allFeatureExtractors.add(new WordListFeatures.Listofnames("celebs")); //2012-08-09 version of freebase celebrity list
+		allFeatureExtractors.add(new WordListFeatures.Listofnames("videogame")); //june 22 version of freebase video game list
+		allFeatureExtractors.add(new WordListFeatures.Listofnames("mobyplaces"));	//moby dictionary of US locations
+		allFeatureExtractors.add(new WordListFeatures.Listofnames("family"));
+		allFeatureExtractors.add(new WordListFeatures.Listofnames("male"));
+		allFeatureExtractors.add(new WordListFeatures.Listofnames("female"));
+		
 		allFeatureExtractors.add(new MiscFeatures.Positions());
 		
 		// These were disabled in the 0.3 release

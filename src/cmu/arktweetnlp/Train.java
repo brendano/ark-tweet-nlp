@@ -17,11 +17,11 @@ import cmu.arktweetnlp.io.CoNLLReader;
 public class Train {
 
 	public double penalty = 2;   // "lambda" in glmnet terminology
-	public double l1mix = 0.1;  // "alpha" in glmnet terminology
+	public double l1mix = 0.01;  // "alpha" in glmnet terminology
 	double l2penalty() { return penalty * (1-l1mix); }
 	double l1penalty() { return penalty * l1mix; } 
-	public double tol = 1e-5;
-	public int maxIter = 500;
+	public double tol = 1e-7;   // 1e-5 seems ok for development, but 1e-7 is pretty reliable
+	public int maxIter = 500;  // we usually finish in 100-200 iters
 	public String modelLoadFilename = null;
 	public String examplesFilename = null;
 	public String modelSaveFilename = null;

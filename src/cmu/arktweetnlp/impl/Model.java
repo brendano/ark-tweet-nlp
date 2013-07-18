@@ -23,6 +23,9 @@ import edu.stanford.nlp.util.Pair;
  * (1) Feature and label vocabularies (therefore knowledge of numberization)
  * (2) Model coefficients (and knowledge how to flattenize them for LBFGS's sake)
  * (3) Decoding/posterior and gradient computation
+ * 
+ * We include inference routines for both MEMM and CRF models here.
+ * Routines specific to one of them have a _MEMM or _CRF suffix.
  */
 public class Model {
 	public Vocabulary labelVocab;
