@@ -28,7 +28,10 @@ public class ModelSentence {
 	 **/
 	public ArrayList<ArrayList< Pair<Integer, Double>>> observationFeatures;
 
-	/** Runtime observed, Trainingtime observed (for MEMM).
+	/**
+	 * This is only used for the MEMM model (the CRF never touches it).
+	 *   
+	 * Runtime observed, Trainingtime observed (for MEMM).
 	 * dim T st: edgeFeatures[t] = ID of label@(t-1).
 	 * values in 0..(N_labels-1), plus extra higher numbers for markers (see Model)
 	 **/

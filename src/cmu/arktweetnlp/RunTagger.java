@@ -148,12 +148,14 @@ public class RunTagger {
 
 	/** Runs the correct algorithm (make config option perhaps) **/
 	public void goDecode(ModelSentence mSent) {
-		if (decoder == Decoder.GREEDY) {
-			tagger.model.greedyDecode(mSent, showConfidence);
-		} else if (decoder == Decoder.VITERBI) {
-//			if (showConfidence) throw new RuntimeException("--confidence only works with greedy decoder right now, sorry, yes this is a lame limitation");
-			tagger.model.viterbiDecode(mSent);
-		}		
+		tagger.model.decodePosterior_CRF(mSent);
+//		tagger.model.decodeGreedy_MEMM(mSent, true);
+		
+//		if (decoder == Decoder.GREEDY) {
+//			tagger.model.greedyDecode(mSent, showConfidence);
+//		} else if (decoder == Decoder.VITERBI) {
+//			tagger.model.viterbiDecode(mSent);
+//		}		
 	}
 	
 	public void runTaggerInEvalMode() throws IOException, ClassNotFoundException {

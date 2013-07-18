@@ -61,7 +61,8 @@ public class Tagger {
 		sentence.tokens = tokens;
 		ModelSentence ms = new ModelSentence(sentence.T());
 		featureExtractor.computeFeatures(sentence, ms);
-		model.greedyDecode(ms, false);
+		model.decodePosterior_CRF(ms);
+//		model.decodeGreedy_MEMM(ms, true);
 
 		ArrayList<TaggedToken> taggedTokens = new ArrayList<TaggedToken>();
 

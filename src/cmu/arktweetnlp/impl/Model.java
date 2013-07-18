@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import util.Arr;
+import util.ChainInfer;
+import util.U;
 
 import cmu.arktweetnlp.util.BasicFileIO;
 import edu.berkeley.nlp.util.ArrayUtil;
@@ -66,149 +68,35 @@ public class Model {
 		edgeCoefs = new double[numLabels][numLabels];
 		biasCoefs = new double[numLabels];
 	}
-
-	/**
-	 * "given labels" i.e. at trainingtime labels are observed.
-	 * You hide the current one and predict it given you know the previous.
-	 * So you get funny incremental posteriors per position that an MEMM uses at trainingtime.
-	 * (They don't have a proper full-model posterior marginal
-	 * interpretation like a CRF forward-backward-computed posterior does. no?)
-	 * 
-	 * @param sentence - must its have .labels set
-	 * @returns posterior marginals, dim (T x N_label)
-	 */
-	public double[][] inferPosteriorGivenLabels(ModelSentence sentence) {
-		double[][] posterior = new double[sentence.T][labelVocab.size()];
-		double[] labelScores = new double[numLabels];
+	
+	public ChainInfer.Marginals inferPosteriorFullMarginals_CRF(ModelSentence sentence) {
+		double[][] edgeFactors = Arr.exp(edgeCoefs);
+		double[][] obsFactors = new double[sentence.T][labelVocab.size()];
 		for (int t=0; t<sentence.T; t++) {
-			// start in log space
-			computeLabelScores(t, sentence, labelScores);
-			// switch to exp space
-			ArrayUtil.expInPlace(labelScores);
-			double Z = ArrayUtil.sum(labelScores);
-
-			for (int k=0; k<numLabels; k++) {
-				posterior[t][k] = labelScores[k] / Z;
-			}
-			//    		if (Math.random() < 0.00001)
-			//    			System.out.printf("\n%s has %.3g\n%s\n", sentence.labels[t],
-			//    					posterior[t][sentence.labels[t]], Util.sp(posterior[t]));
+			computeObsScores(t, sentence, obsFactors[t]);
 		}
-		return posterior;
+		Arr.expInPlace(obsFactors);
+		ChainInfer.Marginals m = ChainInfer.forwardBackward(obsFactors, edgeFactors);
+		return m;
 	}
 
-	/** 
-	 * THIS CLOBBERS THE LABELS, stores its decoding into them.
-	 * Does progressive rolling edge feature extraction
-	 **/
-	public void greedyDecode(ModelSentence sentence, boolean storeConfidences) {
+	/** predict a new sentence, assuming a CRF model. store marginal posteriors and MBR decoding. */
+	public void decodePosterior_CRF(ModelSentence sentence) {
 		int T = sentence.T;
 		sentence.labels = new int[T];
-		
-		if (storeConfidences) {
-			sentence.confidences = new double[T];
-			sentence.labelPosteriors = new double[T][numLabels];
-		}
-
-		double[] labelScores = new double[numLabels];
+		sentence.confidences = new double[T];
+		ChainInfer.Marginals m = inferPosteriorFullMarginals_CRF(sentence);
+		sentence.labelPosteriors = m.labelMarginals;
 		for (int t=0; t<T; t++) {
-			computeLabelScores(t, sentence, labelScores);
-			sentence.labels[t] = ArrayMath.argmax(labelScores);
-			if (t < T-1)
-				sentence.edgeFeatures[t+1] = sentence.labels[t];
-			if (storeConfidences) {
-				ArrayMath.expInPlace(labelScores);
-				double Z = ArrayMath.sum(labelScores);
-				ArrayMath.multiplyInPlace(labelScores, 1.0/Z);
-				sentence.confidences[t] = labelScores[ sentence.labels[t] ];
-				sentence.labelPosteriors[t] = Arr.copy(labelScores);
-			}
-		}
-	}
-
-
-	/**
-	 * This needs forward-backward I think
-	 * @return dim: (T x K) posterior marginals at each position
-	 */
-	public double[][] inferPosteriorForUnknownLabels(ModelSentence sentence) {
-		assert false : "Unimplemented";
-	return null;
-	}
-	
-	
-	/**
-	 *  vit[t][k] is the max probability such that the sequence
-	 *  from 0 to t has token t labeled with tag k.   (0<=t<T)
-	 *  bptr[t][k] gives the max prob. tag of token t-1 (t=0->startMarker)
-	 */
-	public void viterbiDecode(ModelSentence sentence) {
-		assert false : "broken due to startmarker refactor";
-//		int T = sentence.T;
-//		sentence.labels = new int[T];
-//		int[][] bptr = new int[T][numLabels];
-//		double[][] vit = new double[T][numLabels];
-//		double[] labelScores = new double[numLabels];
-//		computeVitLabelScores(0, startMarker(), sentence, labelScores); BROKEN
-//		ArrayUtil.logNormalize(labelScores);
-//		//initialization
-//		vit[0]=labelScores;
-//		for (int k=0; k < numLabels; k++){
-//			bptr[0][k]=startMarker(); BROKEN
-//		}
-//		for (int t=1; t < T; t++){
-//			double[][] prevcurr = new double[numLabels][numLabels];
-//			for (int s=0; s < numLabels; s++){
-//				computeVitLabelScores(t, s, sentence, prevcurr[s]);
-//				ArrayUtil.logNormalize(prevcurr[s]);
-//				prevcurr[s] = ArrayUtil.add(prevcurr[s], labelScores[s]);
-//			}
-//			for (int s=0; s < numLabels; s++){
-//				double[] sprobs = getColumn(prevcurr, s);
-//				bptr[t][s] = ArrayUtil.argmax(sprobs);
-//				vit[t][s] = sprobs[bptr[t][s]];	
-//			}
-//			labelScores=vit[t];
-//		}
-//		sentence.labels[T-1] = ArrayUtil.argmax(vit[T-1]);
-//		//System.out.print(labelVocab.name(sentence.labels[T-1]));
-//		//System.out.println(" with prob: "+Math.exp(vit[T-1][sentence.labels[T-1]]));
-//		int backtrace = bptr[T-1][sentence.labels[T-1]];
-//		for (int i=T-2; (i>=0)&&(backtrace != startMarker()); i--){ //termination
-//			sentence.labels[i] = backtrace;
-//			//System.err.println(labelVocab.name(backtrace)
-//				//+" with prob: "+Math.exp(vit[i][backtrace]));
-//			backtrace = bptr[i][backtrace];
-//		}
-//		assert (backtrace == startMarker());
-	}
-
-	private double[] getColumn(double[][] matrix, int col){
-		double[] column = new double[matrix.length];
-		for (int i=0; i<matrix[0].length; i++){
-			column[i] = matrix[i][col];
-		}
-		return column;
-	}
-	public void mbrDecode(ModelSentence sentence) {
-		double[][] posterior = inferPosteriorForUnknownLabels(sentence);
-		for (int t=0; t < sentence.T; t++) {
-			sentence.labels[t] = ArrayMath.argmax(posterior[t]);
+			sentence.labels[t] = Arr.argmax(m.labelMarginals[t]);
+			sentence.confidences[t] = m.labelMarginals[t][ sentence.labels[t] ];
 		}
 	}
 
 	/** Computes unnormalized log-potentials.
 	 * CLOBBERS labelScores **/
-	public void computeLabelScores(int t, ModelSentence sentence, double[] labelScores) {
-		Arrays.fill(labelScores, 0);
+	public void computeObsScores(int t, ModelSentence sentence, double[] labelScores) {
 		computeBiasScores(labelScores);
-		computeEdgeScores(t, sentence, labelScores);
-		computeObservedFeatureScores(t, sentence, labelScores);
-	}
-	public void computeVitLabelScores(int t, int prior, ModelSentence sentence, double[] labelScores) {
-		Arrays.fill(labelScores, 0);
-		computeBiasScores(labelScores);
-		viterbiEdgeScores(prior, sentence, labelScores);
 		computeObservedFeatureScores(t, sentence, labelScores);
 	}
 
@@ -220,27 +108,9 @@ public class Model {
 	}
 
 	/** Adds into labelScores **/
-	public void computeEdgeScores(int t, ModelSentence sentence, double[] labelScores) {
-		//    	Util.p(sentence.edgeFeatures);
-		int prev = sentence.edgeFeatures[t];
-		if (prev==-1) return;
-		for (int k=0; k < numLabels; k++) {
-			labelScores[k] += edgeCoefs[prev][k];
-		}
-	}
-	/** @return dim T array s.t. labelScores[t]+=score of label prior followed by label t **/
-	public void viterbiEdgeScores(int prior, ModelSentence sentence, double[] EdgeScores) {
-		for (int k=0; k < numLabels; k++) {
-			EdgeScores[k] += edgeCoefs[prior][k];
-		}
-	}
-
-	/** Adds into labelScores **/
 	public void computeObservedFeatureScores(int t, ModelSentence sentence, double[] labelScores) {
 		for (int k=0; k < numLabels; k++) {
-			//    		for (int obsFeat : sentence.observationFeatures.get(t)) {
 			for (Pair<Integer,Double> pair : sentence.observationFeatures.get(t)) {
-				//    			labelScores[k] += observationFeatureCoefs[obsFeat][k];
 				labelScores[k] += observationFeatureCoefs[pair.first][k] * pair.second;
 			}
 		}
@@ -255,42 +125,39 @@ public class Model {
 		}
 		return result;
 	}
+
 	/**
 	 * Training-only
 	 * 
-	 * add-in loglik gradient (direction of higher likelihood) **/
-	public void computeGradient(ModelSentence sentence, double[] grad) {
+	 * add-in loglik gradient (direction of higher likelihood), and return the loglik of the sentence
+	 **/
+	public double computeGradientAndLL_CRF(ModelSentence sentence, double[] grad) {
 		assert grad.length == flatIDsize();
 		int T = sentence.T;
-		double[][] posterior = inferPosteriorGivenLabels(sentence);
+		double ll = 0;
 
-		for (int t=0; t<T; t++) {        	
-			int prevLabel = sentence.edgeFeatures[t];
+		ChainInfer.Marginals m = inferPosteriorFullMarginals_CRF(sentence);
+		
+		for (int t=0; t<T; t++) {
 			int y = sentence.labels[t];
-
-			// add empirical counts, subtract model-expected-counts
+			ll += Math.log(m.labelMarginals[t][y]);
+			
 			for (int k=0; k < numLabels; k++) {
-				double p = posterior[t][k];
-				int empir = y==k ? 1 : 0;
-				grad[biasFeature_to_flatID(k)]                      += empir - p;
-				if (prevLabel != -1) {
-					grad[edgeFeature_to_flatID(prevLabel, k)]           += empir - p;	
-				}
+				double delta = (y==k ? 1 : 0) - m.labelMarginals[t][k]; 
+				grad[biasFeature_to_flatID(k)] += delta;
 				for (Pair<Integer,Double> fv : sentence.observationFeatures.get(t)) {
-					grad[observationFeature_to_flatID(fv.first, k)] += (empir - p) * fv.second;
+					grad[observationFeature_to_flatID(fv.first, k)] += delta * fv.second;
+				}
+				if (t < T-1) {
+					for (int next=0; next<numLabels; next++) {
+						double empir = (y==k && sentence.labels[t+1]==next) ? 1 : 0;
+						double pp = m.pairMarginals[t][k][next];
+						grad[edgeFeature_to_flatID(k, next)] += empir - pp;
+					}
 				}
 			}
 		}
-	}
-
-	public double computeLogLik(ModelSentence s) {
-		double[][] posterior = inferPosteriorGivenLabels(s);
-		double loglik = 0;
-		for (int t=0; t < s.T; t++) {
-			int y = s.labels[t];
-			loglik += Math.log(posterior[t][y]);
-		}
-		return loglik;
+		return ll;
 	}
 
 	/////////////////////////////////////////////////////////
@@ -472,6 +339,114 @@ public class Model {
 						sourceModel.observationFeatureCoefs[sourceFeatID] );
 			}
 		}
+	}
+	
+	/////////////////////////////////////////////
+	
+	/**
+	 * Training-only
+	 * 
+	 * add-in loglik gradient (direction of higher likelihood) **/
+	public double computeGradientAndLL_MEMM(ModelSentence sentence, double[] grad) {
+		assert grad.length == flatIDsize();
+		int T = sentence.T;
+		double[][] posterior = inferPosteriorGivenLabels_MEMM(sentence);
+		
+		double ll = 0;
+
+		for (int t=0; t<T; t++) {        	
+			int prevLabel = sentence.edgeFeatures[t];
+			int y = sentence.labels[t];
+			ll += Math.log(posterior[t][y]);
+
+			// add empirical counts, subtract model-expected-counts
+			for (int k=0; k < numLabels; k++) {
+				double p = posterior[t][k];
+				int empir = y==k ? 1 : 0;
+				grad[biasFeature_to_flatID(k)]                      += empir - p;
+				if (prevLabel != -1) {
+					grad[edgeFeature_to_flatID(prevLabel, k)]           += empir - p;	
+				}
+				for (Pair<Integer,Double> fv : sentence.observationFeatures.get(t)) {
+					grad[observationFeature_to_flatID(fv.first, k)] += (empir - p) * fv.second;
+				}
+			}
+		}
+		return ll;
+	}
+
+	/** Adds into labelScores **/
+	public void computeEdgeScores_MEMM(int t, ModelSentence sentence, double[] labelScores) {
+		int prev = sentence.edgeFeatures[t];
+		if (prev==-1) return;
+		for (int k=0; k < numLabels; k++) {
+			labelScores[k] += edgeCoefs[prev][k];
+		}
+	}
+	
+	/** Computes unnormalized log-potentials.
+	 * CLOBBERS labelScores **/
+	public void computeLabelScores_MEMM(int t, ModelSentence sentence, double[] labelScores) {
+		Arrays.fill(labelScores, 0);
+		computeBiasScores(labelScores);
+		computeEdgeScores_MEMM(t, sentence, labelScores);
+		computeObservedFeatureScores(t, sentence, labelScores);
+	}
+
+	/** 
+	 * THIS CLOBBERS THE LABELS, stores its decoding into them.
+	 * Does progressive rolling edge feature extraction
+	 **/
+	public void decodeGreedy_MEMM(ModelSentence sentence, boolean storeConfidences) {
+		int T = sentence.T;
+		sentence.labels = new int[T];
+		
+		if (storeConfidences) {
+			sentence.confidences = new double[T];
+			sentence.labelPosteriors = new double[T][numLabels];
+		}
+
+		double[] labelScores = new double[numLabels];
+		for (int t=0; t<T; t++) {
+			computeLabelScores_MEMM(t, sentence, labelScores);
+			sentence.labels[t] = ArrayMath.argmax(labelScores);
+			if (t < T-1)
+				sentence.edgeFeatures[t+1] = sentence.labels[t];
+			if (storeConfidences) {
+				ArrayMath.expInPlace(labelScores);
+				double Z = ArrayMath.sum(labelScores);
+				ArrayMath.multiplyInPlace(labelScores, 1.0/Z);
+				sentence.confidences[t] = labelScores[ sentence.labels[t] ];
+				sentence.labelPosteriors[t] = Arr.copy(labelScores);
+			}
+		}
+	}
+
+	/**
+	 * "given labels" i.e. at trainingtime labels are observed.
+	 * You hide the current one and predict it given you know the previous.
+	 * So you get funny incremental posteriors per position that an MEMM uses at trainingtime.
+	 * (They don't have a proper full-model posterior marginal
+	 * interpretation like a CRF forward-backward-computed posterior does. no?)
+	 * 
+	 * @param sentence - must its have .labels set
+	 * @returns posterior marginals, dim (T x N_label)
+	 */
+	public double[][] inferPosteriorGivenLabels_MEMM(ModelSentence sentence) {
+		double[][] posterior = new double[sentence.T][labelVocab.size()];
+		double[] labelScores = new double[numLabels];
+		for (int t=0; t<sentence.T; t++) {
+			// start in log space
+			computeLabelScores_MEMM(t, sentence, labelScores);
+			// switch to exp space
+			ArrayUtil.expInPlace(labelScores);
+			double Z = ArrayUtil.sum(labelScores);
+
+			for (int k=0; k<numLabels; k++) {
+				posterior[t][k] = labelScores[k] / Z;
+			}
+		}
+		return posterior;
 	}
 
 }

@@ -27,7 +27,6 @@ public class Train {
 	public String modelSaveFilename = null;
 	public boolean dumpFeatures = false;
 
-
 	// Data structures
 	private ArrayList<Sentence> lSentences;
 	private ArrayList<ModelSentence> mSentences;
@@ -142,8 +141,8 @@ public class Train {
 			Arr.fill(g,0);
 			double loglik = 0;
 			for (ModelSentence s : mSentences) {
-				model.computeGradient(s, g);
-				loglik += model.computeLogLik(s);
+				loglik += model.computeGradientAndLL_CRF(s, g);
+//				loglik += model.computeGradientAndLL_MEMM(s, g);
 			}
 			Arr.multiplyInPlace(g, -1);
 			addL2regularizerGradient(g, flatCoefs);
