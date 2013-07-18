@@ -108,6 +108,7 @@ public class Train {
 		LBFGS.Params params = new LBFGS.Params();
 		params.max_iterations = maxIter;
 		params.orthantwise_c = l1penalty();
+		params.orthantwise_start = model.observationFeature_to_flatID(0,0);
 		params.delta = params.epsilon = tol;   // only 'delta' will matter
 		
 		LBFGS.Result r = LBFGS.lbfgs(flatCoefs, new GradientCalculator(),
