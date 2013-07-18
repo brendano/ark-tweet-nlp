@@ -3,7 +3,7 @@ package cmu.arktweetnlp.impl;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import edu.berkeley.nlp.util.StringUtils;
+import edu.stanford.nlp.util.StringUtils;
 
 /** Could scrap this and use ark-regression's version -- that one has CheapStrings **/
 public class Vocabulary {

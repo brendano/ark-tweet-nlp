@@ -9,13 +9,10 @@ import java.util.Arrays;
 
 import util.Arr;
 import util.ChainInfer;
-import util.U;
 
 import cmu.arktweetnlp.util.BasicFileIO;
-import edu.berkeley.nlp.util.ArrayUtil;
-import edu.berkeley.nlp.util.Triple;
-import edu.stanford.nlp.math.ArrayMath;
-import edu.stanford.nlp.util.Pair;
+import cmu.arktweetnlp.util.Pair;
+import cmu.arktweetnlp.util.Triple;
 
 /**
  * This contains
@@ -330,15 +327,15 @@ public class Model {
 			}
 		}
 
-		destModel.biasCoefs = ArrayUtil.copy(sourceModel.biasCoefs);
-		destModel.edgeCoefs = ArrayUtil.copy(sourceModel.edgeCoefs);
+		destModel.biasCoefs = Arr.copy(sourceModel.biasCoefs);
+		destModel.edgeCoefs = Arr.copy(sourceModel.edgeCoefs);
 
 		// observation features need the intersection
 		for (int sourceFeatID=0; sourceFeatID < sourceModel.featureVocab.size(); sourceFeatID++) {
 			String featName = sourceModel.featureVocab.name(sourceFeatID);
 			if (destModel.featureVocab.contains(featName)) {
 				int destFeatID = destModel.featureVocab.num(featName);
-				destModel.observationFeatureCoefs[destFeatID] = ArrayUtil.copy(
+				destModel.observationFeatureCoefs[destFeatID] = Arr.copy(
 						sourceModel.observationFeatureCoefs[sourceFeatID] );
 			}
 		}
@@ -412,13 +409,13 @@ public class Model {
 		double[] labelScores = new double[numLabels];
 		for (int t=0; t<T; t++) {
 			computeLabelScores_MEMM(t, sentence, labelScores);
-			sentence.labels[t] = ArrayMath.argmax(labelScores);
+			sentence.labels[t] = Arr.argmax(labelScores);
 			if (t < T-1)
 				sentence.edgeFeatures[t+1] = sentence.labels[t];
 			if (storeConfidences) {
-				ArrayMath.expInPlace(labelScores);
-				double Z = ArrayMath.sum(labelScores);
-				ArrayMath.multiplyInPlace(labelScores, 1.0/Z);
+				Arr.expInPlace(labelScores);
+				double Z = Arr.sum(labelScores);
+				Arr.multiplyInPlace(labelScores, 1.0/Z);
 				sentence.confidences[t] = labelScores[ sentence.labels[t] ];
 				sentence.labelPosteriors[t] = Arr.copy(labelScores);
 			}
@@ -442,8 +439,8 @@ public class Model {
 			// start in log space
 			computeLabelScores_MEMM(t, sentence, labelScores);
 			// switch to exp space
-			ArrayUtil.expInPlace(labelScores);
-			double Z = ArrayUtil.sum(labelScores);
+			Arr.expInPlace(labelScores);
+			double Z = Arr.sum(labelScores);
 
 			for (int k=0; k<numLabels; k++) {
 				posterior[t][k] = labelScores[k] / Z;

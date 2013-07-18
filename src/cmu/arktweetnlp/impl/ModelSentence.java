@@ -3,7 +3,7 @@ package cmu.arktweetnlp.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import edu.stanford.nlp.util.Pair;
+import cmu.arktweetnlp.util.Pair;
 
 /**
  * One sequence structure -- typically, for one sentence

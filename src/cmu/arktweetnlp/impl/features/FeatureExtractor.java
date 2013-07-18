@@ -8,8 +8,8 @@ import java.util.logging.Logger;
 import cmu.arktweetnlp.impl.Model;
 import cmu.arktweetnlp.impl.ModelSentence;
 import cmu.arktweetnlp.impl.Sentence;
+import cmu.arktweetnlp.util.Pair;
 import cmu.arktweetnlp.util.Util;
-import edu.stanford.nlp.util.Pair;
 
 /**
  * Extracts features and numberizes them

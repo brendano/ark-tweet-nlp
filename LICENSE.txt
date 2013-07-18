@@ -10,9 +10,9 @@ Stanford POS Tagger version 2010-05-26.
 
 lib/stanford-postagger-2010-05-26.jar -- license GPL.
 
-lib/posBerkeley.jar -- licensed Apache 2.0 (see below).
-
 lib/trove-3.0.0a5.jar -- licensed LGPL.
+
+lib/myutil.jar -- licensed GPL, though see inside for internal components
 
 (There are many more libraries used in the released version, that have their
 own licenses and not listed here.)
@@ -30,25 +30,3 @@ http://www.gnu.org/licenses/gpl-2.0.html
 Apache version 2.0:
 http://www.apache.org/licenses/LICENSE-2.0
 
-=======================================================================
-
-posBerkeley.jar is Copyright 2011, Taylor Berg-Kirkpatrick.  Licensed as Apache 2.0:
-
-    From: Taylor Berg-Kirkpatrick
-    Date: Thu, 30 Jun 2011 15:33:03 -0700
-    Subject: Re: license for your code
-    To: Kevin Gimpel
-
-    Sure. I give you guys permission to release under Apache.
-
-    On Tue, Jun 28, 2011 at 11:50 AM, Kevin Gimpel <kgimpel@cs.cmu.edu> wrote:
-    [...]
-    > Dipanjan, Brendan, and I are working on the release of our group's Twitter
-    > part-of-speech tagger and we are now trying to figure out what license to
-    > use with the code that we are releasing. We extended code that you shared
-    > with Noah last summer
-    [...]
-    > But in order to do this, we'd have to ask you to "release" that same code
-    > you gave to us under an Apache license.
-
-=======================================================================

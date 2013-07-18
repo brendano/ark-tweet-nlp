@@ -16,3 +16,9 @@ mod/
 target/
 bin/
 *.bak
+
+release/
+test_results/
+saved_stuff/
+newexper/
+experiments*

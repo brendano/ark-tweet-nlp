@@ -7,7 +7,6 @@ import java.util.List;
 
 import cmu.arktweetnlp.impl.Sentence;
 import cmu.arktweetnlp.util.BasicFileIO;
-import edu.stanford.nlp.util.Pair;
 
 
 /**
