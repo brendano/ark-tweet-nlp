@@ -5,6 +5,16 @@
 #  token \t tag
 # (and we skip blank lines.)
 
+# Usage:
+#  scripts/paired_stats.r GoldDataFile Preds1 Preds2
+#
+# For example: make taggings from two different models, then evaluate the paired test.
+#  scripts/java.sh cmu.arktweetnlp.RunTagger --input-format conll data/twpos-data-v0.3/daily547.conll --model model1 > preds1
+#  scripts/java.sh cmu.arktweetnlp.RunTagger --input-format conll data/twpos-data-v0.3/daily547.conll --model model2 > preds2
+#  scripts/paired_stats.r data/twpos-data-v0.3/daily547.conll preds1 preds2
+#
+# Or you could just edit this file if you don't want to use the commandline.
+
 read.tsv = function(f) read.table(f,sep='\t',quote='',comment='',na.strings='',stringsAsFactors=FALSE)
 
 # gold = read.tsv(pipe("grep . conll/daily547.all"))
@@ -30,7 +40,7 @@ cat("\nContingency table of system correctness indicators")
 # print(mcnemar.test(d1$V2==gold$V2, d2$V2==gold$V2))
 t = table(d1$V2==gold$V2, d2$V2==gold$V2)
 print(t)
-cat("\nExact McNemar: proportion of improvements among differences")
+cat("\nExact McNemar: proportion of time one system is better than the other, when they disagree (and excluding cases where both are wrong):")
 print(binom.test(t[1,2], t[1,2]+t[2,1]))
 
 cat("System agreement with each other\n")
