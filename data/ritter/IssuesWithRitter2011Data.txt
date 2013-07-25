@@ -1,0 +1,51 @@
+Brendan O'Connor and Nathan Schneider 2013-07-23
+
+We found several errors/issues in the Ritter dataset (annotations of tweets
+with PTB-tagset POS tags, described in Ritter, Clark, Mausam and Etzioni,
+EMNLP 2011 and available at https://github.com/aritter/twitter_nlp).
+
+[Note that our results resported in Owoputi NAACL-2013 are using the original,
+non-fixed version of the Ritter data.]
+
+We fixed some of these issues but not others:
+
+1. Never using start quotes -- DID NOT FIX, see below!
+2. Several obvious typos or bogus tags -- fixed
+3. Obvious errors, like ",/IN -- a few fixed
+4. please/VB V vs please/UH V inconsistency: fixed.
+5. The data seems to be from the same day or timespan.  There are many
+   near-duplicate messages.
+6. Poor handling of compounds, a problem inherent to using PTB tagset on
+   conversational text; see Owoputi et al. NAACL-2013 for a discussion.
+
+(#1)
+PTB has separate tags for quote tokens: starting (``) and ending quotes ('').
+The annotator in Ritter et al. only used the end quote ('') marker.  We are
+concerned this might screw up downstream models trained on a traditional PTB
+corpus, especially things like parsing.
+
+We attempted to fix it, but were unsatisfied with the results, because the
+tokenizer often erroneously merges end quotes and sentence-ending punctuation.
+It is not clear whether to tag these erroneous tokens as an endquote or a
+sentence-ending punctuation.  Therefore we left in the tags of '' for all
+quotes.  Please be careful that this doesn't screw up your desired
+application.
+
+It would be better to fix the tokenizer and revisit.
+
+(#4)
+"Please/VB come" versus "Please/UH come": we fixed these cases to please/UH,
+following PTB's tagging manual:
+
+    UH "includes 'my' (as in 'My, what a gorgeous day'), 'oh', 'please', 'see'
+    (as in 'See, it's like this'), 'uh', 'well', and 'yes', among others."
+  
+Note that WSJ PTB data is inconsistent, often having please/VB.  So if you're
+using a model trained on WSJ PTB be aware this might get screwed up.
+
+---
+
+To see our changes:
+    
+    diff -u orig/pos.txt pos_fixed.txt
+
