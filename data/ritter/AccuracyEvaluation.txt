@@ -1,0 +1,44 @@
+Brendan O'Connor and Olutobi Owoputi 2013-07-26
+
+Our NAACL paper reports 90.0% token accuracy under cross-validation on the
+original "Ritter/PTB" dataset.  Derczynski et al. (RANLP 2013, available on
+the GATE tagger's website) developed and evaluated on this dataset, and the
+first author argued their results are not comparable with ours, because the
+splits were different.  So we re-did training and evaluation using their
+splits, kindly provided by the replication materials downloadable in the GATE
+Twitter POS tagger:
+  http://gate.ac.uk/wiki/twitter-postagger.html 
+  and specifically, twitie-tagger.zip
+
+
+Token-level accuracy: the first is the new experiment.  The second and third
+were reported in Derczynski et al.
+
+90.4%   ARK tagger
+88.7%   GATE tagger
+84.6%   T-POS (the original tagger from Ritter et al. 2011)
+
+Even though this evaluation set is very small (118 tweets, 2291 tokens),
+the difference between the first two is significant under a paired test.
+
+Sentence-level accuracy:
+
+22.0%   ARK tagger
+20.3%   GATE tagger
+ 9.3%   T-POS
+
+The difference between the first two is not significant under a paired test.
+(The statistical power is very low: there are just 14 tweets where one tagger
+is right and the other wrong, and ARK is right 8/14 times.)
+Note that these whole-tweet accuracy numbers are out of only 118 tweets.
+
+Comparisons like this are easy to run with our tagger: we just followed the
+documentation in docs/training.txt.
+Materials for this experiment are saved in:
+http://www.ark.cs.cmu.edu/TweetNLP/gate_ritterptb_comparison.zip
+
+
+References:
+Owoputi et al. NAACL 2013: http://www.ark.cs.cmu.edu/TweetNLP/owoputi+etal.naacl13.pdf
+Derczynski et al. RANLP 2013: http://derczynski.com/sheffield/papers/twitter_pos.pdf
+
