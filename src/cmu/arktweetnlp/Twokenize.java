@@ -9,6 +9,8 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 /**
  * Twokenize -- a tokenizer designed for Twitter text in English and some other European languages.
+ * This is the Java version. If you want the old Python version, see: http://github.com/brendano/tweetmotif
+ * 
  * This tokenizer code has gone through a long history:
  *
  * (1) Brendan O'Connor wrote original version in Python, http://github.com/brendano/tweetmotif
