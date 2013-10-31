@@ -32,6 +32,6 @@ $ awk '$2=="V"' < mymodel | grep Suff | sort -gk3
 
 == Evaluation ==
 
-$ myjava cmu.arktweetnlp.RunTagger cmu.arktweetnlp.RunTagger --input-format conll --model mymodel data/twpos-data-v0.3/daily547.conll > pred
+$ myjava cmu.arktweetnlp.RunTagger --input-format conll --model mymodel data/twpos-data-v0.3/daily547.conll > pred
 7184 / 7707 correct = 0.9321 acc, 0.0679 err
 547 tweets in 3.3 seconds, 163.5 tweets/sec
