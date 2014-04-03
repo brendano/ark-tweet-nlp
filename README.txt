@@ -1,4 +1,4 @@
-CMU ARK Twitter Part-of-Speech Tagger v0.3
+CMU ARK Twitter Part-of-Speech Tagger v0.3.2
 http://www.ark.cs.cmu.edu/TweetNLP/
 
 Basic usage for released version
