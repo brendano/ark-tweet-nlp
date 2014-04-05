@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.PrintStream;
+import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
@@ -33,6 +34,7 @@ public class RunTagger {
 	int inputField = 1;
 	
 	String inputFilename;
+	String outputFilename;
 	/** Can be either filename or resource name **/
 	String modelFilename = "/cmu/arktweetnlp/model.20120919";
 
@@ -335,6 +337,13 @@ public class RunTagger {
 			} else if (args[i].equals("--output-format")) {
 				tagger.outputFormat = args[i+1];
 				i += 2;
+			} else if (args[i].equals("--output-file")) {
+				tagger.outputFilename = args[i+1];
+				tagger.outputStream = new PrintStream(new FileOutputStream(tagger.outputFilename, true));
+				i += 2;
+			} else if (args[i].equals("--output-overwrite")) {
+				tagger.outputStream = new PrintStream(new FileOutputStream(tagger.outputFilename, false));
+				i += 1;
 			} else if (args[i].equals("--input-field")) {
 				tagger.inputField = Integer.parseInt(args[i+1]);
 				i += 2;
@@ -398,6 +407,8 @@ public class RunTagger {
 "\n                            Options: json, text, conll" +
 "\n  --output-format <Format>  Default: automatically decide from input format." +
 "\n                            Options: pretsv, conll" +
+"\n  --output-file <Filename>  Save output to specified file (Else output to stdout)" +
+"\n  --output-overwrite        Overwrite output-file (default: append)" +
 "\n  --input-field NUM         Default: 1" +
 "\n                            Which tab-separated field contains the input" +
 "\n                            (1-indexed, like unix 'cut')" +
