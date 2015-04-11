@@ -4,6 +4,8 @@ If you are on a Windows machine, you should use the CMUTweetTaggerWindows.py fil
 
 It might not work on Mac or Linux, but will work on Windows.
 
+Please contact Kevin Zhao(kevinzhao53@gmail.com) if you encounter any trouble with the Windows wrapper.
+
 For all branches:
 
 CMU ARK Twitter Part-of-Speech Tagger v0.3.2
