@@ -1,3 +1,11 @@
+For this branch only:
+
+If you are on a Windows machine, you should use the CMUTweetTaggerWindows.py file to run the tagger.
+
+It might not work on Mac or Linux, but will work on Windows.
+
+For all branches:
+
 CMU ARK Twitter Part-of-Speech Tagger v0.3.2
 http://www.ark.cs.cmu.edu/TweetNLP/
 
