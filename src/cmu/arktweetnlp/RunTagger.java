@@ -349,7 +349,7 @@ public class RunTagger {
 				i += 2;
 			} else if (args[i].equals("--word-clusters")) {
 				WordClusterPaths.clusterResourceName = args[i+1];
-				i += 1;
+				i += 2;
 			} else if (args[i].equals("--no-confidence")) {
 				tagger.showConfidence = false;
 				i += 1;
