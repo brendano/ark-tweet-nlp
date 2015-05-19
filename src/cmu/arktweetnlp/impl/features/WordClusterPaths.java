@@ -26,7 +26,7 @@ public class WordClusterPaths implements FeatureExtractorInterface {
 //		log.info("Loading clusters");
 		
 		//read in paths file
-		BufferedReader bReader = BasicFileIO.getResourceReader(clusterResourceName);
+		BufferedReader bReader = BasicFileIO.openFileOrResource(clusterResourceName);
 		String[] splitline = new String[3];
 		String line=BasicFileIO.getLine(bReader);
 		wordToPath = new HashMap<String,String>(); 
