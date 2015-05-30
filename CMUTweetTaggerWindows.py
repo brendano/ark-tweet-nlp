@@ -34,4 +34,6 @@ def runString(s):
     psutil.pids()
 
     os.remove(file_name)
+    #Running one tweet at a time takes much longer time because of restarting the tagger
+    #we recommend putting all sentences into one file and then tag the whole file, use the runFile method shown above
     return l
