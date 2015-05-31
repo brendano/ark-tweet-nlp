@@ -10,12 +10,14 @@ import psutil
 import tempfile
 
 def runFile(fileName):
-    p = subprocess.Popen('java -XX:ParallelGCThreads=2 -Xmx500m -jar ark-tweet-nlp-0.3.2.jar '+ fileName,stdout=subprocess.PIPE)
-
+    p = subprocess.Popen('java -XX:ParallelGCThreads=2 -Xmx500m -jar ark-tweet-nlp-0.3.2.jar "'+ fileName + '"',stdout=subprocess.PIPE)
+    file_name = 'tagged_tweets_%s.txt' % os.getpid()
+    o = codecs.open(file_name,'w','utf-8')
     while p.poll() is None:
         l = p.stdout.readline()
-        return l
-
+        o.write(l.decode('utf-8'))
+        o.flush()
+    o.close()
 
 def runString(s):
     file_name = 'temp_file_%s.txt' % os.getpid()
