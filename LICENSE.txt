@@ -1,4 +1,7 @@
-The full tagger software package is licensed as GPL version 2.
+The full tagger software package is licensed as GPL version 2 or later -- at
+least, according to our interpretation of how the GPL works, which we find
+confusing, so you should conduct your own legal analysis if this is important
+to you.  The details are as follows.
 
 src/ -- All original code we've written -- the files in src/ with one
 exception below -- we license under the Apache License version 2.0. However,
@@ -6,7 +9,10 @@ we have several GPL'd dependencies that we include in this package, which,
 as we understand it, force the full package to be GPL.
 
 src/cmu/arktweetnlp/impl/OWLQN.java -- is licensed GPL, originally from the
-Stanford POS Tagger version 2010-05-26.
+Stanford POS Tagger version 2010-05-26.  It can be removed and the tagger
+works just fine with a pre-trained model (but you can't retrain).  We are not
+aware of an interpretation of the GPL for whether it infects through trained
+models.
 
 lib/stanford-postagger-2010-05-26.jar -- license GPL.
 
