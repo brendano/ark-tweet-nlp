@@ -100,7 +100,7 @@ to associate output with metadata in the input file.
 	
 	.small { font-size: small; }
 </style>
-<?
+<?php
 
 include_once("json.php");
 
@@ -543,17 +543,17 @@ $("body").ready(init);
 	<p>Review the output of an automatic POS tagger run on the sentences below. Click on a word and type the correct tag to change it from the default. <a href="annotator-instructions.txt">(complete guidelines)</a></p>
 </div>
 <ol id="sentences" class="l<?= $lang ?>">
-<? 
+<?php 
 $iid = $iFrom;
 foreach ($SENTENCES as $s) {
 ?>
 	<li id="s<?= $iid ?>"><p class="sentence original l<?= $lang ?>"><?= $s['sentence'] ?></p><div class="metadata"><?= $s['metadata'] ?></div></li>
-<? 
+<?php 
 	$iid++;
 } ?>
 </ol>
 
-<? if (array_key_exists("annotation", $_REQUEST)) {
+<?php if (array_key_exists("annotation", $_REQUEST)) {
 	 $curPage = $_SERVER["REQUEST_URI"];
 	 $m = array();
 	 preg_match('/([-]?[0-9]+)/', $curPage, $m);
@@ -563,7 +563,7 @@ foreach ($SENTENCES as $s) {
 <div class="instructions">
 <p><a href="<?= $nextPage ?>">next page</a></p>
 </div>
-<? } ?>
+<?php } ?>
 <div class="controls">
 <p>
 	<input type="hidden" name="assignmentId" value="<?= $_REQUEST['assignmentId'] ?>" />
