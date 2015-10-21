@@ -27,10 +27,23 @@
                       <sources>
                           <source>${basedir}/../src</source>
                       </sources>
+
                     </configuration>
                   </execution>
+                  <execution>
+                        <id>add-test-source</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${basedir}/../test</source>
+                            </sources>
+                        </configuration>
+                    </execution>
                 </executions>
-            </plugin>		
+            </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -50,7 +63,7 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>	
+			</plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -108,11 +121,11 @@
 										<include>**/*.jar</include>
 									</includes>
 								</JarResource>
-							</resources>						
+							</resources>
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>			
+			</plugin>
         </plugins>
     </build>
     <repositories>
@@ -133,9 +146,9 @@
             <version>1.4</version>
         </dependency>
 		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-			<version>2.3</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.4</version>
 		</dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -162,6 +175,13 @@
             <artifactId>guava</artifactId>
             <version>10.0.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.pirkaengine</groupId>
+            <artifactId>pirka-mobile</artifactId>
+            <version>0.3.0</version>
+        </dependency>
+
         <!-- START testing dependecies -->
         <dependency>
             <groupId>junit</groupId>
@@ -181,7 +201,7 @@
 		  <artifactId>jackson-databind</artifactId>
 		  <version>2.0.0</version>
 		</dependency>
-		
+
         <!-- END testing dependecies -->
     </dependencies>
 </project>

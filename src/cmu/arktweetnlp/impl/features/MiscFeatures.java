@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import cmu.arktweetnlp.Twokenize;
+import cmu.arktweetnlp.impl.DefaultPatternContext;
 import cmu.arktweetnlp.impl.features.FeatureExtractor.FeatureExtractorInterface;
 import cmu.arktweetnlp.impl.features.FeatureExtractor.PositionFeaturePairs;
 
@@ -121,7 +122,7 @@ public class MiscFeatures {
 		/** TODO change to punctuation class, or better from Twokenize **/
 		//Pattern allPunct = Pattern.compile("^[^a-zA-Z0-9]*$");
 		Pattern allPunct = Pattern.compile("^\\W*$");
-		Pattern emoticon = Pattern.compile(Twokenize.emoticon);
+		Pattern emoticon = Pattern.compile(DefaultPatternContext.emoticon);
 		public void addFeatures(List<String> tokens, PositionFeaturePairs pairs) {
 			for (int t=0; t < tokens.size(); t++) {
 				String tok = tokens.get(t);
@@ -154,8 +155,8 @@ public class MiscFeatures {
 		}    
 	}
 	public static class URLFeatures implements FeatureExtractorInterface {	
-		Pattern validURL = Pattern.compile(Twokenize.url);
-		Pattern validEmail = Pattern.compile(Twokenize.Email);
+		Pattern validURL = Pattern.compile(DefaultPatternContext.url);
+		Pattern validEmail = Pattern.compile(DefaultPatternContext.Email);
 		public void addFeatures(List<String> tokens, PositionFeaturePairs pairs) {
 			for (int t=0; t < tokens.size(); t++) {
 				String tok = tokens.get(t);

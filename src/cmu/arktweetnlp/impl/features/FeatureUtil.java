@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import cmu.arktweetnlp.Twokenize;
 
+import cmu.arktweetnlp.impl.DefaultPatternContext;
 import com.twitter.Regex;
 
 
@@ -16,7 +17,7 @@ import com.twitter.Regex;
  **/
 public class FeatureUtil {
 	
-	public static Pattern URL = Pattern.compile(Twokenize.OR(Twokenize.url, Twokenize.Email));
+	public static Pattern URL = Pattern.compile(DefaultPatternContext.OR(DefaultPatternContext.url, DefaultPatternContext.Email));
 	public static Pattern justbase = Pattern.compile("(?!www\\.|ww\\.|w\\.|@)[a-zA-Z0-9]+\\.[A-Za-z0-9\\.]+"); 
 
 //	Pattern URL = Pattern.compile(Twokenize.url);
