@@ -1,6 +1,5 @@
 package cmu.arktweetnlp;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 
 import java.util.*;

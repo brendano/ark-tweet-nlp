@@ -10,6 +10,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
     <build>
 		<plugins>
              <plugin>
@@ -50,7 +51,7 @@
 				<version>1.6</version>
 				<executions>
 					<execution>
-						<phase>package</phase>
+						<phase>none</phase>
 						<goals>
 							<goal>shade</goal>
 						</goals>
@@ -201,6 +202,22 @@
 		  <artifactId>jackson-databind</artifactId>
 		  <version>2.0.0</version>
 		</dependency>
+
+        <dependency>
+            <groupId>edu.stanford.nlp</groupId>
+            <artifactId>stanford-corenlp</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.berkeley.nlp</groupId>
+            <artifactId>berkeleyparser</artifactId>
+            <version>r32</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.trove4j</groupId>
+            <artifactId>trove4j</artifactId>
+            <version>3.0.3</version>
+        </dependency>
 
         <!-- END testing dependecies -->
     </dependencies>
