@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.ArrayList;
 
 import cmu.arktweetnlp.impl.DefaultPatternContext;
-import cmu.arktweetnlp.impl.EmojiExtractorImpl;
 import cmu.arktweetnlp.impl.NoOpEmojiExtractor;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
