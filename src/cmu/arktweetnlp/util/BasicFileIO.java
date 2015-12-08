@@ -43,7 +43,9 @@ public class BasicFileIO {
     public static BufferedReader openFileToReadUTF8(String file) {
         try {
             BufferedReader bReader = null;
-            if (file.endsWith(".gz")) {
+            if (file.equals("/dev/stdin")) {
+                bReader = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
+            } else if (file.endsWith(".gz")) {
                 bReader = new BufferedReader(new InputStreamReader(
                         new GZIPInputStream(new FileInputStream(file)), "UTF-8"));
             } else {
