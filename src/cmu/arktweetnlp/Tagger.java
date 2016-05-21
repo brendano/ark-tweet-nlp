@@ -4,12 +4,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cmu.arktweetnlp.impl.Model;
 import cmu.arktweetnlp.impl.ModelSentence;
 import cmu.arktweetnlp.impl.Sentence;
 import cmu.arktweetnlp.impl.features.FeatureExtractor;
+import edu.stanford.nlp.math.ArrayMath;
+import edu.stanford.nlp.util.ArrayUtils;
 
 
 /**
@@ -74,7 +78,7 @@ public class Tagger {
 
 		return taggedTokens;
 	}
-
+	
 	/**
 	 * Illustrate how to load and call the POS tagger.
 	 * This main() is not intended for serious use; see RunTagger.java for that.

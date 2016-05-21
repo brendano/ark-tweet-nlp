@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import cmu.arktweetnlp.util.BasicFileIO;
 import edu.berkeley.nlp.util.ArrayUtil;
@@ -122,12 +125,54 @@ public class Model {
 
 
 	/**
-	 * This needs forward-backward I think
+	 * This algorithm probably isn't correct
 	 * @return dim: (T x K) posterior marginals at each position
 	 */
 	public double[][] inferPosteriorForUnknownLabels(ModelSentence sentence) {
-		assert false : "Unimplemented";
-	return null;
+		int T = sentence.T;
+		sentence.labels = new int[T];
+		sentence.edgeFeatures[0] = startMarker();
+		
+		double[][] output = new double[T][numLabels];
+		
+		for (int t=0; t<T; t++) {
+			computeLabelScores(t, sentence, output[t]);
+			sentence.labels[t] = ArrayMath.argmax(output[t]);
+			if (t < T-1)
+				sentence.edgeFeatures[t+1] = sentence.labels[t];
+			ArrayMath.expInPlace(output[t]);
+			double Z = ArrayMath.sum(output[t]);
+			ArrayMath.multiplyInPlace(output[t], 1.0/Z);
+		}
+		return output;
+	}
+	
+	/**
+	 * returns with sparsity
+	 */
+	public List<Map<String,Double>> inferPosteriorForUnknownLabelsWithThresholding(ModelSentence sentence, double relThresh) {
+		double[][] posterior = inferPosteriorForUnknownLabels(sentence);
+		List<Map<String,Double>> ret = new ArrayList<>();
+		
+//		for (int t=0;t<posterior.length;t++) {
+//			for (int k=0;k<posterior[0].length;k++) {
+//				System.out.print(posterior[t][k]+" ");
+//			}
+//			System.out.print("   .... ");
+//			System.out.print(ArrayMath.sum(posterior[t]));
+//			System.out.print("\n");
+//		}
+		for (int t=0; t < sentence.T; t++) {
+			Map<String,Double> tagProbs = new HashMap<>();
+			double maxprob = ArrayMath.max(posterior[t]);
+			for (int k=0; k<posterior[t].length; k++) {
+				if (posterior[t][k] >= relThresh*maxprob) {
+					tagProbs.put(labelVocab.name(k), posterior[t][k]);
+				} 
+			}
+			ret.add(tagProbs);
+		}
+		return ret;
 	}
 	
 	

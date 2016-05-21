@@ -9,6 +9,10 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cmu.arktweetnlp.impl.ModelSentence;
 import cmu.arktweetnlp.impl.Sentence;
@@ -40,6 +44,8 @@ public class RunTagger {
 
 	public boolean noOutput = false;
 	public boolean justTokenize = false;
+	public boolean uncertainOutput = false;
+	public double uncertainOutputRelativeThreshold = 1e-3;
 	
 	public static enum Decoder { GREEDY, VITERBI };
 	public Decoder decoder = Decoder.GREEDY; 
@@ -78,7 +84,7 @@ public class RunTagger {
 		}
 	}
 	
-	public void runTagger() throws IOException, ClassNotFoundException {
+		public void runTagger() throws IOException, ClassNotFoundException {
 		
 		tagger = new Tagger();
 		if (!justTokenize) {
@@ -127,8 +133,11 @@ public class RunTagger {
 				tagger.featureExtractor.computeFeatures(sentence, modelSentence);
 				goDecode(modelSentence);
 			}
-				
-			if (outputFormat.equals("conll")) {
+
+			if (uncertainOutput) {
+				outputPrependedUncertainTagging(sentence,modelSentence, line);
+			}
+			else if (outputFormat.equals("conll")) {
 				outputJustTagging(sentence, modelSentence);
 			} else {
 				outputPrependedTagging(sentence, modelSentence, justTokenize, line);				
@@ -298,6 +307,35 @@ public class RunTagger {
 		
 		outputStream.println(sb.toString());
 	}
+	
+	public void outputPrependedUncertainTagging(Sentence lSent, ModelSentence mSent, String inputLine) {
+		int T = lSent.T();
+		String[] tokens = new String[T];
+		for (int t=0; t < T; t++) {
+			tokens[t] = lSent.tokens.get(t);
+		}
+		List<Map<String,Double>> taggings = 
+				tagger.model.inferPosteriorForUnknownLabelsWithThresholding(
+						mSent, uncertainOutputRelativeThreshold);
+		StringBuilder sb = new StringBuilder();
+		sb.append(StringUtils.join(tokens));
+		sb.append("\t");
+		sb.append(toJson(taggings).toString());
+		sb.append("\t");
+		sb.append(inputLine);
+		outputStream.println(sb.toString());
+	}
+	
+	ObjectMapper mapper = new ObjectMapper();
+
+	public JsonNode toJson(final Object data) {
+        try {
+            return mapper.valueToTree(data);
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 
 	///////////////////////////////////////////////////////////////////
@@ -354,6 +392,10 @@ public class RunTagger {
 				tagger.showConfidence = false;
 				i += 1;
 			}	
+			else if (args[i].equals("--uncertain-output")) {
+				tagger.uncertainOutput = true;
+				i += 1;
+			}
 			else {
 				System.out.println("bad option " + args[i]);
 				usage();                
