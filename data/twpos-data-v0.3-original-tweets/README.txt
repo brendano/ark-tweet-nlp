@@ -1,4 +1,4 @@
-Brendan O'Connor 2017-07-18
+Brendan O'Connor 2017-07-24
 Retrieving the original tweets for the ARK Twitter POS annotated data 
 (which are used in Tweebank too, I believe)
 
@@ -9,4 +9,8 @@ There is one json.tsv file for each of the two "supertsv" files
 
 In the .json.tsv files, each line has three fields:
 
-tweetid \t datestamp \t full tweet in JSON format
+tweetid \t timestamp \t full tweet in JSON format
+
+---
+Internal note: data collected from 
+hobbes:~brenocon/twipos/get_orig_tweets_for_ark_pos_data
