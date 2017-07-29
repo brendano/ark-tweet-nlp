@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import cmu.arktweetnlp.Twokenize;
+import cmu.arktweetnlp.impl.DefaultPatternContext;
 import cmu.arktweetnlp.impl.features.FeatureExtractor.FeatureExtractorInterface;
 import cmu.arktweetnlp.impl.features.FeatureExtractor.PositionFeaturePairs;
 import cmu.arktweetnlp.util.BasicFileIO;
@@ -15,7 +16,7 @@ import cmu.arktweetnlp.util.BasicFileIO;
 public class WordListFeatures {
 
 	public static class POSTagDict implements FeatureExtractorInterface {
-		Pattern URL = Pattern.compile(Twokenize.url);
+		Pattern URL = Pattern.compile(DefaultPatternContext.url);
 		Pattern letter = Pattern.compile("[A-Za-z]{3,}");
 		public void addFeatures(List<String> tokens, PositionFeaturePairs pairs) {
 			for (int t=0; t < tokens.size(); t++) {
