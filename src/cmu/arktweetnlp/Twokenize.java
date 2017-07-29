@@ -232,7 +232,28 @@ public class Twokenize {
             // The spans of the "bads" should not be split.
             if (matches.start() != matches.end()){ //unnecessary?
                 List<String> bad = new ArrayList<String>(1);
-                bad.add(splitPunctText.substring(matches.start(),matches.end()));
+                String substr = splitPunctText.substring(matches.start(),matches.end());
+                if (substr.toLowerCase().startsWith("t_")) {
+                    // check if it is RT
+                    int start = matches.start();
+                    if (start >= 1 && Character.toUpperCase(
+                          splitPunctText.charAt(start-1)) == 'R') {
+                        String first = splitPunctText.substring(start-1, start+1);
+                        bad.add(first);
+                        bads.add(bad);
+                        badSpans.add(new Pair<Integer, Integer>(start-1, start+1));
+                        List<String> punct_bad = new ArrayList<String>(1);
+                        int end = start + 1;
+                        while (splitPunctText.charAt(end) == '_')
+                          end ++;
+                        String second = splitPunctText.substring(start+1, end);
+                        punct_bad.add(second);
+                        bads.add(punct_bad);
+                        badSpans.add(new Pair<Integer, Integer>(start+1, end));
+                        continue;
+                    }
+                }
+                bad.add(substr);
                 bads.add(bad);
                 badSpans.add(new Pair<Integer, Integer>(matches.start(),matches.end()));
             }
