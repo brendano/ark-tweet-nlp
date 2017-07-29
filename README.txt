@@ -1,3 +1,16 @@
+For this branch only:
+
+If you are on a Windows machine, you should use the CMUTweetTaggerWindows.py file to run the tagger.
+
+It might not work on Mac or Linux, but will work on Windows.
+
+Please contact Kevin Zhao(kevinzhao53@gmail.com) if you encounter any trouble with the Windows wrapper.
+
+You can find the Python wrapper for Mac/Linux OS at https://github.com/ianozsvald/ark-tweet-nlp-python.  It's a pretty awesome
+program.
+
+For all branches:
+
 CMU ARK Twitter Part-of-Speech Tagger v0.3.2
 http://www.ark.cs.cmu.edu/TweetNLP/
 
