@@ -123,7 +123,7 @@
         </repository>
         <repository>
             <id>twitter</id>
-            <url>http://maven.twttr.com/</url>
+            <url>https://maven.twttr.com/</url>
         </repository>
     </repositories>
     <dependencies>
